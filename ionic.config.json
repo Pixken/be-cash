@@ -1,0 +1,7 @@
+{
+  "name": "be-cash",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
