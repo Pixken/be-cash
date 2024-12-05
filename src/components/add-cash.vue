@@ -51,7 +51,22 @@ defineExpose({
         <main>
           <swiper @slide-change="onSlideChange" @swiper="setControlledSwiper" ref="swiperRef" >
             <swiper-slide v-for="i in cashCategories">
-              <div class="slider">{{ i }}</div>
+              <div class="slider">
+                <ul>
+                  <li v-for="item in 5">
+                    <span class="icon" :style="{backgroundColor:i.color}">
+                      <svg-icon :icon="'mdi:bus'" size="2em" />
+                    </span>
+                    <span class="text">{{ 'test' }}</span>
+                  </li>
+                  <li>
+                    <span class="icon add">
+                      <svg-icon :icon="'mdi:plus'" size="2em" color="#ffcb3d" />
+                    </span>
+                    <span class="text">添加</span>
+                  </li>
+                </ul>
+              </div>
             </swiper-slide>
           </swiper>
         </main>
@@ -133,6 +148,32 @@ defineExpose({
   main {
     .slider {
       height: 16.5em;
+      ul {
+        list-style: none;
+        display: grid;
+        gap: 5px;
+        grid-template-columns: repeat(5, 1fr);
+        li {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          .icon {
+            margin: auto;
+            border-radius: 9999px;
+            width: 3em;
+            height: 3em;
+            color: #fff;
+            display: block;
+            position: relative;
+            i {
+              position: absolute;
+              top: calc(50% - 1em);
+              left: calc(50% - 1em);
+            }
+          }
+        }
+      }
     }
   }
 }
