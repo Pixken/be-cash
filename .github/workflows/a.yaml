@@ -1,38 +1,30 @@
-name: Build and Deploy Vue Project
+name: Build Ionic Project
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   build:
+    name: Build Ionic
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '20' # 请根据需要设置Node.js版本
+          node-version: '20'
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm install
 
-      - name: Build project
-        run: npm run build
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: vue-build
-          path: dist # 假设你的构建输出在dist目录下
-          if-no-files-found: error
+      - name: Build Ionic Project
+        run: ionic build --prod
 
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main'
