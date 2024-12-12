@@ -1,0 +1,1 @@
+System.register(["./index-legacy-C4e-cf1N.js"],(function(e,t){"use strict";var s,u,n,r,a,c,i;return{setters:[e=>{s=e.d,u=e.c,n=e.w,r=e.u,a=e.o,c=e.a,i=e.I}],execute:function(){e("default",s({__name:"shop",setup:e=>(e,t)=>(a(),u(r(i),null,{default:n((()=>t[0]||(t[0]=[c(" shop ")]))),_:1}))}))}}}));

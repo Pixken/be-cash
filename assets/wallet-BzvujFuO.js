@@ -1,0 +1,1 @@
+import{d as a,c as t,w as o,u as n,o as s,a as r,I as l}from"./index-CAqPomFy.js";const c=a({__name:"wallet",setup(u){return(p,e)=>(s(),t(n(l),null,{default:o(()=>e[0]||(e[0]=[r(" wallet ")])),_:1}))}});export{c as default};
