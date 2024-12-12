@@ -1,50 +1,46 @@
-name: Test and deploy
+name: Build and Deploy Vue Project
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
-    name: Build docs
     runs-on: ubuntu-latest
-    needs: test
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: Set up Node.js
         uses: actions/setup-node@v3
+        with:
+          node-version: '20' # 请根据需要设置Node.js版本
+          cache: 'pnpm'
 
       - name: Install pnpm
         run: npm install -g pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
-      - name: Build docs
-        run: npm run build
+      - name: Build project
+        run: pnpm run build
 
-      - name: Upload docs
+      - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: docs
-          path: ./dist
-
-  deploy:
-    name: Deploy to GitHub Pages
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Download docs
-        uses: actions/download-artifact@v3
-        with:
-          name: docs
+          name: vue-build
+          path: dist # 假设你的构建输出在dist目录下
+          if-no-files-found: error
 
       - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GH_TOKEN }}
-          publish_dir: .
+          publish_dir: dist # 假设你的构建输出在dist目录下
