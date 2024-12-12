@@ -1,5 +1,6 @@
 <script setup lang='ts'>
 import { useRoute, useRouter } from 'vue-router';
+import { IonModal, IonButton } from '@ionic/vue'
 
 defineProps<{
   toAdd: () => void
@@ -27,7 +28,7 @@ const handleClick = (path: string) => {
       <svg-icon icon="mdi:calendar-month-outline" v-else />
     </div>
     <div class="tab" @click="handleClick('/tabs/add-page')">
-      <svg-icon icon="mdi:plus-circle" v-if="activeTab === '/tabs/add-page'" color="#ffcb3d" @click="toAdd" size="2em" />
+      <svg-icon icon="mdi:plus-circle" v-if="activeTab === '/tabs/add-page'" color="#ffcb3d" size="2em" />
       <svg-icon icon="mdi:plus-circle-outline" v-else size="2em" />
     </div>
     <div class="tab" @click="handleClick('/tabs/shop')">
@@ -39,6 +40,10 @@ const handleClick = (path: string) => {
       <svg-icon icon="mdi:account-outline" v-else />
     </div>
   </div>
+  <ion-button id="open-modal" expand="block">Open</ion-button>
+  <ion-modal trigger="open-modal">
+    <add-cash />
+  </ion-modal>
 </template>
 
 <style scoped lang="scss">

@@ -3,9 +3,13 @@ import { IonPage } from '@ionic/vue'
 </script>
 
 <template>
-    <ion-page>
+    <ion-page class="add-page">
       add-page
     </ion-page>
 </template>
 
-<style scoped></style>
+<style scoped>
+.add-page {
+  background-color: #fff;
+}
+</style>
