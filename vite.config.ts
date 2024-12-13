@@ -6,6 +6,7 @@ import path from 'path'
 import { defineConfig } from 'vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
+import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -20,6 +21,7 @@ export default defineConfig({
       dirs: ['src/components'], // 自动导入的目录
       dts: 'src/components.d.ts', // 生成自动导入类型声明文件
     }),
+    VitePWA({ registerType: 'autoUpdate' }),
   ],
   resolve: {
     alias: {
@@ -29,5 +31,5 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom'
-  }
+  },
 })
