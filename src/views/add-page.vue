@@ -4,7 +4,7 @@ import { IonPage } from '@ionic/vue'
 
 <template>
     <ion-page class="add-page">
-      add-page
+      add-page123
     </ion-page>
 </template>
 
