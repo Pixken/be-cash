@@ -1,0 +1,1 @@
+System.register(["./index-legacy-BUWl7N9J.js"],(function(e,t){"use strict";var u,s,r,n,c,a,i;return{setters:[e=>{u=e.d,s=e.c,r=e.w,n=e.u,c=e.o,a=e.e,i=e.j}],execute:function(){e("default",u({__name:"user",setup:e=>(e,t)=>(c(),s(n(i),null,{default:r((()=>t[0]||(t[0]=[a(" user ")]))),_:1}))}))}}}));

@@ -1,1 +1,0 @@
-System.register(["./index-legacy-C4e-cf1N.js"],(function(e,t){"use strict";var u,l,a,n,s,r,c;return{setters:[e=>{u=e.d,l=e.c,a=e.w,n=e.u,s=e.o,r=e.a,c=e.I}],execute:function(){e("default",u({__name:"wallet",setup:e=>(e,t)=>(s(),l(n(c),null,{default:a((()=>t[0]||(t[0]=[r(" wallet ")]))),_:1}))}))}}}));

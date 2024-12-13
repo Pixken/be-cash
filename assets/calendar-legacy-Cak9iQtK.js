@@ -1,1 +1,0 @@
-System.register(["./index-legacy-C4e-cf1N.js"],(function(e,t){"use strict";var a,n,u,r,c,s,l;return{setters:[e=>{a=e.d,n=e.c,u=e.w,r=e.u,c=e.o,s=e.a,l=e.I}],execute:function(){e("default",a({__name:"calendar",setup:e=>(e,t)=>(c(),n(r(l),null,{default:u((()=>t[0]||(t[0]=[s(" calendar ")]))),_:1}))}))}}}));

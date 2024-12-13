@@ -1,0 +1,1 @@
+System.register(["./index-legacy-BUWl7N9J.js"],(function(e,t){"use strict";var s,u,n,r,c,a,i;return{setters:[e=>{s=e.d,u=e.c,n=e.w,r=e.u,c=e.o,a=e.e,i=e.j}],execute:function(){e("default",s({__name:"shop",setup:e=>(e,t)=>(c(),u(r(i),null,{default:n((()=>t[0]||(t[0]=[a(" shop ")]))),_:1}))}))}}}));

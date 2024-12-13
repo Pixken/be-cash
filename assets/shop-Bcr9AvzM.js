@@ -1,0 +1,1 @@
+import{d as o,c as t,w as a,u as s,o as n,e as r,j as p}from"./index-n3IDillO.js";const f=o({__name:"shop",setup(u){return(_,e)=>(n(),t(s(p),null,{default:a(()=>e[0]||(e[0]=[r(" shop ")])),_:1}))}});export{f as default};

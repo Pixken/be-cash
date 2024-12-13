@@ -1,1 +1,0 @@
-import{d as a,c as o,w as t,u as s,o as n,a as r,I as p}from"./index-CAqPomFy.js";const f=a({__name:"shop",setup(u){return(_,e)=>(n(),o(s(p),null,{default:t(()=>e[0]||(e[0]=[r(" shop ")])),_:1}))}});export{f as default};
