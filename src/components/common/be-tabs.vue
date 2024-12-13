@@ -20,27 +20,21 @@ const handleClick = (path: string) => {
 <template>
   <div class="be-tabs">
     <div class="tab" @click="handleClick('/tabs/wallet')">
-      <svg-icon icon="mdi:wallet-bifold" v-if="activeTab === '/tabs/wallet'" color="#ffcb3d" />
-      <svg-icon icon="mdi:wallet-bifold-outline" v-else />
+      <svg-icon icon="mdi:wallet-bifold" :color="activeTab === '/tabs/wallet' ? '#ffcb3d' : ''" />
     </div>
     <div class="tab" @click="handleClick('/tabs/calendar')">
-      <svg-icon icon="mdi:calendar-month" v-if="activeTab === '/tabs/calendar'" color="#ffcb3d" />
-      <svg-icon icon="mdi:calendar-month-outline" v-else />
+      <svg-icon icon="mdi:calendar-month" :color="activeTab === '/tabs/calendar' ? '#ffcb3d' : ''" />
     </div>
     <div class="tab" @click="handleClick('/tabs/add-page')">
-      <svg-icon icon="mdi:plus-circle" v-if="activeTab === '/tabs/add-page'" color="#ffcb3d" size="2em" />
-      <svg-icon icon="mdi:plus-circle-outline" v-else size="2em" />
+      <svg-icon icon="mdi:plus-circle" :color="activeTab === '/tabs/add-page' ? '#ffcb3d' : ''" size="2em" />
     </div>
     <div class="tab" @click="handleClick('/tabs/shop')">
-      <svg-icon icon="mdi:shopping" v-if="activeTab === '/tabs/shop'" color="#ffcb3d" />
-      <svg-icon icon="mdi:shopping-outline" v-else />
+      <svg-icon icon="mdi:shopping" :color="activeTab === '/tabs/shop' ? '#ffcb3d' : ''" />
     </div>
     <div class="tab" @click="handleClick('/tabs/user')">
-      <svg-icon icon="mdi:account" v-if="activeTab === '/tabs/user'" color="#ffcb3d" />
-      <svg-icon icon="mdi:account-outline" v-else />
+      <svg-icon icon="mdi:account" :color="activeTab === '/tabs/user' ? '#ffcb3d' : ''" />
     </div>
   </div>
-  <ion-button id="open-modal" expand="block">Open</ion-button>
   <ion-modal trigger="open-modal">
     <add-cash />
   </ion-modal>

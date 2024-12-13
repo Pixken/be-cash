@@ -7,7 +7,7 @@ const props = defineProps<{
 }>()
 const style = computed(() => {
   return {
-    color: props.color ? props.color : '#270170',
+    color: props.color ? props.color : '#333',
     transition: 'all 0.3s',
   }
 })
