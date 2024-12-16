@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { IonHeader, IonToolbar, IonTitle } from '@ionic/vue'
+import { IonHeader, IonToolbar, IonTitle, IonButtons } from '@ionic/vue'
 
 
 </script>
@@ -7,9 +7,15 @@ import { IonHeader, IonToolbar, IonTitle } from '@ionic/vue'
 <template>
   <ion-header class="ion-no-border">
     <ion-toolbar>
+      <ion-buttons slot="start">
+        <slot name="start"></slot>
+      </ion-buttons> 
       <ion-title class="header">
         <slot />
       </ion-title>
+      <ion-buttons slot="end">
+        <slot name="end"></slot>
+      </ion-buttons>
     </ion-toolbar>
   </ion-header>
 </template>

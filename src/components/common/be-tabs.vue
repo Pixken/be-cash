@@ -35,9 +35,6 @@ const handleClick = (path: string) => {
       <svg-icon icon="mdi:account" :color="activeTab === '/tabs/user' ? '#ffcb3d' : ''" />
     </div>
   </div>
-  <ion-modal trigger="open-modal">
-    <add-cash />
-  </ion-modal>
 </template>
 
 <style scoped lang="scss">
