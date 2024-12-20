@@ -1,6 +1,17 @@
 <script setup lang='ts'>
 import { IonPage, IonContent, IonFab, IonFabButton, IonModal, IonButton } from '@ionic/vue'
+import { onBeforeRouteLeave } from 'vue-router';
 
+onBeforeRouteLeave((to, from, next) => {
+  // 在这里执行逻辑，例如确认用户是否要离开当前页面
+  // 可以通过 next() 继续导航或 next(false) 取消导航
+  if (isOpen.value) {
+    isOpen.value = false
+    next(false)
+  } else {
+    next()
+  }
+});
 interface Msg {
   isFrom: boolean
   content: string
@@ -19,14 +30,14 @@ const msglist = ref<Msg[]>([
     avatar: ''
   },
 ])
-const modal = ref();
-const input = ref();
+const isOpen = ref(false);
 
-const cancel = () => modal.value.$el.dismiss(null, 'cancel');
+const cancel = () => {
+  isOpen.value = false;
+}
 
 const confirm = () => {
-  const name = input.value.$el.value;
-  modal.value.$el.dismiss(name, 'confirm');
+  isOpen.value = false;
 };
 </script>
 
@@ -43,12 +54,12 @@ const confirm = () => {
         </ul>
       </div>
       <ion-fab class="fab" slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button color="#ffcb3d" id="open-modal">
+        <ion-fab-button color="#ffcb3d" @click="isOpen = true"> 
           <svg-icon icon="material-symbols:add-2-rounded" style="margin-top: 0.2em;" color="#000"></svg-icon>
         </ion-fab-button>
       </ion-fab>
     </ion-content>
-    <ion-modal ref="modal" trigger="open-modal">
+    <ion-modal :is-open="isOpen">
       <be-header >
         <template #start><ion-button @click="cancel()">返回</ion-button></template>
         添加账单
