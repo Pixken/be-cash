@@ -110,6 +110,28 @@ const cashCategories = {
     }
   ]
 }
+
+const checkedCategory = ref('')
+const handleChecked = (category: any) => {
+  checkedCategory.value = category.name
+}
+
+const showKeyboard = ref(false)
+const keyboard = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', '删除', '清空', '完成']
+const keyboardVal = ref('')
+
+const handleInputKeyboardVal = (key: string) => {
+  if (key === '完成') {
+    showKeyboard.value = false
+    // todo 提交数据 keyboardVal
+    return
+  }
+  if (key === '删除') {
+    keyboardVal.value = keyboardVal.value.slice(0, -1)
+  } else {
+    keyboardVal.value += key
+  }
+}
 </script>
 
 <template>
@@ -121,11 +143,12 @@ const cashCategories = {
         <div class="item" @click="handleChange(1)">收入</div>
         <div class="underline" :style="{ left: `${activeIndex * 3}em` }"></div>
       </header>
-      <swiper :initial-slide="activeIndex" @slideChange="handleChange($event.activeIndex)">
+      <main>
+        <swiper :initial-slide="activeIndex" @slideChange="handleChange($event.activeIndex)">
         <swiper-slide>
           <div class="content">
             <!-- 支出内容 -->
-            <div v-for="category in cashCategories.expense" :key="category.id" class="category">
+            <div v-for="category in cashCategories.expense" :key="category.id" class="category" @click="handleChecked(category)">
               {{ category.name }}
             </div>
           </div>
@@ -133,13 +156,22 @@ const cashCategories = {
         <swiper-slide>
           <div class="content">
             <!-- 收入内容 -->
-            <div v-for="category in cashCategories.income" :key="category.id" class="category">
+            <div v-for="category in cashCategories.income" :key="category.id" class="category" @click="handleChecked(category)">
               {{ category.name }}
             </div>
           </div>
         </swiper-slide>
       </swiper>
-      
+      </main>
+      <footer :class="{ show: showKeyboard }">
+        <div class="ipt" @click="showKeyboard = true">
+          <div>{{ checkedCategory }}</div>
+          <div>{{ keyboardVal }}</div>
+        </div>
+        <div class="keyboard">
+          <div class="num" v-for="key in keyboard" :key="key" @click="handleInputKeyboardVal(key)">{{ key }}</div>
+        </div>
+      </footer>
     </div>
   </ion-content>
 </template>
@@ -162,7 +194,7 @@ const cashCategories = {
     height: 100%;
     overflow-y: auto;
     .category {
-      width: 30%;
+      width: calc(30% - 1px);
       padding: 1em;
       border-radius: 1em;
       background-color: #fff;
@@ -192,6 +224,32 @@ header {
     height: 2em;
     text-align: center;
     line-height: 2em;
+  }
+}
+
+footer {
+  position: absolute;
+  bottom: -9em;
+  left: 0;
+  width: 100%;
+
+  &.show {
+    bottom: 0;
+  }
+
+  .keyboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    margin-top: 1em;
+    .num {
+      height: 3em;
+      text-align: center;
+      line-height: 3em;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+    }
   }
 }
 </style>
