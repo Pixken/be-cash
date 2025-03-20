@@ -34,9 +34,25 @@ import '@ionic/vue/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { Drivers, Storage } from '@ionic/storage';
+
+StatusBar.setStyle({ style: Style.Light });
+StatusBar.setBackgroundColor({ color: '#fff' });
+
 const app = createApp(App)
-  .use(IonicVue)
-  .use(router);
+
+// 配置存储
+const storage = new Storage({
+  name: '__mydb',
+  driverOrder: [Drivers.IndexedDB, Drivers.LocalStorage]
+});
+await storage.create();
+app.provide('storage', storage); // 提供给全局使用
+
+
+app.use(IonicVue)
+app.use(router)
 
 router.isReady().then(() => {
   app.mount('#app');
