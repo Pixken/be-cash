@@ -21,23 +21,23 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: '',
-        redirect: '/tabs/wallet'
+        redirect: '/tabs/home'
       },
       {
-        path: 'wallet',
-        component: () => import('@/views/wallet.vue')
+        path: 'home',
+        component: () => import('@/views/home.vue')
       },
       {
-        path: 'calendar',
-        component: () => import('@/views/calendar.vue')
+        path: 'chart',
+        component: () => import('@/views/chart.vue')
       },
       {
         path: 'add-page',
         component: () => import('@/views/add-page.vue')
       },
       {
-        path: 'shop',
-        component: () => import('@/views/shop.vue')
+        path: 'account',
+        component: () => import('@/views/account.vue')
       },
       {
         path: 'user',

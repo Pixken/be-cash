@@ -3,6 +3,6 @@ import { IonPage } from '@ionic/vue';
 </script>
 <template>
   <ion-page>
-    <h1>我的页面</h1>
+    <h1>账户页面</h1>
   </ion-page>
 </template>

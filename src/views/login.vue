@@ -17,7 +17,8 @@ const { errors, handleSubmit, defineField } = useForm({
 // Creates a submission handler
 // It validate all fields and doesn't call your function unless all fields are valid
 const onSubmit = handleSubmit(values => {
-  alert(JSON.stringify(values, null, 2));
+  // alert(JSON.stringify(values, null, 2));
+  router.replace('/tabs/home');
 });
 
 const [username, usernameAttrs] = defineField('username');
