@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { IonPage, IonContent, IonIcon } from '@ionic/vue'
+import { IonPage, IonContent, IonIcon, IonHeader, IonToolbar, IonTitle } from '@ionic/vue'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'; // 引入中文语言包
 import { add, notifications, pieChart, swapHorizontalOutline, wallet } from 'ionicons/icons';
@@ -39,7 +39,7 @@ const option = ref<EChartsOption>({
     data: ['餐饮', '交通', '购物', '其他'],
     itemWidth: 20,
     itemHeight: 20,
-    itemGap: 40,
+    itemGap: 30,
   },
   series: [
     {

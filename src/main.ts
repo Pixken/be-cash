@@ -37,8 +37,9 @@ import './theme/variables.css';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Drivers, Storage } from '@ionic/storage';
 
+StatusBar.setOverlaysWebView({ overlay: false });
+StatusBar.setBackgroundColor({ color: '#ffffff' });
 StatusBar.setStyle({ style: Style.Light });
-StatusBar.setBackgroundColor({ color: '#fff' });
 
 const app = createApp(App)
 

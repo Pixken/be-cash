@@ -26,33 +26,33 @@ const [code, codeAttrs] = defineField('code');
 <template>
   <ion-page class="h-full flex flex-col items-center bg-white">
     <be-header title="注册账号" show-back />
-      <ion-content class="w-full flex flex-col items-center justify-center">
-        <div class="w-full flex flex-col items-center justify-center p-6">
+    <ion-content class="w-full flex flex-col items-center justify-center">
+      <div class="w-full flex flex-col items-center justify-center p-6">
         <p class="text-gray-500 text-left w-full">创建一个账户，开始管理您的财务</p>
-        <form @submit="onSubmit" class="flex flex-col gap-2 mt-10 w-full">
+        <form @submit="onSubmit" class="flex flex-col gap-2 mt-4 w-full">
           <label for="username" class="text-gray-500">手机号</label>
           <input type="text" id="username" v-model="username" v-bind="usernameAttrs"
-            class="w-full block h-12 p-2 rounded-md border border-gray-300" :class="{ 'border-red-500': errors.username }"
-            placeholder="请输入手机号" />
+            class="w-full block h-12 p-2 rounded-md border border-gray-300"
+            :class="{ 'border-red-500': errors.username }" placeholder="请输入手机号" />
           <span class="text-red-500 block h-4">{{ errors.username }}</span>
 
           <label for="password" class="text-gray-500">设置密码</label>
           <input type="password" id="password" v-model="password" v-bind="passwordAttrs"
-            class="w-full block h-12 p-2 rounded-md border border-gray-300" :class="{ 'border-red-500': errors.password }"
-            placeholder="请输入密码" />
+            class="w-full block h-12 p-2 rounded-md border border-gray-300"
+            :class="{ 'border-red-500': errors.password }" placeholder="请输入密码" />
           <span class="text-red-500 block h-4">{{ errors.password }}</span>
 
           <label for="confirmPassword" class="text-gray-500">确认密码</label>
           <input type="password" id="confirmPassword" v-model="confirmPassword" v-bind="confirmPasswordAttrs"
-            class="w-full block h-12 p-2 rounded-md border border-gray-300" :class="{ 'border-red-500': errors.confirmPassword }"
-            placeholder="请输入密码" />
+            class="w-full block h-12 p-2 rounded-md border border-gray-300"
+            :class="{ 'border-red-500': errors.confirmPassword }" placeholder="请输入密码" />
           <span class="text-red-500 block h-4">{{ errors.confirmPassword }}</span>
 
           <label for="code" class="text-gray-500">验证码</label>
           <div class="flex items-center gap-2">
             <input type="text" id="code" v-model="code" v-bind="codeAttrs"
-            class="w-full block h-12 p-2 rounded-md border border-gray-300" :class="{ 'border-red-500': errors.code }"
-            placeholder="请输入验证码" />
+              class="w-full block h-12 p-2 rounded-md border border-gray-300" :class="{ 'border-red-500': errors.code }"
+              placeholder="请输入验证码" />
             <img src="" alt="验证码" class="w-48 h-12 rounded-md">
           </div>
           <span class="text-red-500 block h-4">{{ errors.code }}</span>
