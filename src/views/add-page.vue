@@ -67,7 +67,7 @@ const categories = ref([
 </script>
 <template>
   <ion-page>
-    <be-header title="记账" show-back />
+    <be-header title="记账" />
     <ion-content>
       <div class="p-4">
         <div class="flex items-center justify-between bg-gray-100 rounded-md h-16 relative">
