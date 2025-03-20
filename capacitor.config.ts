@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
-  appName: 'be-cash',
+  appName: '鸟蛋记账',
   webDir: 'dist'
 };
 
