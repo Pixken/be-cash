@@ -26,6 +26,8 @@ const [password, passwordAttrs] = defineField('password');
 
 // 在组件挂载后检查是否有保存的用户信息
 onMounted(async () => {
+  username.value = '13556381021';
+  password.value = '123456';
   if (storage) {
     const savedUser = await storage.get('user');
     if (savedUser && savedUser.username) {
