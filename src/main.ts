@@ -47,7 +47,9 @@ const storage = new Storage({
   name: '__mydb',
   driverOrder: [Drivers.IndexedDB, Drivers.LocalStorage]
 });
-await storage.create();
+(async () => {
+  await storage.create();
+})();
 app.provide('storage', storage); // 提供给全局使用
 
 
