@@ -14,7 +14,7 @@ const logout = () => {
     <ion-content>
       <div class="p-4">
         <div class="flex items-center p-4 border border-gray-200 rounded-2xl">
-          <img src="@/assets/logo.webp" alt="" class="w-16 h-16 rounded-full">
+          <img src="@/assets/zxd.png" alt="" class="w-16 h-16 rounded-full">
           <div class="flex flex-col h-14 justify-between ml-4">
             <span class="text-lg font-bold">小蛋</span>
             <span class="text-gray-500">13800138000</span>
