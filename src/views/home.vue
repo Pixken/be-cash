@@ -28,10 +28,7 @@ const date = dayjs().format('YYYY年MM月DD日 dddd')
 
 const option = ref<EChartsOption>({
   color: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444'],
-  tooltip: {
-    trigger: 'item',
-    formatter: '{a} <br/>{b} : {c} ({d}%)',
-  },
+  tooltip: {},
   legend: {
     orient: 'horizontal',
     bottom: '1%',

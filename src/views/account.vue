@@ -99,7 +99,7 @@ const creditCards = ref([
                 <div class="h-12 flex flex-col justify-between">
                   <p class="text-base font-bold">{{ item.name }}</p>
                   <p class="text-sm text-[#7a818a]" v-if="item.type !== 'card'">上次更新：{{ item.updatedAt }}</p>
-                  <p class="text-sm text-[#7a818a]" v-else>储蓄卡 (****{{ item.cardNumber?.slice(8, 12) }})</p>
+                  <p class="text-sm text-[#7a818a]" v-else>信用卡 (****{{ item.cardNumber?.slice(8, 12) }})</p>
                 </div>
               </div>
               <p class="text-lg font-bold">¥{{ item.amount }} </p>
