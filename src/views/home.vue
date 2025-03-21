@@ -13,6 +13,10 @@ import {
 } from 'echarts/components';
 import VChart, { THEME_KEY } from 'vue-echarts';
 import type { EChartsOption } from 'echarts';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
 use([
   CanvasRenderer,
   PieChart,
@@ -97,7 +101,7 @@ const transactions = ref([
             <h1 class="text-2xl font-bold mb-2">你好，小蛋</h1>
             <p class="text-sm text-gray-500">{{ date }}</p>
           </div>
-          <div>
+          <div class="cursor-pointer" @click="router.push('/notifications')">
             <ion-icon :icon="notifications" class="text-gray-500 text-3xl"></ion-icon>
           </div>
         </div>
