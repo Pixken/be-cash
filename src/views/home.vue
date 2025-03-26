@@ -14,7 +14,7 @@ import {
 import VChart, { THEME_KEY } from 'vue-echarts';
 import type { EChartsOption } from 'echarts';
 import { useRouter } from 'vue-router';
-
+import AI from '@/components/AI.vue';
 const router = useRouter();
 
 use([
@@ -94,6 +94,7 @@ const transactions = ref([
 
 <template>
   <ion-page>
+    <AI />
     <ion-content>
       <div class="p-4">
         <div class="flex items-center justify-between">

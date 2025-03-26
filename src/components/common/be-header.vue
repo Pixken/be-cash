@@ -1,6 +1,6 @@
 <script setup lang='ts'>
-import { IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue'
-import { chevronBackOutline } from 'ionicons/icons'
+import { IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonButton, IonIcon } from '@ionic/vue'
+import { chevronBackOutline, closeOutline } from 'ionicons/icons'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -8,6 +8,7 @@ const router = useRouter()
 defineProps<{
   title?: string
   showBack?: boolean
+  close?: () => void
 }>()
 </script>
 
@@ -26,6 +27,8 @@ defineProps<{
 
     <div>
       <slot name="end"></slot>
+      <ion-icon :icon="closeOutline" v-if="close" class="text-gray-500 absolute top-1/2 -translate-y-1/2 right-4"
+        @click="close" />
     </div>
   </ion-header>
 </template>

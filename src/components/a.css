@@ -1,0 +1,20 @@
+.chat-container {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+
+.chat-container::-webkit-scrollbar {
+  display: none;
+}
+
+p {
+  margin: 0 !important;
+}
+
+.ant-avatar, .ant-btn, .ant-prompts-icon, .ant-prompts-item {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+

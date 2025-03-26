@@ -2,6 +2,7 @@
 
 import legacy from '@vitejs/plugin-legacy'
 import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 import path from 'path'
 import { defineConfig } from 'vite'
 import AutoImport from 'unplugin-auto-import/vite'
@@ -13,6 +14,7 @@ export default defineConfig({
   plugins: [
     vue(),
     legacy(),
+    vueJsx(),
     AutoImport({
       imports: ['vue'], // 自动导入vue模块中的API
       dts: 'src/auto-imports.d.ts', // 生成自动导入的类型声明文件
