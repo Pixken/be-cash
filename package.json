@@ -32,6 +32,7 @@
     "mitt": "^3.0.1",
     "pinia": "^3.0.1",
     "swiper": "^11.1.15",
+    "timeago.js": "^4.0.2",
     "vee-validate": "^4.15.0",
     "vue": "^3.3.0",
     "vue-echarts": "^7.0.3",

@@ -1,5 +1,7 @@
 import { get, post } from "@/utils/request"
-import storage from "@/utils/storage"
+import useUserStore from "@/store/user"
+
+const userStore = useUserStore()
 
 const userApi = {
   login: (data: any) => {
@@ -10,7 +12,7 @@ const userApi = {
   },
   refreshToken: () => {
     return post('/auth/refresh', {
-      refreshToken: storage.local.get('refresh_token')
+      refreshToken: userStore.refresh_token
     })
   },
   userInfo: () => {

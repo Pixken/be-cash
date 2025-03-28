@@ -1,25 +1,26 @@
 import { defineStore } from 'pinia'
-import storage from '@/utils/storage'
 
 const useUserStore = defineStore('user', () => {
-  const access_token = ref('')
-  const refresh_token = ref('')
+  const access_token = ref(localStorage.getItem('access_token') || '')
+  const refresh_token = ref(localStorage.getItem('refresh_token') || '')
+  const user = ref(JSON.parse(localStorage.getItem('user') || '{}'))
 
   const setToken = (access_token: string, refresh_token: string) => { 
-    storage.local.set('access_token', access_token)
-    storage.local.set('refresh_token', refresh_token)
+    localStorage.setItem('access_token', access_token)
+    localStorage.setItem('refresh_token', refresh_token)
   }
 
-  const getToken = () => {
-    access_token.value = storage.local.get('access_token') as string
-    refresh_token.value = storage.local.get('refresh_token') as string
+  const setUser = (user: any) => {
+    console.log(121212);
+    localStorage.setItem('user', JSON.stringify(user))
   }
 
   return {
     access_token,
     refresh_token,
     setToken,
-    getToken,
+    user,
+    setUser,
   }
 })
 export default useUserStore

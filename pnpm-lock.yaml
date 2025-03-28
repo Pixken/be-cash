@@ -68,6 +68,9 @@ importers:
       swiper:
         specifier: ^11.1.15
         version: 11.1.15
+      timeago.js:
+        specifier: ^4.0.2
+        version: 4.0.2
       vee-validate:
         specifier: ^4.15.0
         version: 4.15.0(vue@3.5.13(typescript@5.7.2))
@@ -3791,6 +3794,9 @@ packages:
 
   through@2.3.8:
     resolution: {integrity: sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==}
+
+  timeago.js@4.0.2:
+    resolution: {integrity: sha512-a7wPxPdVlQL7lqvitHGGRsofhdwtkoSXPGATFuSOA2i1ZNQEPLrGnj68vOp2sOJTCFAQVXPeNMX/GctBaO9L2w==}
 
   tiny-case@1.0.3:
     resolution: {integrity: sha512-Eet/eeMhkO6TX8mnUteS9zgPbUMQa4I6Kkp5ORiBD5476/m+PIRiumP5tmh5ioJpH7k51Kehawy2UDfsnxxY8Q==}
@@ -8949,6 +8955,8 @@ snapshots:
       readable-stream: 3.6.2
 
   through@2.3.8: {}
+
+  timeago.js@4.0.2: {}
 
   tiny-case@1.0.3: {}
 
