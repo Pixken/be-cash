@@ -36,6 +36,7 @@ import './theme/variables.css';
 
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Drivers, Storage } from '@ionic/storage';
+import { createPinia } from 'pinia';
 
 StatusBar.setOverlaysWebView({ overlay: false });
 StatusBar.setBackgroundColor({ color: '#ffffff' });
@@ -53,7 +54,7 @@ const storage = new Storage({
 })();
 app.provide('storage', storage); // 提供给全局使用
 
-
+app.use(createPinia())
 app.use(IonicVue)
 app.use(router)
 

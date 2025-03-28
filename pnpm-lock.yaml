@@ -44,6 +44,9 @@ importers:
       ant-design-x-vue:
         specifier: ^1.0.6
         version: 1.0.6(ant-design-vue@4.2.6(vue@3.5.13(typescript@5.7.2)))(vue@3.5.13(typescript@5.7.2))
+      axios:
+        specifier: ^1.8.4
+        version: 1.8.4
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13
@@ -56,6 +59,12 @@ importers:
       markdown-it:
         specifier: ^14.1.0
         version: 14.1.0
+      mitt:
+        specifier: ^3.0.1
+        version: 3.0.1
+      pinia:
+        specifier: ^3.0.1
+        version: 3.0.1(typescript@5.7.2)(vue@3.5.13(typescript@5.7.2))
       swiper:
         specifier: ^11.1.15
         version: 11.1.15
@@ -1721,6 +1730,9 @@ packages:
   aws4@1.13.2:
     resolution: {integrity: sha512-lHe62zvbTB5eEABUVi/AwVh0ZKY9rMMDhmm+eeyuuUQbQ3+J+fONVQOZyj+DdrvD4BY33uYniyRJ4UJIaSKAfw==}
 
+  axios@1.8.4:
+    resolution: {integrity: sha512-eBSYY4Y68NNlHbHBMdeDmKNtDgXWhQsJcGqzO3iLUM0GraQFSS9cVgPX5I9b3lbdFKyYoAEGAZF1DwhTaljNAw==}
+
   babel-plugin-polyfill-corejs2@0.4.12:
     resolution: {integrity: sha512-CPWT6BwvhrTO2d8QVorhTCQw9Y43zOu7G9HigcfxvepOU6b8o3tcWad6oVgZIsZCTt42FFv97aA7ZJsbM4+8og==}
     peerDependencies:
@@ -2327,6 +2339,15 @@ packages:
 
   flatted@3.3.2:
     resolution: {integrity: sha512-AiwGJM8YcNOaobumgtng+6NHuOqC3A7MixFeDafM3X9cIUM+xUXoS5Vfgf+OihAYe20fxqNM9yPBXJzRtZ/4eA==}
+
+  follow-redirects@1.15.9:
+    resolution: {integrity: sha512-gew4GsXizNgdoRyqmyfMHyAmXsZDk6mHkSxZFCzW9gwlbtOW44CDtYavM+y+72qD/Vq2l550kMF52DT8fOLJqQ==}
+    engines: {node: '>=4.0'}
+    peerDependencies:
+      debug: '*'
+    peerDependenciesMeta:
+      debug:
+        optional: true
 
   for-each@0.3.3:
     resolution: {integrity: sha512-jqYfLp7mo9vIyQf8ykW2v7A+2N4QjeCeI5+Dz9XraiO1ign81wjiH7Fb9vSOWvQfNtmSa4H2RoQTrrXivdUZmw==}
@@ -3260,6 +3281,15 @@ packages:
     resolution: {integrity: sha512-udgsAY+fTnvv7kI7aaxbqwWNb0AHiB0qBO89PZKPkoTmGOgdbrHDKD+0B2X4uTfJ/FT1R09r9gTsjUjNJotuog==}
     engines: {node: '>=0.10.0'}
 
+  pinia@3.0.1:
+    resolution: {integrity: sha512-WXglsDzztOTH6IfcJ99ltYZin2mY8XZCXujkYWVIJlBjqsP6ST7zw+Aarh63E1cDVYeyUcPCxPHzJpEOmzB6Wg==}
+    peerDependencies:
+      typescript: '>=4.4.4'
+      vue: ^2.7.0 || ^3.5.11
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   pirates@4.0.6:
     resolution: {integrity: sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==}
     engines: {node: '>= 6'}
@@ -3348,6 +3378,9 @@ packages:
 
   proxy-from-env@1.0.0:
     resolution: {integrity: sha512-F2JHgJQ1iqwnHDcQjVBsq3n/uoaFL+iPW/eAeL7kVxy/2RrWaN4WroKjjvbsoRtv0ftelNyC01bjRhn/bhcf4A==}
+
+  proxy-from-env@1.1.0:
+    resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
 
   psl@1.15.0:
     resolution: {integrity: sha512-JZd3gMVBAVQkSs6HdNZo9Sdo0LNcQeMNP3CozBJb3JYC/QUYZTnKxP+f8oWRX4rHP5EurWxqAHTSwUCjlNKa1w==}
@@ -6684,6 +6717,14 @@ snapshots:
 
   aws4@1.13.2: {}
 
+  axios@1.8.4:
+    dependencies:
+      follow-redirects: 1.15.9
+      form-data: 4.0.1
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+
   babel-plugin-polyfill-corejs2@0.4.12(@babel/core@7.26.0):
     dependencies:
       '@babel/compat-data': 7.26.2
@@ -7445,6 +7486,8 @@ snapshots:
       rimraf: 3.0.2
 
   flatted@3.3.2: {}
+
+  follow-redirects@1.15.9: {}
 
   for-each@0.3.3:
     dependencies:
@@ -8333,6 +8376,13 @@ snapshots:
 
   pify@2.3.0: {}
 
+  pinia@3.0.1(typescript@5.7.2)(vue@3.5.13(typescript@5.7.2)):
+    dependencies:
+      '@vue/devtools-api': 7.7.2
+      vue: 3.5.13(typescript@5.7.2)
+    optionalDependencies:
+      typescript: 5.7.2
+
   pirates@4.0.6: {}
 
   pkg-types@1.2.1:
@@ -8410,6 +8460,8 @@ snapshots:
   proto-list@1.2.4: {}
 
   proxy-from-env@1.0.0: {}
+
+  proxy-from-env@1.1.0: {}
 
   psl@1.15.0:
     dependencies:

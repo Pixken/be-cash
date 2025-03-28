@@ -94,7 +94,7 @@ const transactions = ref([
 
 <template>
   <ion-page>
-    <AI />
+    <AI v-if="false" />
     <ion-content>
       <div class="p-4">
         <div class="flex items-center justify-between">

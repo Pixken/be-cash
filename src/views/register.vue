@@ -2,9 +2,10 @@
 import { IonContent, IonPage } from '@ionic/vue'
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
+import userApi from '@/api/user';
 const { errors, handleSubmit, defineField } = useForm({
   validationSchema: yup.object({
-    username: yup.string().matches(/^1[3-9]\d{9}$/, '请输入正确的手机号').required('请输入手机号'),
+    email: yup.string().email('请输入正确的邮箱').required('请输入邮箱'),
     password: yup.string().min(6, '密码长度至少为6位').required('请输入密码'),
     confirmPassword: yup.string().min(6, '密码长度至少为6位').oneOf([yup.ref('password')], '密码不一致').required('请确认密码'),
     code: yup.string().required('请输入验证码'),
@@ -14,10 +15,14 @@ const { errors, handleSubmit, defineField } = useForm({
 // Creates a submission handler
 // It validate all fields and doesn't call your function unless all fields are valid
 const onSubmit = handleSubmit(values => {
-  alert(JSON.stringify(values, null, 2));
+  userApi.register(values).then(res => {
+    console.log(res)
+  }).catch(err => {
+    console.log(err)
+  })
 });
 
-const [username, usernameAttrs] = defineField('username');
+const [email, emailAttrs] = defineField('email');
 const [password, passwordAttrs] = defineField('password');
 const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
 const [code, codeAttrs] = defineField('code');
@@ -30,11 +35,11 @@ const [code, codeAttrs] = defineField('code');
       <div class="w-full flex flex-col items-center justify-center p-6">
         <p class="text-gray-500 text-left w-full">创建一个账户，开始管理您的财务</p>
         <form @submit="onSubmit" class="flex flex-col gap-2 mt-4 w-full">
-          <label for="username" class="text-gray-500">手机号</label>
-          <input type="text" id="username" v-model="username" v-bind="usernameAttrs"
+          <label for="email" class="text-gray-500">邮箱</label>
+          <input type="text" id="email" v-model="email" v-bind="emailAttrs"
             class="w-full block h-12 p-2 rounded-md border border-gray-300"
-            :class="{ 'border-red-500': errors.username }" placeholder="请输入手机号" />
-          <span class="text-red-500 block h-4">{{ errors.username }}</span>
+            :class="{ 'border-red-500': errors.email }" placeholder="请输入邮箱" />
+          <span class="text-red-500 block h-4">{{ errors.email }}</span>
 
           <label for="password" class="text-gray-500">设置密码</label>
           <input type="password" id="password" v-model="password" v-bind="passwordAttrs"

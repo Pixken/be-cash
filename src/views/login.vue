@@ -9,7 +9,7 @@ const router = useRouter();
 
 const { errors, handleSubmit, defineField } = useForm({
   validationSchema: yup.object({
-    username: yup.string().required('请输入用户名/手机号'),
+    email: yup.string().email('请输入正确的邮箱').required('请输入邮箱'),
     password: yup.string().min(6, '密码长度至少为6位').required('请输入密码'),
   }),
 });
@@ -21,17 +21,17 @@ const onSubmit = handleSubmit(values => {
   router.replace('/tabs/home');
 });
 
-const [username, usernameAttrs] = defineField('username');
+const [email, emailAttrs] = defineField('email');
 const [password, passwordAttrs] = defineField('password');
 
 // 在组件挂载后检查是否有保存的用户信息
 onMounted(async () => {
-  username.value = '13556381021';
+  email.value = 'zxdbf@163.com';
   password.value = '123456';
   if (storage) {
     const savedUser = await storage.get('user');
-    if (savedUser && savedUser.username) {
-      username.value = savedUser.username;
+    if (savedUser && savedUser.email) {
+      email.value = savedUser.email;
       if (savedUser.password) {
         password.value = savedUser.password;
         remember.value = true;
@@ -46,7 +46,7 @@ console.log(storage);
 watch(remember, (val) => {
   if (val) {
     storage?.set('user', {
-      username: username.value,
+      email: email.value,
       password: password.value,
     });
   } else {
@@ -67,11 +67,11 @@ watch(remember, (val) => {
           <p class="text-gray-500">登录您的账户继续使用</p>
         </div>
         <form @submit="onSubmit" class="flex flex-col gap-2 mt-10 w-full">
-          <label for="username" class="text-gray-500">用户名/手机号</label>
-          <input type="text" id="username" v-model="username" v-bind="usernameAttrs"
-            class="w-full block h-12 p-2 rounded-md border border-gray-300" :class="{ 'border-red-500': errors.username }"
-            placeholder="请输入用户名/手机号" />
-          <span class="text-red-500 block h-4">{{ errors.username }}</span>
+          <label for="email" class="text-gray-500">邮箱</label>
+          <input type="text" id="email" v-model="email" v-bind="emailAttrs"
+            class="w-full block h-12 p-2 rounded-md border border-gray-300" :class="{ 'border-red-500': errors.email }"
+            placeholder="请输入邮箱" />
+          <span class="text-red-500 block h-4">{{ errors.email }}</span>
 
           <label for="password" class="text-gray-500">密码</label>
           <input type="password" id="password" v-model="password" v-bind="passwordAttrs"
