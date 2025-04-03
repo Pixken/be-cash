@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router';
 import userApi from '@/api/user';
 import emitter from '@/utils/emitter';
 import useUserStore from '@/store/user';
+import { storage } from '@/utils/storage';
 const router = useRouter();
 const userStore = useUserStore();
 const { errors, handleSubmit, defineField } = useForm({
@@ -15,24 +16,18 @@ const { errors, handleSubmit, defineField } = useForm({
   }),
 });
 
-const getUserInfo = async () => {
-  userApi.userInfo().then(async res => {
-    await userStore.setUser(res.data);
-    router.replace('/tabs/home');
-  }).catch(err => {
-    emitter.emit('message', err.response.data.message);
-  })
-}
-
 // Creates a submission handler
 // It validate all fields and doesn't call your function unless all fields are valid
 const onSubmit = handleSubmit(values => {
   // alert(JSON.stringify(values, null, 2));
   userApi.login(values).then(async res => {
-    userStore.setToken(res.data.access_token, res.data.refresh_token);
-    await getUserInfo();
+    await userStore.setToken(res.data.access_token, res.data.refresh_token);
+    const user = await userApi.userInfo()
+    await userStore.setUser(user.data);
+    router.replace('/tabs/home');
+    emitter.emit('message', { msg: '登录成功', type: 'success' });
   }).catch(err => {
-    emitter.emit('message', err.response.data.message);
+    emitter.emit('message', { msg: err.response.data.message, type: 'error' });
   })
 });
 
@@ -41,16 +36,16 @@ const [password, passwordAttrs] = defineField('password');
 
 // 在组件挂载后检查是否有保存的用户信息
 onMounted(async () => {
-  email.value = '2959615052@qq.com';
+  email.value = '3110801700@qq.com';
   password.value = '111111';
 });
 
 const remember = ref(false);
 watch(remember, (val) => {
   if (val) {
-    localStorage.setItem('user', JSON.stringify({ email: email.value, password: password.value }));
+    storage.setItem('user', { email: email.value, password: password.value });
   } else {
-    localStorage.removeItem('user');
+    storage.removeItem('user');
   }
 });
 </script>

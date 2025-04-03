@@ -7,7 +7,9 @@ import BeHeader from './common/be-header.vue';
 import { Typography } from 'ant-design-vue';
 import './a.css';
 import markdownit from 'markdown-it';
+import useUserStore from '@/store/user';
 
+const userStore = useUserStore();
 interface Message {
   type: 'user' | 'ai';
   content: string;
@@ -72,41 +74,41 @@ export default defineComponent({
     const isDone = ref(true);
     async function chat(message?: string) {
       isDone.value = false;
-      const response = await fetch('http://117.72.49.27/api/ai/chat', {
+      const response = await fetch('http://localhost:3000/api/ai/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           message: message || userInput.value,
-          userId: '1',
+          userId: userStore.user?.id || '',
           time: new Date().toISOString(),
         }),
       });
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      while (true) {
-        const { value, done } = await reader?.read();
-        if (done) break;
-
-        const text = decoder.decode(value);
-        const lines = text.split('\n');
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const content = line.slice(6);
-            if (content === '[DONE]') {
-              isDone.value = true;
-              break;
-            }
-            // 逐字显示内容
-            messages.value[messages.value.length - 1].content += content.replace(/\\n/g, '\n');
-            aaa.value += content.replace(/\\n/g, '\n');
-            // 或者更新到 UI
-          }
-        }
+      if (!response.body) {
+        throw new Error('No response body');
       }
+    
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+    
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) {
+          isDone.value = true;
+          break;
+        }
+    
+        const chunk = decoder.decode(value, { stream: true });
+        messages.value[messages.value.length - 1].content += JSON.parse(chunk.split('data: ')[1]).choices[0].delta.content;
+      }
+      
+      // const eventSource = new EventSource('http://localhost:3000/api/ai/chat');
+      // eventSource.onmessage = (event) => {
+      //   const data = JSON.parse(event.data);
+      //   console.log('收到流数据:', data);
+      // };
     }
 
     const closeDialog = () => {

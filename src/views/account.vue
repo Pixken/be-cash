@@ -16,7 +16,7 @@ const creditCards = computed(() => {
 
 const getAccounts = async () => {
   try {
-    const res = await getAccount(userStore.user.id);
+    const res = await getAccount(userStore.user?.id || '');
     accounts.value = res.data;
   } catch (error) {
     console.log(error);
@@ -38,31 +38,31 @@ const dismiss = () => {
 const accounts_select = ref([
   {
     label: '现金',
-    value: 'cash',
+    value: '现金',
     icon: 'mingcute:cash-fill',
     color: '#10b981',
   },
   {
     label: '支付宝',
-    value: 'alipay',
+    value: '支付宝',
     icon: 'tdesign:logo-alipay',
     color: '#3b82f6',
   },
   {
     label: '微信',
-    value: 'wechat',
+    value: '微信',
     icon: 'ic:twotone-wechat',
     color: '#22c55e',
   },
   {
     label: '储蓄卡',
-    value: 'debit-card',
+    value: '储蓄卡',
     icon: 'streamline:credit-card-1-solid',
     color: '#f59e0b',
   },
   {
     label: '信用卡',
-    value: 'credit-card',
+    value: '信用卡',
     icon: 'streamline:credit-card-1-solid',
     color: '#f59e0b',
   },
@@ -78,11 +78,11 @@ const formRef = ref();
 
 const handleSubmit = () => {
   formRef.value.validate().then(async () => {
-    const { id } = userStore.user;
+    const { id } = userStore.user || {};
     let cardType;
-    if (form.value.name === 'credit-card') {
+    if (form.value.name === '信用卡') {
       cardType = 'credit';
-    } else if (form.value.name === 'debit-card') {
+    } else if (form.value.name === '储蓄卡') {
       cardType = 'debit';
     }
     const res = await createAccount({

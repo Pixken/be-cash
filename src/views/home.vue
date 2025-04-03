@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { IonPage, IonContent, IonIcon, IonHeader, IonToolbar, IonTitle } from '@ionic/vue'
+import { IonPage, IonContent, IonIcon, IonHeader, IonToolbar, IonTitle, onIonViewDidEnter } from '@ionic/vue'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'; // 引入中文语言包
 import { add, notifications, pieChart, swapHorizontalOutline, wallet } from 'ionicons/icons';
@@ -15,7 +15,11 @@ import VChart, { THEME_KEY } from 'vue-echarts';
 import type { EChartsOption } from 'echarts';
 import { useRouter } from 'vue-router';
 import AI from '@/components/AI.vue';
+import { getMonthCash } from '@/api/cash';
+import useUserStore from '@/store/user';
+import { format } from 'timeago.js';
 const router = useRouter();
+const userStore = useUserStore();
 
 use([
   CanvasRenderer,
@@ -30,14 +34,24 @@ provide(THEME_KEY, 'light');
 dayjs.locale('zh-cn'); // 设置为中文
 const date = dayjs().format('YYYY年MM月DD日 dddd')
 
-const option = ref<EChartsOption>({
+interface Cash {
+  id: string;
+  description: string;
+  price: number;
+  date: string;
+  type: string;
+}
+
+const monthCash = ref<Cash[]>([]);
+
+const option = computed(() => ({
   color: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444'],
   tooltip: {},
   legend: {
     orient: 'horizontal',
     bottom: '1%',
     left: 'center',
-    data: ['餐饮', '交通', '购物', '其他'],
+    data: monthCash.value.map((item: any) => item.category.name),
     itemWidth: 20,
     itemHeight: 20,
     itemGap: 30,
@@ -47,12 +61,10 @@ const option = ref<EChartsOption>({
       type: 'pie',
       radius: ['45%', '80%'],
       center: ['50%', '45%'],
-      data: [
-        { value: 335, name: '餐饮' },
-        { value: 310, name: '交通' },
-        { value: 234, name: '购物' },
-        { value: 135, name: '其他' },
-      ],
+      data: monthCash.value.map((item: any) => ({
+        value: item.price,
+        name: item.category.name,
+      })),
       labelLine: {
         show: false
       },
@@ -68,33 +80,33 @@ const option = ref<EChartsOption>({
       },
     },
   ],
+}));
+
+const transactions = computed(() => {
+  return monthCash.value.sort((a: any, b: any) => dayjs(b.date).diff(dayjs(a.date))).slice(0, 5);
+});
+const income = computed(() => {
+  return monthCash.value.filter((item: any) => item.type === 'income').reduce((acc: number, curr: any) => acc + curr.price, 0);
+});
+const expense = computed(() => {
+  return monthCash.value.filter((item: any) => item.type === 'expense').reduce((acc: number, curr: any) => acc + curr.price, 0);
+});
+const balance = computed(() => {
+  return income.value - expense.value;
 });
 
-const transactions = ref([
-  {
-    icon: 'material-symbols:fork-spoon-rounded',
-    name: '午餐',
-    amount: -38,
-    time: '今天 12:30',
-    type: '餐饮',
-    color: '#4f46e5',
-    id: 1,
-  },
-  {
-    icon: 'hugeicons:money-03',
-    name: '工资',
-    amount: 10000,
-    time: '今天 12:30',
-    type: '收入',
-    color: '#10b981',
-    id: 2,
-  },
-])
+const getBalance = async () => {
+  const res = await getMonthCash(userStore.user?.id || '', [dayjs().startOf('month').format('YYYY-MM-DD'), dayjs().endOf('month').format('YYYY-MM-DD')]);
+  monthCash.value = res.data;
+}
+onIonViewDidEnter(() => {
+  getBalance();
+})
 </script>
 
 <template>
   <ion-page>
-    <AI v-if="false" />
+    <AI v-if="true" />
     <ion-content>
       <div class="p-4">
         <div class="flex items-center justify-between">
@@ -110,16 +122,16 @@ const transactions = ref([
           class="w-full h-48 rounded-2xl text-white mt-4 p-4 flex flex-col justify-between">
           <div>
             <h2 class="text-lg mb-1">本月结余</h2>
-            <p class="text-4xl font-bold">¥ 3,245.60</p>
+            <p class="text-4xl font-bold">¥ {{ balance }}</p>
           </div>
           <div class="flex items-center justify-between">
             <div>
               <p class="text-lg mb-1">收入</p>
-              <p class="text-xl font-bold">¥ 8,560.00</p>
+              <p class="text-xl font-bold">¥ {{ income }}</p>
             </div>
             <div>
               <p class="text-lg mb-1">支出</p>
-              <p class="text-xl font-bold">¥ 5,314.40</p>
+              <p class="text-xl font-bold">¥ {{ expense }}</p>
             </div>
           </div>
         </div>
@@ -165,17 +177,18 @@ const transactions = ref([
             <li class="flex items-center justify-between py-4 border-b border-[#E5E7EB]" v-for="item in transactions"
               :key="item.id">
               <div class="flex items-center gap-2">
-                <div class="flex items-center justify-center w-12 h-12 rounded-full" :style="{ backgroundColor: item.color }">
+                <div class="flex items-center justify-center w-12 h-12 rounded-full"
+                  :style="{ backgroundColor: item.color }">
                   <svg-icon :icon="item.icon" color="#ffffff"></svg-icon>
                 </div>
                 <div class="h-12 flex flex-col justify-between">
-                  <p class="text-base font-bold">{{ item.name }}</p>
-                  <p class="text-sm text-[#7a818a]">{{ item.time }} · {{ item.type }}</p>
+                  <p class="text-base font-bold">{{ item.description }}</p>
+                  <p class="text-sm text-[#7a818a]">{{ format(item.date, 'zh_CN') }} · {{ item.type === 'expense' ? '支出' : '收入' }}</p>
                 </div>
               </div>
               <p class="text-base font-bold"
-                :class="{ 'text-[#ef4444]': item.amount < 0, 'text-[#10b981]': item.amount > 0 }">
-                {{ item.amount < 0 ? '-¥' : '+¥' }}{{ Math.abs(item.amount) }} </p>
+                :class="{ 'text-[#ef4444]': item.type === 'expense', 'text-[#10b981]': item.type === 'income' }">
+                {{ item.type === 'expense' ? '-¥' : '+¥' }}{{ Math.abs(item.price) }} </p>
             </li>
           </ul>
         </div>

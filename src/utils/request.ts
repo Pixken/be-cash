@@ -2,7 +2,7 @@ import axios from 'axios'
 import type { AxiosInstance, AxiosResponse } from 'axios'
 import useUserStore from '@/store/user'
 import userApi from '@/api/user'
-
+import { storage } from '@/utils/storage'
 const userStore = useUserStore()
 
 export interface ApiResponse<T> {
@@ -29,7 +29,8 @@ request.interceptors.response.use((response: AxiosResponse) => {
 }, async (error: any) => {
   if (error.response.status === 401) {
     try {
-      if (!localStorage.getItem('refresh_token')) {
+      const refresh_token = storage.getItem('refresh_token')
+      if (!refresh_token) {
         window.location.href = '/login?redirect=' + window.location.pathname
         return
       }
