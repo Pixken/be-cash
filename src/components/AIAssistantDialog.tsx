@@ -74,7 +74,7 @@ export default defineComponent({
     const isDone = ref(true);
     async function chat(message?: string) {
       isDone.value = false;
-      const response = await fetch('http://localhost:3000/api/ai/chat', {
+      const response = await fetch('http://117.72.49.27:11434/api/ai/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
