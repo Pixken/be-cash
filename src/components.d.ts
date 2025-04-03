@@ -7,11 +7,9 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AddCash: typeof import('./components/add-cash.vue')['default']
     AI: typeof import('./components/AI.vue')['default']
     AIAssistantDialog: typeof import('./components/AIAssistantDialog.vue')['default']
     BeHeader: typeof import('./components/common/be-header.vue')['default']
-    BeTabs: typeof import('./components/common/be-tabs.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SvgIcon: typeof import('./components/common/svg-icon.vue')['default']
