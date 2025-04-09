@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IonPage, IonContent, IonModal } from '@ionic/vue';
+import { IonPage, IonContent, IonModal, onIonViewDidEnter } from '@ionic/vue';
 import { ref } from 'vue';
 import { Form, FormItem, Select, Input, InputNumber, Button } from 'ant-design-vue';
 import useUserStore from '@/store/user';
@@ -97,11 +97,17 @@ const handleSubmit = () => {
     console.log('error');
   });
 };
+
+const content = ref();
+
+onIonViewDidEnter(() => {
+  content.value?.$el.scrollToTop(0);
+});
 </script>
 <template>
   <ion-page>
     <be-header title="账户" />
-    <ion-content>
+    <ion-content ref="content">
       <div class="p-4">
         <div style="background: linear-gradient(135deg, #4f46e5 0%, #818cf8 100%);"
           class="w-full h-32 rounded-2xl text-white p-4 flex flex-col">

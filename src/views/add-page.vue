@@ -76,9 +76,12 @@ const getCashCategorys = async () => {
   }
 }
 
+const content = ref();
+
 onIonViewDidEnter(() => {
   getCashCategorys();
-})
+  content.value?.$el.scrollToTop(0);
+});
 
 const amountInput = ref();
 
@@ -97,7 +100,7 @@ const handleSelectCategory = (item: any) => {
 <template>
   <ion-page>
     <be-header title="记账" />
-    <ion-content>
+    <ion-content ref="content">
       <div class="p-4">
         <div class="flex items-center justify-between bg-gray-100 rounded-md h-16 relative">
           <p class="text-center w-1/2 z-10 transition-all duration-300"

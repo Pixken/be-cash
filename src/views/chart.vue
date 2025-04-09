@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IonPage, IonContent } from '@ionic/vue';
+import { IonPage, IonContent, onIonViewDidEnter } from '@ionic/vue';
 import svgIcon from '@/components/common/svg-icon.vue';
 import dayjs from 'dayjs';
 import { use } from 'echarts/core'
@@ -109,11 +109,18 @@ const chartOptions2 = computed<EChartsOption>(() => {
     ],
   }
 });
+
+const content = ref();
+
+onIonViewDidEnter(() => {
+  content.value?.$el.scrollToTop(0);
+});
+
 </script>
 <template>
   <ion-page>
     <be-header title="报表" />
-    <ion-content>
+    <ion-content ref="content">
       <div class="p-4">
         <div class="flex items-center justify-between">
           <button class="w-10 h-10 flex items-center justify-center" @click="date = dayjs(date).subtract(1, 'month')">

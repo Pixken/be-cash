@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { IonContent, IonPage } from '@ionic/vue'
+import { IonContent, IonPage, onIonViewDidEnter } from '@ionic/vue'
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 import { useRouter } from 'vue-router';
@@ -53,11 +53,17 @@ watch(remember, (val) => {
     storage.removeItem('user');
   }
 });
+
+const content = ref();
+
+onIonViewDidEnter(() => {
+  content.value?.$el.scrollToTop(0);
+});
 </script>
 
 <template>
   <ion-page>
-    <ion-content class="ion-padding">
+    <ion-content ref="content" class="ion-padding">
       <!-- 背景渐变和装饰元素 -->
       <div class="absolute top-0 left-0 w-full h-64 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-b-[40px] z-0"></div>
       <div class="absolute top-10 right-10 w-24 h-24 bg-white opacity-10 rounded-full"></div>

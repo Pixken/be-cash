@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IonPage, IonContent, IonToggle } from '@ionic/vue';
+import { IonPage, IonContent, IonToggle, onIonViewDidEnter } from '@ionic/vue';
 import { useRouter } from 'vue-router';
 import userApi from '@/api/user';
 import emitter from '@/utils/emitter';
@@ -15,10 +15,16 @@ const logout = () => {
     isLoading.value = false;
   }, 1000);
 };
+
+const content = ref();
+
+onIonViewDidEnter(() => {
+  content.value?.$el.scrollToTop(0);
+});
 </script>
 <template>
   <ion-page>
-    <ion-content class="ion-padding">
+    <ion-content ref="content" class="ion-padding">
       <!-- 背景渐变和装饰元素 -->
       <div class="absolute top-0 left-0 w-full h-64 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-b-[40px] z-0"></div>
       <div class="absolute top-10 right-10 w-24 h-24 bg-white opacity-10 rounded-full"></div>
