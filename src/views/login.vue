@@ -7,6 +7,10 @@ import userApi from '@/api/user';
 import emitter from '@/utils/emitter';
 import useUserStore from '@/store/user';
 import { storage } from '@/utils/storage';
+import { get } from '@/utils/request';
+import axios from 'axios';
+import { checkApiConnection, getNetworkType, getDeviceInfo } from '@/utils/network';
+
 const router = useRouter();
 const userStore = useUserStore();
 const { errors, handleSubmit, defineField } = useForm({
@@ -27,7 +31,8 @@ const onSubmit = handleSubmit(values => {
     router.replace('/tabs/home');
     emitter.emit('message', { msg: '登录成功', type: 'success' });
   }).catch(err => {
-    emitter.emit('message', { msg: err.response.data.message, type: 'error' });
+    alert(JSON.stringify(err, null, 2))
+    emitter.emit('message', { msg: err, type: 'error' });
   })
 });
 
@@ -36,7 +41,7 @@ const [password, passwordAttrs] = defineField('password');
 
 // 在组件挂载后检查是否有保存的用户信息
 onMounted(async () => {
-  email.value = '3110801700@qq.com';
+  email.value = 'zxd@163.com';
   password.value = '111111';
 });
 
