@@ -41,8 +41,8 @@ const [password, passwordAttrs] = defineField('password');
 
 // 在组件挂载后检查是否有保存的用户信息
 onMounted(async () => {
-  email.value = 'zxd@163.com';
-  password.value = '111111';
+  email.value = import.meta.env.VITE_ENV === 'local' ? '3110801700@qq.com' : 'zxd@163.com';
+  password.value = import.meta.env.VITE_ENV === 'local' ? '111111' : '111111';
 });
 
 const remember = ref(false);
