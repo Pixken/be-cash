@@ -71,15 +71,10 @@ request.interceptors.response.use((response: AxiosResponse) => {
     // 网络错误
     const errorMessage = `网络错误: ${error.message}。API地址: ${import.meta.env.VITE_BASE_URL}`;
     console.error(`❌ ${errorMessage}`, error);
-    
-    // 显示更有帮助的信息
-    alert(`无法连接到API服务器 (${import.meta.env.VITE_BASE_URL})。\n\n错误: ${error.message}\n\n可能原因:\n1. 服务器未运行\n2. 网络连接问题\n3. CORS策略限制`);
-    
     return Promise.reject(errorMessage);
   }
   
   console.error(`❌ 请求错误 (${error.response.status}): ${error.config.url}`, error.response.data);
-  alert(JSON.stringify(error.response.data || error.message, null, 2));
   
   if (error.response.status === 401) {
     try {
