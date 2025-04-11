@@ -74,7 +74,7 @@ export default defineComponent({
     const isDone = ref(true);
     async function chat(message?: string) {
       isDone.value = false;
-      const response = await fetch('http://117.72.49.27:11434/api/ai/chat', {
+      const response = await fetch('http://117.72.49.27:11434/api/ai/chat-v2', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,14 +101,24 @@ export default defineComponent({
         }
     
         const chunk = decoder.decode(value, { stream: true });
-        messages.value[messages.value.length - 1].content += JSON.parse(chunk.split('data: ')[1]).choices[0].delta.content;
+        console.log(chunk);
+        
+        // 处理可能包含多行数据的chunk
+        const lines = chunk.split('\n');
+        for (const line of lines) {
+          if (line.trim().startsWith('data: ')) {
+            try {
+              const jsonText = line.substring(line.indexOf('{'));
+              const data = JSON.parse(jsonText);
+              if (data.choices && data.choices[0].delta && data.choices[0].delta.content) {
+                messages.value[messages.value.length - 1].content += data.choices[0].delta.content;
+              }
+            } catch (e) {
+              console.error('解析响应数据失败:', line, e);
+            }
+          }
+        }
       }
-      
-      // const eventSource = new EventSource('http://localhost:3000/api/ai/chat');
-      // eventSource.onmessage = (event) => {
-      //   const data = JSON.parse(event.data);
-      //   console.log('收到流数据:', data);
-      // };
     }
 
     const closeDialog = () => {
@@ -136,7 +146,7 @@ export default defineComponent({
     };
 
     const rolesAsFunction = (bubbleData: BubbleProps, index: number) => {
-      const RenderIndex: BubbleProps['messageRender'] = (content) => (
+      const RenderIndex: BubbleProps['messageRender'] = (content: string) => (
         <Typography>
           <div v-html={md.render(content)} />
         </Typography>
@@ -160,7 +170,7 @@ export default defineComponent({
             placement: 'start',
             avatar: { icon: <UserOutlined />, style: { visibility: 'hidden' } },
             variant: 'borderless',
-            messageRender: (items) => <Prompts vertical items={items as any} onItemClick={(i) => sendMessage(i.data.description)} />,
+            messageRender: (items: any) => <Prompts vertical items={items as any} onItemClick={(i: any) => sendMessage(i.data.description)} />,
           };
         case 'user':
           return {
@@ -205,7 +215,7 @@ export default defineComponent({
               readOnly={!isDone.value}
               allowSpeech
               value={userInput.value}
-              onUpdate:value={(val) => userInput.value = val}
+              onUpdate:value={(val: string) => userInput.value = val}
               onSubmit={() => {
                 sendMessage();
               }}

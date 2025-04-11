@@ -291,13 +291,9 @@ onIonViewDidEnter(() => {
           </div>
         </div>
       </div>
-      
-      <!-- 添加账单按钮 -->
-      <!-- <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-        <ion-fab-button @click="router.push('/bill/add')" class="bg-gradient-to-r from-indigo-500 to-purple-600">
-          <ion-icon :icon="add"></ion-icon>
-        </ion-fab-button>
-      </ion-fab> -->
+
+      <!-- AI助手按钮 -->
+      <AI />
     </ion-content>
   </ion-page>
 </template>
