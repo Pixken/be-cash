@@ -6,7 +6,7 @@
       class="custom-toast"
       :is-open="isOpen"
       :message="message"
-      :duration="3000"
+      :duration="1000"
       @didDismiss="isOpen = false"
     ></ion-toast>
     <ion-router-outlet></ion-router-outlet>
