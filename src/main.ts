@@ -38,8 +38,9 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { Drivers, Storage } from '@ionic/storage';
 import { createPinia } from 'pinia';
 
-StatusBar.setOverlaysWebView({ overlay: false });
-StatusBar.setBackgroundColor({ color: '#ffffff' });
+// 设置状态栏为透明沉浸式
+StatusBar.setOverlaysWebView({ overlay: true });
+StatusBar.setBackgroundColor({ color: '#00000000' });
 StatusBar.setStyle({ style: Style.Light });
 
 const app = createApp(App)

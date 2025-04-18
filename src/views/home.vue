@@ -192,25 +192,25 @@ onIonViewDidEnter(() => {
         
         <!-- 快捷操作按钮 -->
         <div class="flex justify-between mb-6 p-4">
-          <div @click="router.push('/bill/add')" class="flex flex-col items-center cursor-pointer">
+          <div @click="router.push('/tabs/add-page')" class="flex flex-col items-center cursor-pointer">
             <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-2">
               <ion-icon :icon="add" class="text-indigo-500 text-2xl"></ion-icon>
             </div>
             <span class="text-sm text-gray-600">记一笔</span>
           </div>
-          <div @click="router.push('/transfer')" class="flex flex-col items-center cursor-pointer">
+          <div @click="router.push('/tabs/transfer')" class="flex flex-col items-center cursor-pointer">
             <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mb-2">
               <ion-icon :icon="swapHorizontalOutline" class="text-green-500 text-2xl"></ion-icon>
             </div>
             <span class="text-sm text-gray-600">转账</span>
           </div>
-          <div @click="router.push('/statistics')" class="flex flex-col items-center cursor-pointer">
+          <div @click="router.push('/tabs/chart')" class="flex flex-col items-center cursor-pointer">
             <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center mb-2">
               <ion-icon :icon="pieChart" class="text-yellow-500 text-2xl"></ion-icon>
             </div>
             <span class="text-sm text-gray-600">统计</span>
           </div>
-          <div @click="router.push('/account')" class="flex flex-col items-center cursor-pointer">
+          <div @click="router.push('/tabs/account')" class="flex flex-col items-center cursor-pointer">
             <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center mb-2">
               <ion-icon :icon="wallet" class="text-red-500 text-2xl"></ion-icon>
             </div>

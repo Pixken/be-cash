@@ -3,18 +3,54 @@ import { IonContent, IonPage, onIonViewDidEnter } from '@ionic/vue'
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 import { useRouter } from 'vue-router';
-import userApi from '@/api/user';
+import { login, userInfo, getCaptcha } from '@/api/user';
 import emitter from '@/utils/emitter';
 import useUserStore from '@/store/user';
 import { storage } from '@/utils/storage';
-
-const router = useRouter();
 const userStore = useUserStore();
+const router = useRouter();
+
+const checkLogin = () => {
+  if (userStore.user.id) {
+    router.replace('/tabs/home');
+  }
+}
+checkLogin();
+
 const { errors, handleSubmit, defineField } = useForm({
   validationSchema: yup.object({
-    email: yup.string().email('请输入正确的邮箱').required('请输入邮箱'),
-    password: yup.string().min(6, '密码长度至少为6位').required('请输入密码'),
+    username: yup.string().required('请输入用户名'),
+    password: yup.string().min(8, '密码长度至少为8位').required('请输入密码'),
+    code: yup.string().required('请输入验证码'),
   }),
+});
+
+// 验证码相关
+const captchaUrl = ref('');
+const captchaId = ref('');
+const formatCaptchaUrl = computed(() => {
+  // 判断 url 是不是 svg 格式
+  if (captchaUrl.value.includes('data:image/svg+xml;base64,')) {
+    return captchaUrl.value
+  }
+  return captchaUrl.value.replace('data:image/png;base64,', '');
+})
+
+const getCaptchaInfo = async () => {
+  const res = await getCaptcha();
+  console.log(res);
+  
+  captchaUrl.value = res.data.image;
+  captchaId.value = res.data.uuid;
+}
+
+// 在组件挂载后加载验证码
+onMounted(async () => {
+  await getCaptchaInfo();
+  
+  // 加载保存的用户信息
+  username.value = import.meta.env.VITE_ENV === 'local' ? 'test1' : 'lgb';
+  password.value = import.meta.env.VITE_ENV === 'local' ? 'Test123456' : '123LGBlgb';
 });
 
 // 登录状态
@@ -23,32 +59,31 @@ const isLoading = ref(false);
 // 表单提交处理
 const onSubmit = handleSubmit(values => {
   isLoading.value = true;
-  userApi.login(values).then(async res => {
-    await userStore.setToken(res.data.access_token, res.data.refresh_token);
-    const user = await userApi.userInfo()
-    await userStore.setUser(user.data);
-    router.replace('/tabs/home');
+  login({...values, uuid: captchaId.value}).then(async res => {
+    console.log(res);
+    // await userStore.setToken(res.data.access_token, res.data.refresh_token);
+    // const user = await userInfo()
+    await userStore.setUser(res.data);
     emitter.emit('message', { msg: '登录成功', type: 'success' });
-  }).catch(err => {
+    router.replace('/tabs/home');
+  }).catch(async err => {
+    // 登录失败时刷新验证码
+    await getCaptchaInfo();
+    console.log(err);
     emitter.emit('message', { msg: err, type: 'error' });
   }).finally(() => {
     isLoading.value = false;
   });
 });
 
-const [email, emailAttrs] = defineField('email');
+const [username, usernameAttrs] = defineField('username');
 const [password, passwordAttrs] = defineField('password');
-
-// 在组件挂载后检查是否有保存的用户信息
-onMounted(async () => {
-  email.value = import.meta.env.VITE_ENV === 'local' ? '3110801700@qq.com' : 'zxd@163.com';
-  password.value = import.meta.env.VITE_ENV === 'local' ? '111111' : '111111';
-});
+const [code, codeAttrs] = defineField('code');
 
 const remember = ref(false);
 watch(remember, (val) => {
   if (val) {
-    storage.setItem('user', { email: email.value, password: password.value });
+    storage.setItem('user', { username: username.value, password: password.value });
   } else {
     storage.removeItem('user');
   }
@@ -70,7 +105,7 @@ onIonViewDidEnter(() => {
       <div class="absolute top-40 left-10 w-16 h-16 bg-white opacity-10 rounded-full"></div>
       
       <!-- 登录表单区域 -->
-      <div class="relative z-10 h-full flex flex-col items-center justify-center">
+      <div class="relative z-10 h-full flex flex-col items-center justify-center mt-[32px]">
         <!-- Logo区域 - 带动画 -->
         <div class="animate-bounce-slow">
           <div class="bg-white p-4 rounded-2xl shadow-xl">
@@ -85,29 +120,28 @@ onIonViewDidEnter(() => {
         </div>
         
         <!-- 登录卡片 -->
-        <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 animate-slide-up">
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 md:p-8 animate-slide-up">
           <form @submit="onSubmit" class="flex flex-col">
             <!-- 邮箱输入框 -->
             <div class="form-group mb-4">
-              <label for="email" class="text-gray-600 text-sm font-medium block mb-2">邮箱</label>
+              <label for="email" class="text-gray-600 text-sm font-medium block mb-2">用户名</label>
               <div class="relative">
                 <div class="absolute left-3 top-3.5 text-gray-400">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                   </svg>
                 </div>
                 <input 
                   type="text" 
-                  id="email" 
-                  v-model="email" 
-                  v-bind="emailAttrs"
+                  id="username" 
+                  v-model="username" 
+                  v-bind="usernameAttrs"
                   class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all outline-none" 
-                  :class="{ 'border-red-500 bg-red-50': errors.email }"
-                  placeholder="请输入邮箱" 
+                  :class="{ 'border-red-500 bg-red-50': errors.username }"
+                  placeholder="请输入用户名" 
                 />
               </div>
-              <div class="text-red-500 text-xs h-5 mt-1">{{ errors.email }}</div>
+              <div class="text-red-500 text-xs h-5 mt-1">{{ errors.username }}</div>
             </div>
 
             <!-- 密码输入框 -->
@@ -130,6 +164,39 @@ onIonViewDidEnter(() => {
                 />
               </div>
               <div class="text-red-500 text-xs h-5 mt-1">{{ errors.password }}</div>
+            </div>
+
+            <!-- 验证码 -->
+            <div class="form-group mb-5">
+              <label for="code" class="text-gray-600 text-sm font-medium block mb-2">验证码</label>
+              <div class="flex gap-2">
+                <div class="relative flex-1">
+                  <div class="absolute left-3 top-3.5 text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <input 
+                    type="text" 
+                    id="code" 
+                    v-model="code" 
+                    v-bind="codeAttrs"
+                    class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all outline-none" 
+                    :class="{ 'border-red-500 bg-red-50': errors.code }"
+                    placeholder="请输入验证码" 
+                  />
+                </div>
+                <div class="w-32 h-12 bg-gray-100 rounded-xl border border-gray-200 flex items-center justify-center overflow-hidden">
+                  <img 
+                    :src="formatCaptchaUrl"
+                    alt="验证码" 
+                    class="w-full h-full object-cover cursor-pointer" 
+                    @click="getCaptchaInfo" 
+                  />
+                </div>
+              </div>
+              <div class="text-red-500 text-xs h-5 mt-1">{{ errors.code }}</div>
+              <div class="text-xs text-gray-500 mt-1">点击图片可刷新验证码</div>
             </div>
 
             <!-- 记住我和忘记密码 -->
@@ -155,19 +222,22 @@ onIonViewDidEnter(() => {
             <!-- 登录按钮 -->
             <button 
               type="submit" 
-              class="h-12 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center"
+              class="h-12 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center relative overflow-hidden"
               :disabled="isLoading"
             >
-              <svg v-if="isLoading" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span>{{ isLoading ? '登录中...' : '登录' }}</span>
+              <span class="relative z-10 flex items-center">
+                <svg v-if="isLoading" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>{{ isLoading ? '登录中...' : '登录' }}</span>
+              </span>
+              <div class="absolute top-0 left-0 w-full h-full bg-white opacity-0 hover:opacity-20 transition-opacity"></div>
             </button>
           </form>
 
           <!-- 注册链接 -->
-          <div class="flex items-center justify-center gap-2 mt-8">
+          <div class="flex items-center justify-center gap-2 mt-6">
             <p class="text-gray-600">还没有账号？</p>
             <span class="text-blue-500 font-medium hover:underline cursor-pointer" @click="router.push('/register')">立即注册</span>
           </div>
@@ -220,5 +290,15 @@ onIonViewDidEnter(() => {
 /* 聚焦效果 */
 input:focus {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* 适配沉浸式状态栏 */
+ion-content::part(scroll) {
+  padding-top: var(--ion-safe-area-top, 0);
+}
+
+/* 按钮发光效果 */
+button[type="submit"]:not(:disabled):hover {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
 }
 </style>

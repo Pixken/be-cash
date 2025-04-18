@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { IonPage, IonContent, IonToggle, onIonViewDidEnter } from '@ionic/vue';
 import { useRouter } from 'vue-router';
-import userApi from '@/api/user';
 import emitter from '@/utils/emitter';
+import useUserStore from '@/store/user';
 
+const userStore = useUserStore();
 const router = useRouter();
 const isLoading = ref(false);
 
 const logout = () => {
   isLoading.value = true;
+  userStore.logout();
   setTimeout(() => {
     emitter.emit('message', { msg: '退出成功', type: 'success' });
     router.push('/login');
@@ -31,7 +33,7 @@ onIonViewDidEnter(() => {
       <div class="absolute top-40 left-10 w-16 h-16 bg-white opacity-10 rounded-full"></div>
       
       <!-- 用户信息区域 -->
-      <div class="relative z-10 h-full flex flex-col items-center">
+      <div class="relative z-10 h-full flex flex-col items-center pt-[var(--ion-safe-area-top,20px)]">
         <!-- 返回按钮 -->
         <div class="self-start">
           <div @click="router.push('/')" class="flex items-center text-white cursor-pointer">
@@ -53,6 +55,69 @@ onIonViewDidEnter(() => {
         
         <!-- 用户信息卡片 -->
         <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-4 animate-slide-up">
+          <!-- 账号设置 -->
+          <div class="mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">账号设置</h2>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <span class="text-gray-800 font-medium">编辑用户名</span>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                  </div>
+                  <span class="text-gray-800 font-medium">修改邮箱</span>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <span class="text-gray-800 font-medium">修改密码</span>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <span class="text-gray-800 font-medium">更换头像</span>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          
           <!-- 通用设置 -->
           <div class="mb-8">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">通用设置</h2>
@@ -279,5 +344,17 @@ onIonViewDidEnter(() => {
 
 .animate-slide-up {
   animation: slide-up 0.5s ease-out forwards;
+}
+</style>
+
+<style>
+/* 适配沉浸式状态栏 */
+ion-content::part(scroll) {
+  padding-top: var(--ion-safe-area-top, 0);
+}
+
+/* 按钮发光效果 */
+button:not(:disabled):hover {
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
 }
 </style>

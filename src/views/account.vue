@@ -130,7 +130,7 @@ onIonViewDidEnter(() => {
                       <FormItem label="账户类型" name="name">
                         <Select v-model:value="form.name" :options="accounts_select"></Select>
                       </FormItem>
-                      <FormItem label="卡号" name="cardNumber" v-if="form.name === 'debit-card' || form.name === 'credit-card'">
+                      <FormItem label="卡号" name="cardNumber" v-if="form.name === '储蓄卡' || form.name === '信用卡'">
                         <Input v-model:value="form.cardNumber" />
                       </FormItem>
                       <FormItem label="账户金额" name="amount">

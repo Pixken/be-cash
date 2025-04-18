@@ -2,17 +2,17 @@
 import { IonContent, IonPage, onIonViewDidEnter } from '@ionic/vue'
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
-import userApi from '@/api/user';
+import { register } from '@/api/user';
 import { useRouter } from 'vue-router';
 import emitter from '@/utils/emitter';
 
 const router = useRouter();
 const { errors, handleSubmit, defineField } = useForm({
   validationSchema: yup.object({
+    username: yup.string().required('请输入用户名'),
     email: yup.string().email('请输入正确的邮箱').required('请输入邮箱'),
-    password: yup.string().min(6, '密码长度至少为6位').required('请输入密码'),
-    confirmPassword: yup.string().min(6, '密码长度至少为6位').oneOf([yup.ref('password')], '密码不一致').required('请确认密码'),
-    code: yup.string().required('请输入验证码'),
+    password: yup.string().min(8, '密码长度至少为8位').matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, '密码必须包含大小写字母和数字').required('请输入密码'),
+    confirmPassword: yup.string().oneOf([yup.ref('password')], '密码不一致').required('请确认密码'),
   }),
 });
 
@@ -23,7 +23,7 @@ const isLoading = ref(false);
 // It validate all fields and doesn't call your function unless all fields are valid
 const onSubmit = handleSubmit(values => {
   isLoading.value = true;
-  userApi.register(values).then(res => {
+  register({ username: values.username, email: values.email, password: values.password }).then(res => {
     emitter.emit('message', { msg: '注册成功，请登录', type: 'success' });
     router.push('/login');
   }).catch(err => {
@@ -33,10 +33,10 @@ const onSubmit = handleSubmit(values => {
   });
 });
 
+const [username, usernameAttrs] = defineField('username');
 const [email, emailAttrs] = defineField('email');
 const [password, passwordAttrs] = defineField('password');
 const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
-const [code, codeAttrs] = defineField('code');
 
 const acceptTerms = ref(false);
 
@@ -56,16 +56,7 @@ onIonViewDidEnter(() => {
       <div class="absolute top-40 left-10 w-16 h-16 bg-white opacity-10 rounded-full"></div>
       
       <!-- 注册表单区域 -->
-      <div class="relative z-10 h-full flex flex-col items-center">
-        <!-- 返回按钮 -->
-        <div class="self-start">
-          <div @click="router.push('/login')" class="flex items-center text-white cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-            <span>返回</span>
-          </div>
-        </div>
+      <div class="relative z-10 h-full flex flex-col items-center mt-[32px]">
         
         <!-- 欢迎文字 -->
         <div class="flex flex-col items-center mt-6 mb-8">
@@ -76,6 +67,28 @@ onIonViewDidEnter(() => {
         <!-- 注册卡片 -->
         <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 animate-slide-up">
           <form @submit="onSubmit" class="flex flex-col">
+            <!-- 用户名输入框 -->
+            <div class="form-group mb-4">
+              <label for="username" class="text-gray-600 text-sm font-medium block mb-2">用户名</label>
+              <div class="relative">
+                <div class="absolute left-3 top-3.5 text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <input 
+                  type="text" 
+                  id="username" 
+                  v-model="username" 
+                  v-bind="usernameAttrs"
+                  class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none" 
+                  :class="{ 'border-red-500 bg-red-50': errors.username }"
+                  placeholder="请输入用户名"
+                />
+              </div>
+              <div class="text-red-500 text-xs h-5 mt-1">{{ errors.username }}</div>
+            </div>
+            
             <!-- 邮箱输入框 -->
             <div class="form-group mb-4">
               <label for="email" class="text-gray-600 text-sm font-medium block mb-2">邮箱</label>
@@ -143,33 +156,6 @@ onIonViewDidEnter(() => {
               <div class="text-red-500 text-xs h-5 mt-1">{{ errors.confirmPassword }}</div>
             </div>
             
-            <!-- 验证码 -->
-            <div class="form-group mb-5">
-              <label for="code" class="text-gray-600 text-sm font-medium block mb-2">验证码</label>
-              <div class="flex gap-2">
-                <div class="relative flex-1">
-                  <div class="absolute left-3 top-3.5 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <input 
-                    type="text" 
-                    id="code" 
-                    v-model="code" 
-                    v-bind="codeAttrs"
-                    class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none" 
-                    :class="{ 'border-red-500 bg-red-50': errors.code }"
-                    placeholder="请输入验证码" 
-                  />
-                </div>
-                <div class="w-32 h-12 bg-gray-100 rounded-xl border border-gray-200 flex items-center justify-center overflow-hidden">
-                  <img src="" alt="验证码" class="w-full h-full object-cover" />
-                </div>
-              </div>
-              <div class="text-red-500 text-xs h-5 mt-1">{{ errors.code }}</div>
-            </div>
-
             <!-- 用户协议 -->
             <div class="flex items-center mb-6">
               <div class="relative inline-block w-5 h-5 mr-2">
