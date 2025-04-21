@@ -28,7 +28,8 @@ const request: AxiosInstance = axios.create({
 request.interceptors.request.use((config) => {
   // 记录每个请求，辅助调试
   
-  config.headers['Authorization'] = `Bearer ${userStore.access_token}`
+  // config.headers['Authorization'] = `Bearer ${userStore.access_token}`
+  config.headers['X-User-ID'] = `${userStore.user.id.value}`
   
   // 添加API版本和时间戳防止缓存
   // if (config.method === 'get') {

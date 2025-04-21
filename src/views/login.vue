@@ -33,7 +33,7 @@ const formatCaptchaUrl = computed(() => {
   if (captchaUrl.value.includes('data:image/svg+xml;base64,')) {
     return captchaUrl.value
   }
-  return captchaUrl.value.replace('data:image/png;base64,', '');
+  return `data:image/png;base64,${captchaUrl.value}`
 })
 
 const getCaptchaInfo = async () => {

@@ -156,8 +156,8 @@ onIonViewDidEnter(() => {
               :class="{ 'text-[#4245dc]': activeTab === '支出分析' }" @click="activeTab = '支出分析'">支出分析</span>
             <span class="w-20 text-lg text-center transition-all duration-300"
               :class="{ 'text-[#4245dc]': activeTab === '收入分析' }" @click="activeTab = '收入分析'">收入分析</span>
-            <span class="w-20 text-lg text-center transition-all duration-300"
-              :class="{ 'text-[#4245dc]': activeTab === '趋势' }" @click="activeTab = '趋势'">趋势</span>
+            <!-- <span class="w-20 text-lg text-center transition-all duration-300"
+              :class="{ 'text-[#4245dc]': activeTab === '趋势' }" @click="activeTab = '趋势'">趋势</span> -->
             <span class="absolute left-0 bottom-0 w-20 h-[2px] bg-[#4245dc] transition-all duration-300"
               :style="{ transform: `translateX(${activeTab === '支出分析' ? '0' : activeTab === '收入分析' ? 'calc(100% + 1rem)' : 'calc(200% + 2rem)'})` }"></span>
           </div>
