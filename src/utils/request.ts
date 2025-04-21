@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios'
 import useUserStore from '@/store/user'
-import userApi from '@/api/user'
+import { refreshToken } from '@/api/user'
 import { storage } from '@/utils/storage'
 const userStore = useUserStore()
 
@@ -27,18 +27,18 @@ const request: AxiosInstance = axios.create({
 // 添加请求拦截器，用于调试
 request.interceptors.request.use((config) => {
   // 记录每个请求，辅助调试
-  console.log(`🚀 请求: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`, config);
   
-  config.headers['Authorization'] = `Bearer ${userStore.access_token}`
+  // config.headers['Authorization'] = `Bearer ${userStore.access_token}`
+  config.headers['X-User-ID'] = `${userStore.user.id.value}`
   
   // 添加API版本和时间戳防止缓存
-  if (config.method === 'get') {
-    config.params = {
-      ...config.params, 
-      _t: Date.now(),
-      _v: import.meta.env.VITE_API_VERSION || '1.0.0'
-    };
-  }
+  // if (config.method === 'get') {
+  //   config.params = {
+  //     ...config.params, 
+  //     _t: Date.now(),
+  //     _v: import.meta.env.VITE_API_VERSION || '1.0.0'
+  //   };
+  // }
   
   return config
 })
@@ -53,8 +53,6 @@ const retryRequest = async (config: AxiosRequestConfig, retries = 0): Promise<an
       throw err;
     }
     
-    console.log(`重试请求 (${retries+1}/${MAX_RETRIES}): ${config.url}`);
-    
     // 等待时间递增
     const delay = Math.pow(2, retries) * 1000;
     await new Promise(resolve => setTimeout(resolve, delay));
@@ -64,40 +62,36 @@ const retryRequest = async (config: AxiosRequestConfig, retries = 0): Promise<an
 };
 
 request.interceptors.response.use((response: AxiosResponse) => {
-  console.log(`✅ 响应: ${response.config.url}`, response.data);
-  return response
-}, async (error: any) => {
+  if (response.data.code == '0000') {
+    return response;
+  } else {
+    return Promise.reject(response.data.info)
+  }
+}, (error: any) => {
   if (!error.response) {
     // 网络错误
     const errorMessage = `网络错误: ${error.message}。API地址: ${import.meta.env.VITE_BASE_URL}`;
-    console.error(`❌ ${errorMessage}`, error);
-    
-    // 显示更有帮助的信息
-    alert(`无法连接到API服务器 (${import.meta.env.VITE_BASE_URL})。\n\n错误: ${error.message}\n\n可能原因:\n1. 服务器未运行\n2. 网络连接问题\n3. CORS策略限制`);
-    
     return Promise.reject(errorMessage);
   }
   
-  console.error(`❌ 请求错误 (${error.response.status}): ${error.config.url}`, error.response.data);
-  alert(JSON.stringify(error.response.data || error.message, null, 2));
+  // if (error.response.status === 401) {
+  //   try {
+  //     const refresh_token = storage.getItem('refresh_token')
+  //     if (!refresh_token) {
+  //       window.location.href = '/login?redirect=' + window.location.pathname
+  //       return
+  //     }
+  //     const res = await refreshToken()
+  //     if (res.code === 200) {
+  //       userStore.setToken(res.data.access_token, res.data.refresh_token)
+  //       return request(error.config)
+  //     }
+  //   } catch (error) {
+  //     window.location.href = '/login?redirect=' + window.location.pathname
+  //   }
+  // }
   
-  if (error.response.status === 401) {
-    try {
-      const refresh_token = storage.getItem('refresh_token')
-      if (!refresh_token) {
-        window.location.href = '/login?redirect=' + window.location.pathname
-        return
-      }
-      const res = await userApi.refreshToken()
-      if (res.code === 200) {
-        userStore.setToken(res.data.access_token, res.data.refresh_token)
-        return request(error.config)
-      }
-    } catch (error) {
-      window.location.href = '/login?redirect=' + window.location.pathname
-    }
-  }
-  return Promise.reject(error)
+  return Promise.reject(error.response.data.message)
 })
 
 export const get = async (url: string, params?: any) => {
@@ -105,8 +99,7 @@ export const get = async (url: string, params?: any) => {
     const res = await request.get(url, { params });
     return res.data as ApiResponse<any>;
   } catch (error) {
-    console.error(`GET请求失败: ${url}`, error);
-    throw error;
+    return Promise.reject(error)
   }
 }
 
@@ -115,8 +108,7 @@ export const post = async (url: string, data: any) => {
     const res = await request.post(url, data);
     return res.data as ApiResponse<any>;
   } catch (error) {
-    console.error(`POST请求失败: ${url}`, error);
-    throw error;
+    return Promise.reject(error)
   }
 }
 
@@ -125,8 +117,7 @@ export const patch = async (url: string, data: any) => {
     const res = await request.patch(url, data);
     return res.data as ApiResponse<any>;
   } catch (error) {
-    console.error(`PATCH请求失败: ${url}`, error);
-    throw error;
+    return Promise.reject(error)
   }
 }
 
@@ -135,8 +126,7 @@ export const del = async (url: string, params: any) => {
     const res = await request.delete(url, { params });
     return res.data as ApiResponse<any>;
   } catch (error) {
-    console.error(`DELETE请求失败: ${url}`, error);
-    throw error;
+    return Promise.reject(error)
   }
 }
 

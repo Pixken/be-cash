@@ -1,11 +1,17 @@
 <script setup lang="ts">
-import { IonPage, IonContent } from '@ionic/vue';
+import { IonPage, IonContent, onIonViewDidEnter } from '@ionic/vue';
+
+const content = ref();
+
+onIonViewDidEnter(() => {
+  content.value?.$el.scrollToTop(0);
+});
 </script>
 
 <template>
   <ion-page>
     <be-header title="通知" show-back />
-    <ion-content>
+    <ion-content ref="content">
       <div class="p-4">
         <div>
           <p>今天</p>

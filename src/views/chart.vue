@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IonPage, IonContent } from '@ionic/vue';
+import { IonPage, IonContent, onIonViewDidEnter } from '@ionic/vue';
 import svgIcon from '@/components/common/svg-icon.vue';
 import dayjs from 'dayjs';
 import { use } from 'echarts/core'
@@ -109,11 +109,18 @@ const chartOptions2 = computed<EChartsOption>(() => {
     ],
   }
 });
+
+const content = ref();
+
+onIonViewDidEnter(() => {
+  content.value?.$el.scrollToTop(0);
+});
+
 </script>
 <template>
   <ion-page>
     <be-header title="报表" />
-    <ion-content>
+    <ion-content ref="content">
       <div class="p-4">
         <div class="flex items-center justify-between">
           <button class="w-10 h-10 flex items-center justify-center" @click="date = dayjs(date).subtract(1, 'month')">
@@ -149,8 +156,8 @@ const chartOptions2 = computed<EChartsOption>(() => {
               :class="{ 'text-[#4245dc]': activeTab === '支出分析' }" @click="activeTab = '支出分析'">支出分析</span>
             <span class="w-20 text-lg text-center transition-all duration-300"
               :class="{ 'text-[#4245dc]': activeTab === '收入分析' }" @click="activeTab = '收入分析'">收入分析</span>
-            <span class="w-20 text-lg text-center transition-all duration-300"
-              :class="{ 'text-[#4245dc]': activeTab === '趋势' }" @click="activeTab = '趋势'">趋势</span>
+            <!-- <span class="w-20 text-lg text-center transition-all duration-300"
+              :class="{ 'text-[#4245dc]': activeTab === '趋势' }" @click="activeTab = '趋势'">趋势</span> -->
             <span class="absolute left-0 bottom-0 w-20 h-[2px] bg-[#4245dc] transition-all duration-300"
               :style="{ transform: `translateX(${activeTab === '支出分析' ? '0' : activeTab === '收入分析' ? 'calc(100% + 1rem)' : 'calc(200% + 2rem)'})` }"></span>
           </div>

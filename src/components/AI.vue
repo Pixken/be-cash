@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import AIAssistantDialog from './AIAssistantDialog.tsx';
+import AIAssistantDialog from './AIAssistantDialog';
 import { IonFab, IonFabButton } from '@ionic/vue';
 import { ref } from 'vue';
 

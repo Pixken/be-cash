@@ -4,6 +4,20 @@ http://ionicframework.com/docs/theming/ */
 @tailwind components;
 @tailwind utilities;
 
+/*设置安卓安全区域top高度 预留出状态栏区域*/
+:root {
+  --ion-safe-area-top: env(safe-area-inset-top, 200px);
+  
+  .md {
+    --ion-safe-area-top: env(safe-area-inset-top, 320px);
+  }
+  
+  .ios {
+    --ion-safe-area-top: env(safe-area-inset-top, 47px);
+  }
+}
+
+
 * {
   margin: 0;
   padding: 0;

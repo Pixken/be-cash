@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IonPage, IonContent, IonModal } from '@ionic/vue';
+import { IonPage, IonContent, IonModal, onIonViewDidEnter } from '@ionic/vue';
 import { ref } from 'vue';
 import { Form, FormItem, Select, Input, InputNumber, Button } from 'ant-design-vue';
 import useUserStore from '@/store/user';
@@ -16,7 +16,7 @@ const creditCards = computed(() => {
 
 const getAccounts = async () => {
   try {
-    const res = await getAccount(userStore.user?.id || '');
+    const res = await getAccount();
     accounts.value = res.data;
   } catch (error) {
     console.log(error);
@@ -54,18 +54,18 @@ const accounts_select = ref([
     icon: 'ic:twotone-wechat',
     color: '#22c55e',
   },
-  {
-    label: '储蓄卡',
-    value: '储蓄卡',
-    icon: 'streamline:credit-card-1-solid',
-    color: '#f59e0b',
-  },
-  {
-    label: '信用卡',
-    value: '信用卡',
-    icon: 'streamline:credit-card-1-solid',
-    color: '#f59e0b',
-  },
+  // {
+  //   label: '储蓄卡',
+  //   value: '储蓄卡',
+  //   icon: 'streamline:credit-card-1-solid',
+  //   color: '#f59e0b',
+  // },
+  // {
+  //   label: '信用卡',
+  //   value: '信用卡',
+  //   icon: 'streamline:credit-card-1-solid',
+  //   color: '#f59e0b',
+  // },
 ]);
 
 const rules = ref({
@@ -78,30 +78,29 @@ const formRef = ref();
 
 const handleSubmit = () => {
   formRef.value.validate().then(async () => {
-    const { id } = userStore.user || {};
-    let cardType;
-    if (form.value.name === '信用卡') {
-      cardType = 'credit';
-    } else if (form.value.name === '储蓄卡') {
-      cardType = 'debit';
-    }
     const res = await createAccount({
       name: form.value.name,
-      balance: form.value.amount,
-      cardNumber: form.value.cardNumber,
-      cardType,
-      userId: id,
+      type: form.value.name,
+      initialBalance: form.value.amount,
     });
     console.log(res);
+    dismiss();
+    getAccounts();
   }).catch(() => {
     console.log('error');
   });
 };
+
+const content = ref();
+
+onIonViewDidEnter(() => {
+  content.value?.$el.scrollToTop(0);
+});
 </script>
 <template>
   <ion-page>
     <be-header title="账户" />
-    <ion-content>
+    <ion-content ref="content">
       <div class="p-4">
         <div style="background: linear-gradient(135deg, #4f46e5 0%, #818cf8 100%);"
           class="w-full h-32 rounded-2xl text-white p-4 flex flex-col">
@@ -124,7 +123,7 @@ const handleSubmit = () => {
                       <FormItem label="账户类型" name="name">
                         <Select v-model:value="form.name" :options="accounts_select"></Select>
                       </FormItem>
-                      <FormItem label="卡号" name="cardNumber" v-if="form.name === 'debit-card' || form.name === 'credit-card'">
+                      <FormItem label="卡号" name="cardNumber" v-if="form.name === '储蓄卡' || form.name === '信用卡'">
                         <Input v-model:value="form.cardNumber" />
                       </FormItem>
                       <FormItem label="账户金额" name="amount">
@@ -155,8 +154,17 @@ const handleSubmit = () => {
               <p class="text-lg font-bold">¥{{ item.balance }} </p>
             </li>
           </ul>
+          <div v-if="accounts.length === 0" class="flex flex-col items-center justify-center py-10">
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </div>
+            <p class="text-gray-500 mb-2">暂无账户</p>
+            <p class="text-sm text-gray-400">点击右上角添加按钮添加新账户</p>
+          </div>
         </div>
-        <div class="w-full mt-4">
+        <!-- <div class="w-full mt-4">
           <div class="flex items-center justify-between">
             <p class="text-lg font-bold">信用卡</p>
             <span class="text-sm text-[#4f46e5]">添加信用卡</span>
@@ -177,7 +185,7 @@ const handleSubmit = () => {
               <p class="text-lg font-bold">¥{{ item.balance }} </p>
             </li>
           </ul>
-        </div>
+        </div> -->
       </div>
 
     </ion-content>

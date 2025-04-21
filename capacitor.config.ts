@@ -7,7 +7,7 @@ const config: CapacitorConfig = {
   // 添加服务器配置
   server: {
     // 允许从应用程序外部加载内容
-    allowNavigation: ['http://117.72.49.27/*', 'https://*.*'],
+    allowNavigation: ['http://117.72.49.27/*', 'http://116.198.241.147:8091/*', 'https://*.*'],
     // 清除历史记录
     cleartext: true
   },
