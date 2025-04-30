@@ -11,10 +11,12 @@ const style = computed(() => {
     transition: 'all 0.3s',
   }
 })
+console.log(props.icon.replaceAll(':', '--'))
 </script>
 
 <template>
   <i :style="style">
+    <!-- <span :class="`icon-[${props.icon.replaceAll(':', '--')}] text-[${props.size || '1.4em'}]`"></span> -->
     <Icon :icon="icon" :height="props.size || '1.4em'" :width="props.size || '1.4em'" />
   </i>
 </template>

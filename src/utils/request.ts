@@ -29,7 +29,7 @@ request.interceptors.request.use((config) => {
   // 记录每个请求，辅助调试
   
   // config.headers['Authorization'] = `Bearer ${userStore.access_token}`
-  config.headers['X-User-ID'] = `${userStore.user.id.value}`
+  config.headers['X-User-ID'] = `${userStore.user.id?.value || ''}`
   
   // 添加API版本和时间戳防止缓存
   // if (config.method === 'get') {
@@ -62,12 +62,15 @@ const retryRequest = async (config: AxiosRequestConfig, retries = 0): Promise<an
 };
 
 request.interceptors.response.use((response: AxiosResponse) => {
+  console.log(response.data)
   if (response.data.code == '0000') {
     return response;
   } else {
     return Promise.reject(response.data.info)
   }
 }, (error: any) => {
+  console.log(error);
+  
   if (!error.response) {
     // 网络错误
     const errorMessage = `网络错误: ${error.message}。API地址: ${import.meta.env.VITE_BASE_URL}`;
