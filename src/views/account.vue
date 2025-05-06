@@ -1,18 +1,11 @@
 <script setup lang="ts">
 import { IonPage, IonContent, IonModal, onIonViewDidEnter } from '@ionic/vue';
 import { ref } from 'vue';
-import { Form, FormItem, Select, Input, InputNumber, Button } from 'ant-design-vue';
-import useUserStore from '@/store/user';
-import { createAccount, getAccount } from '@/api/account';
+import { Form, FormItem, Select, Input, InputNumber, Button, Popconfirm } from 'ant-design-vue';
+import { createAccount, delAccount, getAccount, updateAccount } from '@/api/account';
 import { format } from 'timeago.js';
 
-const userStore = useUserStore();
-
 const accounts = ref<any[]>([]);
-
-const creditCards = computed(() => {
-  return accounts.value.filter((item: any) => item.type === 'credit');
-});
 
 const getAccounts = async () => {
   try {
@@ -23,13 +16,11 @@ const getAccounts = async () => {
   }
 }
 
-getAccounts();
-
 const modal = ref();
 const form = ref({
   cardNumber: '',
   name: '',
-  amount: 0,
+  balance: 0,
 });
 const dismiss = () => {
   modal.value?.$el.dismiss()
@@ -71,7 +62,7 @@ const accounts_select = ref([
 const rules = ref({
   cardNumber: [{ required: true, message: '请输入卡号' }],
   name: [{ required: true, message: '请选择账户类型' }],
-  amount: [{ required: true, message: '请输入账户金额' }],
+  balance: [{ required: true, message: '请输入账户金额' }],
 });
 
 const formRef = ref();
@@ -81,7 +72,7 @@ const handleSubmit = () => {
     const res = await createAccount({
       name: form.value.name,
       type: form.value.name,
-      initialBalance: form.value.amount,
+      initialBalance: form.value.balance,
     });
     console.log(res);
     dismiss();
@@ -95,7 +86,65 @@ const content = ref();
 
 onIonViewDidEnter(() => {
   content.value?.$el.scrollToTop(0);
+  getAccounts();
 });
+
+const editModal = ref();
+const editForm = ref({
+  cardNumber: '',
+  name: '',
+  balance: 0,
+});
+const editingAccount = ref<any>(null);
+
+const openEditModal = (account: any) => {
+  console.log(account);
+  editingAccount.value = account;
+  editForm.value = account
+  editModal.value?.$el.present();
+};
+
+const dismissEditModal = () => {
+  editModal.value?.$el.dismiss();
+};
+
+const editFormRef = ref();
+
+const handleEdit = () => {
+  editFormRef.value.validate().then(async () => {
+    // TODO: Implement edit logic
+    console.log('Edit form submitted', editForm.value);
+    const res = await updateAccount(editForm.value)
+    if (res.code === '0000') {
+      await getAccounts()
+      dismissEditModal();
+    }
+  }).catch(() => {
+    console.log('error');
+  });
+};
+
+const deleteModal = ref();
+const deletingAccount = ref<any>(null);
+
+const openDeleteModal = (account: any) => {
+  deletingAccount.value = account;
+  deleteModal.value?.$el.present();
+};
+
+const dismissDeleteModal = () => {
+  deleteModal.value?.$el.dismiss();
+};
+
+const handleDelete = async () => {
+  // TODO: Implement delete logic
+  console.log('Delete account', deletingAccount.value);
+  const res = await delAccount(deletingAccount.value.id)
+  if (res.code === '0000') {
+    await getAccounts()
+    dismissDeleteModal();
+  }
+};
 </script>
 <template>
   <ion-page>
@@ -126,8 +175,8 @@ onIonViewDidEnter(() => {
                       <FormItem label="卡号" name="cardNumber" v-if="form.name === '储蓄卡' || form.name === '信用卡'">
                         <Input v-model:value="form.cardNumber" />
                       </FormItem>
-                      <FormItem label="账户金额" name="amount">
-                        <InputNumber v-model:value="form.amount" class="w-full" />
+                      <FormItem label="账户金额" name="balance">
+                        <InputNumber v-model:value="form.balance" class="w-full" />
                       </FormItem>
                       <FormItem>
                         <Button type="primary" @click="handleSubmit" class="w-full">添加</Button>
@@ -151,7 +200,17 @@ onIonViewDidEnter(() => {
                   <p class="text-sm text-[#7a818a]" v-else>储蓄卡 (****{{ item.cardNumber?.slice(8, 12) }})</p>
                 </div>
               </div>
-              <p class="text-lg font-bold">¥{{ item.balance }} </p>
+              <div class="flex items-center gap-4">
+                <p class="text-lg font-bold">¥{{ item.balance }}</p>
+                <div class="flex gap-2">
+                  <Button type="text" size="small" @click="openEditModal(item)">
+                    <svg-icon icon="mdi:pencil" class="text-gray-500"></svg-icon>
+                  </Button>
+                  <Button type="text" size="small" @click="openDeleteModal(item)">
+                    <svg-icon icon="mdi:delete" class="text-red-500"></svg-icon>
+                  </Button>
+                </div>
+              </div>
             </li>
           </ul>
           <div v-if="accounts.length === 0" class="flex flex-col items-center justify-center py-10">
@@ -186,6 +245,51 @@ onIonViewDidEnter(() => {
             </li>
           </ul>
         </div> -->
+
+        <!-- Edit Modal -->
+        <ion-modal ref="editModal">
+          <ion-content>
+            <div class="p-4">
+              <div class="flex items-center justify-between">
+                <p class="text-lg font-bold">编辑账户</p>
+                <span class="text-sm text-[#4f46e5]" @click="dismissEditModal">取消</span>
+              </div>
+              <div class="flex items-center justify-between mt-4">
+                <Form ref="editFormRef" :model="editForm" :rules="rules" class="w-full" layout="horizontal" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+                  <FormItem label="账户类型" name="name">
+                    <Select v-model:value="editForm.name" :options="accounts_select"></Select>
+                  </FormItem>
+                  <FormItem label="卡号" name="cardNumber" v-if="editForm.name === '储蓄卡' || editForm.name === '信用卡'">
+                    <Input v-model:value="editForm.cardNumber" />
+                  </FormItem>
+                  <FormItem label="账户金额" name="balance">
+                    <InputNumber v-model:value="editForm.balance" class="w-full" />
+                  </FormItem>
+                  <FormItem>
+                    <Button type="primary" @click="handleEdit" class="w-full">保存</Button>
+                  </FormItem>
+                </Form>
+              </div>
+            </div>
+          </ion-content>
+        </ion-modal>
+
+        <!-- Delete Modal -->
+        <ion-modal class="delete" ref="deleteModal">
+          <ion-content>
+            <div class="flex flex-col items-center justify-center gap-5 h-full">
+              <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg-icon icon="mdi:delete" class="text-red-500 text-3xl"></svg-icon>
+              </div>
+              <p class="text-lg font-bold mb-2">确定要删除这个账户吗？</p>
+              <p class="text-gray-500 mb-8">删除后将无法恢复</p>
+              <div class="flex gap-4">
+                <Button class="flex-1" @click="dismissDeleteModal">取消</Button>
+                <Button type="primary" danger class="flex-1" @click="handleDelete">删除</Button>
+              </div>
+            </div>
+          </ion-content>
+        </ion-modal>
       </div>
 
     </ion-content>
@@ -201,6 +305,10 @@ ion-modal {
   --width: 80%;
   --border-radius: 16px;
   --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+ion-modal.delete {
+  --height: 40%;
 }
 
 ion-modal::part(backdrop) {

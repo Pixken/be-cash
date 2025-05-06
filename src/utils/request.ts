@@ -7,7 +7,7 @@ const userStore = useUserStore()
 
 export interface ApiResponse<T> {
   message: string
-  code: number
+  code: string
   data: T
 }
 
@@ -115,16 +115,16 @@ export const post = async (url: string, data: any) => {
   }
 }
 
-export const patch = async (url: string, data: any) => {
+export const put = async (url: string, data: any) => {
   try {
-    const res = await request.patch(url, data);
+    const res = await request.put(url, data);
     return res.data as ApiResponse<any>;
   } catch (error) {
     return Promise.reject(error)
   }
 }
 
-export const del = async (url: string, params: any) => {
+export const del = async (url: string, params?: any) => {
   try {
     const res = await request.delete(url, { params });
     return res.data as ApiResponse<any>;

@@ -42,8 +42,7 @@ const isLoading = ref(true);
 const fetchBills = async () => {
   try {
     isLoading.value = true;
-    const response = await billStore.getBills(userStore.user.id);
-    console.log(response)
+    const response = await billStore.getBills();
     bills.value = response.data;
   } catch (error) {
     emitter.emit('message', { msg: '获取账单失败', type: 'error' });

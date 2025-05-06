@@ -16,8 +16,7 @@ console.log(props.icon.replaceAll(':', '--'))
 
 <template>
   <i :style="style">
-    <!-- <span :class="`icon-[${props.icon.replaceAll(':', '--')}] text-[${props.size || '1.4em'}]`"></span> -->
-    <Icon :icon="icon" :height="props.size || '1.4em'" :width="props.size || '1.4em'" />
+    <Icon :icon="icon" :height="props.size || '1.4em'" :width="props.size || '1.4em'" :ssr="true" />
   </i>
 </template>
 
