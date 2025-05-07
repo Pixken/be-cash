@@ -11,7 +11,6 @@ const style = computed(() => {
     transition: 'all 0.3s',
   }
 })
-console.log(props.icon.replaceAll(':', '--'))
 </script>
 
 <template>

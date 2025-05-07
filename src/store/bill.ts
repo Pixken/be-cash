@@ -10,22 +10,15 @@ export const useBillStore = defineStore('bill', () => {
   const getBills = async () => {
     // TODO: 实现实际的API调用
     const res = await getCashByDaterange({
-      startDate: dayjs().startOf('month').format('YYYY-MM-DDTHH:mm:ss'),
-      endDate: dayjs().endOf('month').format('YYYY-MM-DDTHH:mm:ss')
+      startDate: dayjs().startOf('month').format('YYYY-MM-DD HH:mm:ss'),
+      endDate: dayjs().endOf('month').format('YYYY-MM-DD HH:mm:ss')
     })
     bills.value = res.data
     return { data: bills.value }
   }
 
-  const addBill = async (bill: BillDTO) => {
-    const res = await addCash(bill)
-    bills.value.push(res.data)
-    return { data: res.data }
-  }
-
   return {
     bills,
-    getBills,
-    addBill
+    getBills
   }
 }) 

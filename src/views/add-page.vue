@@ -53,6 +53,7 @@ const onSubmit = () => {
   addCash(form.value, activeTab.value).then(res => {
     emitter.emit('message', { msg: '添加成功', type: 'success' });
     form.value = deepClone(initForm);
+    router.push('/')
   }).catch(err => {
     emitter.emit('message', { msg: err, type: 'error' });
   })

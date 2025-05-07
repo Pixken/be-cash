@@ -1,7 +1,7 @@
 export interface BillVO {
   id: string;
-  price: number;
-  type: 'income' | 'expense';
+  amount: number;
+  type: 'INCOME' | 'EXPENSE';
   category: any;
   account: any;
   icon: string;
@@ -10,8 +10,8 @@ export interface BillVO {
 } 
 
 export interface BillDTO {
-  price: number;
-  type: 'income' | 'expense';
+  amount: number;
+  type: 'INCOME' | 'EXPENSE';
   categoryId: string;
   description: string;
   date: string;

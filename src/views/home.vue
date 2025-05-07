@@ -54,14 +54,13 @@ const fetchBills = async () => {
 // 计算收支统计
 const income = computed(() => {
   return bills.value
-    .filter(bill => bill.type === 'income')
-    .reduce((sum, bill) => sum + bill.price, 0);
+    .filter(bill => bill.type === 'INCOME')
+    .reduce((sum, bill) => sum + bill.amount, 0).toFixed(2);
 });
-
 const expense = computed(() => {
   return bills.value
-    .filter(bill => bill.type === 'expense')
-    .reduce((sum, bill) => sum + bill.price, 0);
+    .filter(bill => bill.type === 'EXPENSE')
+    .reduce((sum, bill) => sum + bill.amount, 0).toFixed(2);
 });
 
 // 图表配置
@@ -76,7 +75,7 @@ const chartOption = computed<EChartsOption>(() => ({
     bottom: '1%',
     left: 'center',
     data: bills.value
-      .filter(bill => bill.type === 'expense')
+      .filter(bill => bill.type === 'EXPENSE')
       .map(bill => bill.category.name),
     itemWidth: 20,
     itemHeight: 20,
@@ -88,9 +87,9 @@ const chartOption = computed<EChartsOption>(() => ({
       radius: ['45%', '80%'],
       center: ['50%', '45%'],
       data: bills.value
-        .filter(bill => bill.type === 'expense')
+        .filter(bill => bill.type === 'EXPENSE')
         .map(bill => ({
-          value: bill.price,
+          value: bill.amount,
           name: bill.category.name,
         })),
       labelLine: {
@@ -129,6 +128,23 @@ onMounted(() => {
 });
 
 const content = ref();
+
+const tabs = ['全部', '收入', '支出']
+const activeTab = ref('全部');
+const activeTabBills = computed(() => {
+  if (activeTab.value === '全部') {
+    return billStore.bills;
+  } else if (activeTab.value === '收入') {
+    return billStore.bills.filter(bill => bill.type === 'INCOME');
+  } else if (activeTab.value === '支出') {
+    return billStore.bills.filter(bill => bill.type === 'EXPENSE');
+  } else {
+    return billStore.bills;
+  }
+})
+const handleTabClick = (tab: string) => {
+  activeTab.value = tab;
+}
 
 onIonViewDidEnter(() => {
   fetchBills();
@@ -175,7 +191,7 @@ onIonViewDidEnter(() => {
                   <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" />
                 </svg>
               </div>
-              <p class="text-2xl font-bold text-green-600">¥{{ formatAmount(income) }}</p>
+              <p class="text-2xl font-bold text-green-600">¥{{ income }}</p>
             </div>
             <div class="bg-indigo-50 rounded-xl p-4">
               <div class="flex items-center justify-between mb-2">
@@ -184,7 +200,7 @@ onIonViewDidEnter(() => {
                   <path fill-rule="evenodd" d="M12 13a1 1 0 100 2h5a1 1 0 001-1V9a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586 3.707 5.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z" clip-rule="evenodd" />
                 </svg>
               </div>
-              <p class="text-2xl font-bold text-red-600">¥{{ formatAmount(expense) }}</p>
+              <p class="text-2xl font-bold text-red-600">¥{{ expense }}</p>
             </div>
           </div>
         </div>
@@ -233,14 +249,13 @@ onIonViewDidEnter(() => {
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-lg font-semibold text-gray-800">账单记录</h2>
             <div class="flex items-center space-x-2">
-              <button class="px-3 py-1 text-sm text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors">
-                全部
-              </button>
-              <button class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                收入
-              </button>
-              <button class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                支出
+              <button 
+                class="px-3 py-1 text-sm rounded-lg hover:bg-indigo-100 transition-colors"
+                v-for="(tab, index) in tabs"
+                :key="index"
+                :class="{ 'bg-indigo-100 text-indigo-600': tab === activeTab }"
+                @click="handleTabClick(tab)">
+                {{ tab }}
               </button>
             </div>
           </div>
@@ -264,9 +279,9 @@ onIonViewDidEnter(() => {
           
           <!-- 账单列表 -->
           <div v-else class="space-y-4">
-            <div v-for="bill in bills" :key="bill.id" 
+            <div v-for="bill in activeTabBills" :key="bill.id" 
               class="flex items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
-              @click="router.push(`/bill/${bill.id}`)"
+              
             >
               <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
                 <svg-icon :icon="bill.icon" color="#6366f1" size="20"></svg-icon>
@@ -274,8 +289,8 @@ onIonViewDidEnter(() => {
               <div class="flex-1">
                 <div class="flex items-center justify-between">
                   <h3 class="text-gray-800 font-medium">{{ bill.category.name }}</h3>
-                  <span :class="bill.type === 'income' ? 'text-green-600' : 'text-red-600'" class="font-semibold">
-                    {{ bill.type === 'income' ? '+' : '-' }}¥{{ formatAmount(bill.price) }}
+                  <span :class="bill.type === 'INCOME' ? 'text-green-600' : 'text-red-600'" class="font-semibold">
+                    {{ bill.type === 'INCOME' ? '+' : '-' }}¥{{ formatAmount(bill.amount) }}
                   </span>
                 </div>
                 <div class="flex items-center justify-between mt-1">
