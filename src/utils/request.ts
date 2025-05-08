@@ -3,6 +3,7 @@ import type { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios'
 import useUserStore from '@/store/user'
 import { refreshToken } from '@/api/user'
 import { storage } from '@/utils/storage'
+import emitter from './emitter'
 const userStore = useUserStore()
 
 export interface ApiResponse<T> {
@@ -66,6 +67,7 @@ request.interceptors.response.use((response: AxiosResponse) => {
   if (response.data.code == '0000') {
     return response;
   } else {
+    emitter.emit('message', { msg: response.data.info, type: 'error'  })
     return Promise.reject(response.data.info)
   }
 }, (error: any) => {
