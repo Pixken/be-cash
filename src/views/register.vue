@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router';
 import emitter from '@/utils/emitter';
 
 const router = useRouter();
-const { errors, handleSubmit, defineField } = useForm({
+const { errors, handleSubmit, defineField, resetForm } = useForm({
   validationSchema: yup.object({
     username: yup.string().required('请输入用户名'),
     email: yup.string().email('请输入正确的邮箱').required('请输入邮箱'),
@@ -44,6 +44,10 @@ const content = ref();
 
 onIonViewDidEnter(() => {
   content.value?.$el.scrollToTop(0);
+  // 重置表单
+  resetForm();
+  // 重置接受条款复选框
+  acceptTerms.value = false;
 });
 </script>
 
