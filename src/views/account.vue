@@ -257,16 +257,16 @@ const handleDelete = async () => {
               <div class="flex items-center justify-between mt-4">
                 <Form ref="editFormRef" :model="editForm" :rules="rules" class="w-full" layout="horizontal" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
                   <FormItem label="账户类型" name="name">
-                    <Select v-model:value="editForm.name" :options="accounts_select"></Select>
+                    <Select v-model:value="editForm.name" :options="accounts_select" class="h-14"></Select>
                   </FormItem>
-                  <FormItem label="卡号" name="cardNumber" v-if="editForm.name === '储蓄卡' || editForm.name === '信用卡'">
-                    <Input v-model:value="editForm.cardNumber" />
-                  </FormItem>
+                  <!-- <FormItem label="卡号" name="cardNumber" v-if="editForm.name === '储蓄卡' || editForm.name === '信用卡'">
+                    <Input v-model:value="editForm.cardNumber" class="h-14" />
+                  </FormItem> -->
                   <FormItem label="账户金额" name="balance">
-                    <InputNumber v-model:value="editForm.balance" class="w-full" />
+                    <InputNumber v-model:value="editForm.balance" class="w-full h-14 leading-[3.5rem]" />
                   </FormItem>
                   <FormItem>
-                    <Button type="primary" @click="handleEdit" class="w-full">保存</Button>
+                    <Button type="primary" @click="handleEdit" class="w-full h-14">保存</Button>
                   </FormItem>
                 </Form>
               </div>

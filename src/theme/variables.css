@@ -23,3 +23,19 @@ http://ionicframework.com/docs/theming/ */
   padding: 0;
   box-sizing: border-box !important;
 }
+
+.ant-select-item-option {
+  height: 3rem !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ant-input-number-input {
+  height: 3.5rem !important;
+}
+.ant-select-selector {
+  height: 100% !important;
+}
+.ant-select-selection-item {
+  line-height: 3.5rem !important;
+}

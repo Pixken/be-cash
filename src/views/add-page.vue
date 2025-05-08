@@ -163,17 +163,17 @@ const handleTOAccount = () => {
           <form class="flex flex-col gap-2 w-full">
             <label for="remark" class="text-gray-500">备注</label>
             <FormItem name="description">
-              <Input v-model:value="form.description" placeholder="请输入备注" size="large" />
+              <Input v-model:value="form.description" placeholder="请输入备注" size="large" class="h-14" />
             </FormItem>
 
             <label for="account" class="text-gray-500">账户</label>
             <FormItem name="accountId">
-              <Select v-model:value="form.accountId" :options="accounts" size="large" />
+              <Select v-model:value="form.accountId" :options="accounts" size="large" class="h-14" />
             </FormItem>
 
             <label for="date" class="text-gray-500">日期</label>
             <FormItem name="date">
-              <DatePicker v-model:value="date" size="large" :locale="locale" class="w-full" />
+              <DatePicker v-model:value="date" size="large" :locale="locale" class="w-full h-14" />
             </FormItem>
           </form>
         </div>
@@ -188,4 +188,11 @@ ion-modal {
   --width: 80%;
   --border-radius: 16px;
 }
+:deep(.ant-select-selector) {
+  height: 100% !important;
+}
+:deep(.ant-select-selection-item) {
+  line-height: 3.5rem !important;
+}
+
 </style>

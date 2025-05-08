@@ -13,6 +13,8 @@ import {
 import { CanvasRenderer } from 'echarts/renderers'
 import VChart from 'vue-echarts';
 import type { EChartsOption } from 'echarts';
+import { getStatistics, getTransactionsByCategory } from '@/api/chart';
+import { Analysis, DateRange, Statistics } from '@/types';
 
 use([
   LegendComponent,
@@ -29,6 +31,49 @@ const currentDate = computed(() => {
   return dayjs(date.value).format('YYYY年MM月');
 });
 
+const monthDateRange = computed((): DateRange => {
+  const start = dayjs(date.value).startOf('month').format('YYYY-MM-DD HH:mm:ss');
+  const end = dayjs(date.value).endOf('month').format('YYYY-MM-DD HH:mm:ss');
+  return { startDate: start, endDate: end };
+})
+
+const yearDateRange = computed((): DateRange => {
+  const start = dayjs(date.value).startOf('year').format('YYYY-MM-DD HH:mm:ss');
+  const end = dayjs(date.value).endOf('year').format('YYYY-MM-DD HH:mm:ss');
+  return { startDate: start, endDate: end };
+})
+
+const monthstatistics = ref<Statistics>({
+  balance: 0,
+  income: 0,
+  expense: 0
+})
+
+const yearStatistics = ref<Statistics[]>([])
+
+const analysis = ref<Analysis>({})
+
+const getInfo = async () => {
+  const monthstat = await getStatistics(monthDateRange.value);
+  const yearstat = await getStatistics(yearDateRange.value);
+  monthstatistics.value = monthstat.data[0] || {
+    balance: 0,
+    income: 0,
+    expense: 0
+  };
+  yearStatistics.value = yearstat.data;
+  const res = await getTransactionsByCategory(monthDateRange.value);
+  analysis.value = res.data;
+}
+
+watch(monthDateRange, () => {
+  getInfo();
+});
+
+onMounted(() => {
+  getInfo();
+});
+
 const chartOptions = computed<EChartsOption>(() => {
   return {
     grid: {
@@ -43,12 +88,20 @@ const chartOptions = computed<EChartsOption>(() => {
     },
     tooltip: {},
     dataset: {
-      dimensions: ['product', '收入', '支出'],
-      source: [
-        { product: '1月', '收入': 43.3, '支出': 85.8 },
-        { product: '2月', '收入': 83.1, '支出': 73.4 },
-        { product: '3月', '收入': 86.4, '支出': 65.2 },
-      ]
+      dimensions: ['month', '收入', '支出'],
+      source:  
+      yearStatistics.value.map(item => {
+        return {
+          month: `${item.month}月`,
+          收入: item.income,
+          支出: item.expense
+        }
+      })
+      // [
+      //   { month: '1月', '收入': 43.3, '支出': 85.8 },
+      //   { month: '2月', '收入': 83.1, '支出': 73.4 },
+      //   { month: '3月', '收入': 86.4, '支出': 65.2 },
+      // ]
     },
     xAxis: { type: 'category' },
     yAxis: {},
@@ -71,27 +124,36 @@ const chartOptions = computed<EChartsOption>(() => {
 
 const activeTab = ref('支出分析');
 
+
+
 const chartOptions2 = computed<EChartsOption>(() => {
   return {
-    color: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444'],
+    color: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#f97316', '#9333ea', '#6366f1', '#3b82f6', '#2563eb', '#1d4ed8', '#1e40af', '#1e3a8a'],
     tooltip: {},
     legend: {
       orient: 'horizontal',
       bottom: '1%',
       left: 'center',
-      data: ['餐饮', '交通', '购物', '其他']
+      data: Object.values(analysis.value).map(item => {
+        if (activeTab.value === '支出分析') {
+          return item[0].totalExpense === 0 ? 0 : item[0].category.toString();
+        } else {
+          return item[0].totalIncome === 0 ? 0 : item[0].category.toString();
+        }
+      }).filter(item => item !== 0),
     },
     series: [
       {
         type: 'pie',
         radius: ['45%', '80%'],
         center: ['50%', '45%'],
-        data: [
-          { value: 335, name: '餐饮' },
-          { value: 310, name: '交通' },
-          { value: 234, name: '购物' },
-          { value: 135, name: '其他' },
-        ],
+        data: 
+        Object.values(analysis.value).map(val => {
+          return {
+            name: val[0].category.toString(),
+            value: activeTab.value === '支出分析' ? val[0].totalExpense : val[0].totalIncome
+          }
+        }).filter(item => item.value !== 0),
         labelLine: {
           show: false
         },
@@ -109,6 +171,12 @@ const chartOptions2 = computed<EChartsOption>(() => {
     ],
   }
 });
+
+watch(activeTab, () => {
+  if (activeTab.value === '支出分析') {
+  } else {
+  }
+})
 
 const content = ref();
 
@@ -136,18 +204,21 @@ onIonViewDidEnter(() => {
         <div class="mt-4 grid grid-cols-3 gap-2 rounded-2xl border border-gray-200 p-4">
           <div class="bg-gray-100 rounded-2xl p-2 flex flex-col items-center justify-center">
             <span>收入</span>
-            <span class="text-xl font-bold text-green-500">¥8,560.00</span>
+            <span class="text-xl font-bold text-green-500">¥{{monthstatistics.income.toFixed(2)}}</span>
           </div>
           <div class="bg-gray-100 rounded-2xl p-2 flex flex-col items-center justify-center">
             <span>支出</span>
-            <span class="text-xl font-bold text-red-500">¥8,560.00</span>
+            <span class="text-xl font-bold text-red-500">¥{{monthstatistics.expense.toFixed(2)}}</span>
           </div>
           <div class="bg-gray-100 rounded-2xl p-2 flex flex-col items-center justify-center">
             <span>结余</span>
-            <span class="text-xl font-bold">¥8,560.00</span>
+            <span class="text-xl font-bold">¥{{monthstatistics.balance.toFixed(2)}}</span>
           </div>
           <div class="col-span-3 h-80 w-full">
-            <v-chart class="chart" :option="chartOptions" autoresize />
+            <v-chart class="chart" :option="chartOptions" autoresize v-if="yearStatistics.length" />
+            <div v-else class="flex justify-center items-center h-full">
+              <p class="text-gray-700">本年度暂无数据</p>
+            </div>
           </div>
         </div>
         <div class="mt-2">
