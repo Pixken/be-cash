@@ -6,7 +6,7 @@ export interface BillVO {
   account: any;
   icon: string;
   description: string;
-  date: string;
+  transactionDate: string;
 } 
 
 export interface BillDTO {
@@ -14,7 +14,7 @@ export interface BillDTO {
   type: 'INCOME' | 'EXPENSE';
   categoryId: string;
   description: string;
-  date: string;
+  transactionDate: string;
   userId: string;
   accountId: string;
 }

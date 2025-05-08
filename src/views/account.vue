@@ -273,7 +273,7 @@ const handleDelete = async () => {
         </ion-modal>
 
         <!-- Delete Modal -->
-        <ion-modal id="example-modal" class="delete" ref="deleteModal">
+        <ion-modal class="delete" ref="deleteModal">
           <div class="flex flex-col items-center justify-center gap-5 h-full wrapper">
             <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg-icon icon="mdi:delete" class="text-red-500 text-3xl"></svg-icon>
