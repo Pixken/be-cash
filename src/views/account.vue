@@ -296,12 +296,6 @@ const handleDelete = async () => {
 .not-last-border-b:not(:last-child) {
   border-bottom: 1px solid #E5E7EB;
 }
-ion-modal {
-  --height: 50%;
-  --width: 80%;
-  --border-radius: 16px;
-  --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-}
 
 ion-modal {
   --width: fit-content;
