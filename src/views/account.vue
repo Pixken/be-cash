@@ -196,8 +196,8 @@ const handleDelete = async () => {
                 </div>
                 <div class="h-12 flex flex-col justify-between">
                   <p class="text-base font-bold">{{ accounts_select.find(i => i.value === item.name)?.label || '' }}</p>
-                  <p class="text-sm text-[#7a818a]" v-if="item.type !== 'card'">上次更新：{{ format(item.updateTime, 'zh_CN') }}</p>
-                  <p class="text-sm text-[#7a818a]" v-else>储蓄卡 (****{{ item.cardNumber?.slice(8, 12) }})</p>
+                  <p class="text-sm text-[#7a818a]" v-if="item.type !== 'card'">上次更新：{{ format(item.updatedAt, 'zh_CN') }}</p>
+                  <!-- <p class="text-sm text-[#7a818a]" v-else>储蓄卡 (****{{ item.cardNumber?.slice(8, 12) }})</p> -->
                 </div>
               </div>
               <div class="flex items-center gap-4">
