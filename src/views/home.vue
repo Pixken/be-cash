@@ -284,7 +284,7 @@ onIonViewDidEnter(() => {
               
             >
               <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
-                <svg-icon :icon="bill.icon" color="#6366f1" size="20"></svg-icon>
+                <svg-icon :icon="bill.category.icon" color="#6366f1" size="20"></svg-icon>
               </div>
               <div class="flex-1">
                 <div class="flex items-center justify-between">
