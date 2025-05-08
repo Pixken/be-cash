@@ -161,30 +161,28 @@ const handleDelete = async () => {
             <p class="text-lg font-bold">我的账户</p>
             <span class="text-sm text-[#4f46e5]" id="open-modal">添加账户</span>
             <ion-modal ref="modal" trigger="open-modal">
-              <ion-content>
-                <div class="p-4">
-                  <div class="flex items-center justify-between">
-                    <p class="text-lg font-bold">添加账户</p>
-                    <span class="text-sm text-[#4f46e5]" @click="dismiss">取消</span>
-                  </div>
-                  <div class="flex items-center justify-between mt-4">
-                    <Form ref="formRef" :model="form" :rules="rules" class="w-full" layout="horizontal" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-                      <FormItem label="账户类型" name="name">
-                        <Select v-model:value="form.name" :options="accounts_select"></Select>
-                      </FormItem>
-                      <FormItem label="卡号" name="cardNumber" v-if="form.name === '储蓄卡' || form.name === '信用卡'">
-                        <Input v-model:value="form.cardNumber" />
-                      </FormItem>
-                      <FormItem label="账户金额" name="balance">
-                        <InputNumber v-model:value="form.balance" class="w-full" />
-                      </FormItem>
-                      <FormItem>
-                        <Button type="primary" @click="handleSubmit" class="w-full">添加</Button>
-                      </FormItem>
-                    </Form>
-                  </div>
+              <div class="p-4">
+                <div class="flex items-center justify-between">
+                  <p class="text-lg font-bold">添加账户</p>
+                  <span class="text-sm text-[#4f46e5]" @click="dismiss">取消</span>
                 </div>
-              </ion-content>
+                <div class="flex items-center justify-between mt-4">
+                  <Form ref="formRef" :model="form" :rules="rules" class="w-full" layout="horizontal" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+                    <FormItem label="账户类型" name="name">
+                      <Select v-model:value="form.name" :options="accounts_select"></Select>
+                    </FormItem>
+                    <FormItem label="卡号" name="cardNumber" v-if="form.name === '储蓄卡' || form.name === '信用卡'">
+                      <Input v-model:value="form.cardNumber" />
+                    </FormItem>
+                    <FormItem label="账户金额" name="balance">
+                      <InputNumber v-model:value="form.balance" class="w-full" />
+                    </FormItem>
+                    <FormItem>
+                      <Button type="primary" @click="handleSubmit" class="w-full">添加</Button>
+                    </FormItem>
+                  </Form>
+                </div>
+              </div>
             </ion-modal>
           </div>
           <ul class="mt-2">
