@@ -248,47 +248,43 @@ const handleDelete = async () => {
 
         <!-- Edit Modal -->
         <ion-modal ref="editModal">
-          <ion-content>
-            <div class="p-4">
-              <div class="flex items-center justify-between">
-                <p class="text-lg font-bold">编辑账户</p>
-                <span class="text-sm text-[#4f46e5]" @click="dismissEditModal">取消</span>
-              </div>
-              <div class="flex items-center justify-between mt-4">
-                <Form ref="editFormRef" :model="editForm" :rules="rules" class="w-full" layout="horizontal" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-                  <FormItem label="账户类型" name="name">
-                    <Select v-model:value="editForm.name" :options="accounts_select" class="h-14"></Select>
-                  </FormItem>
-                  <!-- <FormItem label="卡号" name="cardNumber" v-if="editForm.name === '储蓄卡' || editForm.name === '信用卡'">
-                    <Input v-model:value="editForm.cardNumber" class="h-14" />
-                  </FormItem> -->
-                  <FormItem label="账户金额" name="balance">
-                    <InputNumber v-model:value="editForm.balance" class="w-full h-14 leading-[3.5rem]" />
-                  </FormItem>
-                  <FormItem>
-                    <Button type="primary" @click="handleEdit" class="w-full h-14">保存</Button>
-                  </FormItem>
-                </Form>
-              </div>
+          <div class="p-4 wrapper">
+            <div class="flex items-center justify-between">
+              <p class="text-lg font-bold">编辑账户</p>
+              <span class="text-sm text-[#4f46e5]" @click="dismissEditModal">取消</span>
             </div>
-          </ion-content>
+            <div class="flex items-center justify-between mt-4">
+              <Form ref="editFormRef" :model="editForm" :rules="rules" class="w-full" layout="horizontal" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+                <FormItem label="账户类型" name="name">
+                  <Select v-model:value="editForm.name" :options="accounts_select" class="h-14"></Select>
+                </FormItem>
+                <!-- <FormItem label="卡号" name="cardNumber" v-if="editForm.name === '储蓄卡' || editForm.name === '信用卡'">
+                  <Input v-model:value="editForm.cardNumber" class="h-14" />
+                </FormItem> -->
+                <FormItem label="账户金额" name="balance">
+                  <InputNumber v-model:value="editForm.balance" class="w-full h-14 leading-[3.5rem]" />
+                </FormItem>
+                <FormItem>
+                  <Button type="primary" @click="handleEdit" class="w-full h-14">保存</Button>
+                </FormItem>
+              </Form>
+            </div>
+          </div>
         </ion-modal>
 
         <!-- Delete Modal -->
-        <ion-modal class="delete" ref="deleteModal">
-          <ion-content>
-            <div class="flex flex-col items-center justify-center gap-5 h-full">
-              <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg-icon icon="mdi:delete" class="text-red-500 text-3xl"></svg-icon>
-              </div>
-              <p class="text-lg font-bold mb-2">确定要删除这个账户吗？</p>
-              <p class="text-gray-500 mb-8">删除后将无法恢复</p>
-              <div class="flex gap-4">
-                <Button class="flex-1" @click="dismissDeleteModal">取消</Button>
-                <Button type="primary" danger class="flex-1" @click="handleDelete">删除</Button>
-              </div>
+        <ion-modal id="example-modal" class="delete" ref="deleteModal">
+          <div class="flex flex-col items-center justify-center gap-5 h-full wrapper">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg-icon icon="mdi:delete" class="text-red-500 text-3xl"></svg-icon>
             </div>
-          </ion-content>
+            <p class="text-lg font-bold mb-2">确定要删除这个账户吗？</p>
+            <p class="text-gray-500 mb-8">删除后将无法恢复</p>
+            <div class="flex gap-4">
+              <Button class="flex-1" @click="dismissDeleteModal">取消</Button>
+              <Button type="primary" danger class="flex-1" @click="handleDelete">删除</Button>
+            </div>
+          </div>
         </ion-modal>
       </div>
 
@@ -307,8 +303,15 @@ ion-modal {
   --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
-ion-modal.delete {
-  --height: 40%;
+ion-modal {
+  --width: fit-content;
+  --min-width: 250px;
+  --height: fit-content;
+  --border-radius: 16px;
+}
+
+ion-modal .wrapper {
+  margin: 20px 10px;
 }
 
 ion-modal::part(backdrop) {
