@@ -12,10 +12,12 @@ export interface Statistics {
 }
 
 export interface Analysis {
-  [key: string | number]: {
-    category: number
-    count: number
-    totalExpense: number
-    totalIncome: number
-  }[]
+  [key: string]: {
+    [key: string]: {
+      category: number
+      count: number
+      totalExpense: number
+      totalIncome: number
+    }
+  }
 }

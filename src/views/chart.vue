@@ -124,7 +124,24 @@ const chartOptions = computed<EChartsOption>(() => {
 
 const activeTab = ref('支出分析');
 
+const EI = computed(() => {
+  return activeTab.value === '支出分析'? '支出' : '收入';
+})
 
+const totalEI = computed(() => {
+  return Object.keys(analysis.value).length ? Object.keys(analysis.value[EI.value]).map(item => {
+    return {
+      name: item,
+      value:activeTab.value === '支出分析'
+        ? analysis.value['支出'][item].totalExpense
+        : analysis.value['收入'][item].totalIncome
+    }
+  }) : []
+})
+
+const legendData = computed(() => {
+  return Object.keys(analysis.value).length ? Object.keys(analysis.value[EI.value]) : []
+})
 
 const chartOptions2 = computed<EChartsOption>(() => {
   return {
@@ -134,26 +151,14 @@ const chartOptions2 = computed<EChartsOption>(() => {
       orient: 'horizontal',
       bottom: '1%',
       left: 'center',
-      data: Object.values(analysis.value).map(item => {
-        if (activeTab.value === '支出分析') {
-          return item[0].totalExpense === 0 ? 0 : item[0].category.toString();
-        } else {
-          return item[0].totalIncome === 0 ? 0 : item[0].category.toString();
-        }
-      }).filter(item => item !== 0),
+      data: legendData.value,
     },
     series: [
       {
         type: 'pie',
         radius: ['45%', '80%'],
         center: ['50%', '45%'],
-        data: 
-        Object.values(analysis.value).map(val => {
-          return {
-            name: val[0].category.toString(),
-            value: activeTab.value === '支出分析' ? val[0].totalExpense : val[0].totalIncome
-          }
-        }).filter(item => item.value !== 0),
+        data: totalEI.value,
         labelLine: {
           show: false
         },
@@ -238,44 +243,20 @@ onIonViewDidEnter(() => {
             <v-chart class="chart" :option="chartOptions2" autoresize />
           </div>
           <ul class="flex flex-col items-center justify-between gap-2 text-xl mt-4">
-            <li class="flex items-center justify-between w-full py-1 border-b border-gray-200">
+            <li 
+              class="flex items-center justify-between w-full py-1 border-b border-gray-200"
+              v-for="(item,index) in legendData"
+              :key="index"
+            >
               <div class="flex items-center gap-2">
                 <div class="w-4 h-4 bg-[#4f46e5] rounded-full"></div>
-                <span>餐饮</span>
+                <span>{{ item }}</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="font-bold">¥100.00</span>
-                <span class="text-gray-500">10%</span>
-              </div>
-            </li>
-            <li class="flex items-center justify-between w-full py-1 border-b border-gray-200">
-              <div class="flex items-center gap-2">
-                <div class="w-4 h-4 bg-[#10b981] rounded-full"></div>
-                <span>交通</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="font-bold">¥100.00</span>
-                <span class="text-gray-500">10%</span>
-              </div>
-            </li>
-            <li class="flex items-center justify-between w-full py-1 border-b border-gray-200">
-              <div class="flex items-center gap-2">
-                <div class="w-4 h-4 bg-[#f59e0b] rounded-full"></div>
-                <span>购物</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="font-bold">¥100.00</span>
-                <span class="text-gray-500">10%</span>
-              </div>
-            </li>
-            <li class="flex items-center justify-between w-full py-1">
-              <div class="flex items-center gap-2">
-                <div class="w-4 h-4 bg-[#ef4444] rounded-full"></div>
-                <span>其他</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="font-bold">¥100.00</span>
-                <span class="text-gray-500">10%</span>
+                <span class="font-bold">¥{{ analysis[EI][item][ activeTab === '支出分析' ? 'totalExpense' : 'totalIncome'] }}</span>
+                <span class="text-gray-500">
+                  {{ totalEI.reduce((a, b) => a + b.value, 0) / 5 * 100 }}%
+                </span>
               </div>
             </li>
           </ul>
