@@ -312,9 +312,4 @@ ion-modal::part(backdrop) {
   background: rgba(209, 213, 219);
   opacity: 1;
 }
-
-ion-modal ion-toolbar {
-  --background: rgb(14 116 144);
-  --color: white;
-}
 </style>
