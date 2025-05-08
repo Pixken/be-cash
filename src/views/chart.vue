@@ -255,7 +255,7 @@ onIonViewDidEnter(() => {
               <div class="flex items-center gap-2">
                 <span class="font-bold">¥{{ analysis[EI][item][ activeTab === '支出分析' ? 'totalExpense' : 'totalIncome'] }}</span>
                 <span class="text-gray-500">
-                  {{ totalEI.reduce((a, b) => a + b.value, 0) / 5 * 100 }}%
+                  {{ analysis[EI][item][ activeTab === '支出分析' ? 'totalExpense' : 'totalIncome'] / totalEI.reduce((a, b) => a + b.value, 0) * 100 }}%
                 </span>
               </div>
             </li>
