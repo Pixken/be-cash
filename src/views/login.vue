@@ -17,6 +17,11 @@ const checkLogin = () => {
 }
 checkLogin();
 
+const toRegister = async () => {
+  console.log(await router.replace('/register'));
+  router.replace('/register');
+}
+
 const { errors, handleSubmit, defineField } = useForm({
   validationSchema: yup.object({
     username: yup.string().required('请输入用户名'),
@@ -49,8 +54,8 @@ onMounted(async () => {
   await getCaptchaInfo();
   
   // 加载保存的用户信息
-  username.value = import.meta.env.VITE_ENV === 'local' ? 'test1' : 'lgb';
-  password.value = import.meta.env.VITE_ENV === 'local' ? 'Test123456' : '123LGBlgb';
+  username.value = storage.getItem('user').username ? '' : import.meta.env.VITE_ENV === 'local' ? 'test1' : 'lgb';
+  password.value = storage.getItem('user').password ? '' : import.meta.env.VITE_ENV === 'local' ? 'Test123456' : '123LGBlgb';
 });
 
 // 登录状态
@@ -80,7 +85,7 @@ const [username, usernameAttrs] = defineField('username');
 const [password, passwordAttrs] = defineField('password');
 const [code, codeAttrs] = defineField('code');
 
-const remember = ref(false);
+const remember = ref(storage.getItem('user').username ? true : false);
 watch(remember, (val) => {
   if (val) {
     storage.setItem('user', { username: username.value, password: password.value });
@@ -239,7 +244,7 @@ onIonViewDidEnter(() => {
           <!-- 注册链接 -->
           <div class="flex items-center justify-center gap-2 mt-6">
             <p class="text-gray-600">还没有账号？</p>
-            <span class="text-blue-500 font-medium hover:underline cursor-pointer" @click="router.push('/register')">立即注册</span>
+            <span class="text-blue-500 font-medium cursor-pointer" @click="toRegister">立即注册</span>
           </div>
         </div>
       </div>

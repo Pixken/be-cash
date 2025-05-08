@@ -78,7 +78,7 @@ onIonViewDidEnter(() => {
                 </div>
                 <input 
                   type="text" 
-                  id="username" 
+                  id="register-username" 
                   v-model="username" 
                   v-bind="usernameAttrs"
                   class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none" 
@@ -123,7 +123,7 @@ onIonViewDidEnter(() => {
                 </div>
                 <input 
                   type="password" 
-                  id="password" 
+                  id="register-password" 
                   v-model="password" 
                   v-bind="passwordAttrs"
                   class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none" 

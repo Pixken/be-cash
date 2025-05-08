@@ -67,7 +67,7 @@ router.beforeEach((to, from, next) => {
   }
   
   // 如果需要登录且用户未登录，重定向到登录页
-  if (!isAuthenticated && to.path !== '/login') {
+  if (!isAuthenticated && to.path !== '/login' && to.path!== '/register') {
     return next('/login')
   }
   
