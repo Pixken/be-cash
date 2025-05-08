@@ -31,6 +31,7 @@ jobs:
         # 把 dist 目录下的所有文件上传到云服务器的 /home/be-cash 目录下，不包含 dist 目录
         source: "dist/*"
         target: "/home/be-cash/"
+        strip_components: 1
     
     - name: 重启 Nginx
       uses: appleboy/ssh-action@master
