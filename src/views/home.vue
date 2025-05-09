@@ -69,7 +69,7 @@ const chartOption = computed<EChartsOption>(() => ({
   color: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444'],
   tooltip: {
     trigger: 'item',
-    formatter: '{b}: {c} ({d}%)'
+    formatter: '{b}: ￥{c} ({d}%)'
   },
   legend: {
     orient: 'horizontal',
@@ -404,7 +404,7 @@ onIonViewDidEnter(() => {
                   </span>
                 </div>
                 <div class="flex items-center justify-between mt-1">
-                  <p class="text-gray-500 text-sm">{{ bill.description }}</p>
+                  <p class="text-gray-500 text-sm max-w-28 text-ellipsis whitespace-nowrap overflow-hidden">{{ bill.description }}</p>
                   <span class="text-gray-400 text-sm">{{ formatDate(bill.date) }}</span>
                 </div>
               </div>

@@ -142,10 +142,10 @@ const totalEI = computed(() => {
 const legendData = computed(() => {
   return Object.keys(analysis.value).length ? Object.keys(analysis.value[EI.value]) : []
 })
-
+const colors =  ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#f97316', '#9333ea', '#6366f1', '#3b82f6', '#2563eb', '#1d4ed8', '#1e40af', '#1e3a8a']
 const chartOptions2 = computed<EChartsOption>(() => {
   return {
-    color: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#f97316', '#9333ea', '#6366f1', '#3b82f6', '#2563eb', '#1d4ed8', '#1e40af', '#1e3a8a'],
+    color: colors,
     tooltip: {},
     legend: {
       orient: 'horizontal',
@@ -186,6 +186,7 @@ watch(activeTab, () => {
 const content = ref();
 
 onIonViewDidEnter(() => {
+  getInfo();
   content.value?.$el.scrollToTop(0);
 });
 
@@ -249,13 +250,13 @@ onIonViewDidEnter(() => {
               :key="index"
             >
               <div class="flex items-center gap-2">
-                <div class="w-4 h-4 bg-[#4f46e5] rounded-full"></div>
+                <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: index < colors.length ? colors[index] : colors[colors.length % index] }"></div>
                 <span>{{ item }}</span>
               </div>
               <div class="flex items-center gap-2">
                 <span class="font-bold">¥{{ analysis[EI][item][activeTab === '支出分析' ? 'totalExpense' : 'totalIncome'] }}</span>
                 <span class="text-gray-500">
-                  {{ analysis[EI][item][activeTab === '支出分析' ? 'totalExpense' : 'totalIncome'] / totalEI.reduce((a, b) => a + b.value, 0) * 100 }}%
+                  {{ (analysis[EI][item][activeTab === '支出分析' ? 'totalExpense' : 'totalIncome'] / totalEI.reduce((a, b) => a + b.value, 0) * 100 ).toFixed(2) }}%
                 </span>
               </div>
             </li>

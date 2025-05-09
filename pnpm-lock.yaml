@@ -65,6 +65,12 @@ importers:
       pinia:
         specifier: ^3.0.1
         version: 3.0.1(typescript@5.7.2)(vue@3.5.13(typescript@5.7.2))
+      react:
+        specifier: 19.2.0-canary-38ef6550-20250508
+        version: 19.2.0-canary-38ef6550-20250508
+      react-dom:
+        specifier: 19.2.0-canary-38ef6550-20250508
+        version: 19.2.0-canary-38ef6550-20250508(react@19.2.0-canary-38ef6550-20250508)
       swiper:
         specifier: ^11.1.15
         version: 11.1.15
@@ -3088,8 +3094,17 @@ packages:
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
 
+  react-dom@19.2.0-canary-38ef6550-20250508:
+    resolution: {integrity: sha512-PF05rFhPbxJrawYkNt1JVPUrJP92wp31j8jCMdS8kpfH8PBtm6X6M+MPNBV2dYES147AoEMKfixo1L+BqVAUNw==}
+    peerDependencies:
+      react: 19.2.0-canary-38ef6550-20250508
+
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
+
+  react@19.2.0-canary-38ef6550-20250508:
+    resolution: {integrity: sha512-yat+3HemxGEohoL969qTux1Tsv7Mti53y4W9mJ9EP8pzgcxzLToTaLvKpGBIkMMfqrsWfXe5oWLF+rJQGKKzgA==}
+    engines: {node: '>=0.10.0'}
 
   read-cache@1.0.0:
     resolution: {integrity: sha512-Owdv/Ft7IjOgm/i0xvNDZ1LrRANRfew4b2prF3OWMQLxLfu3bS8FVhCsrSCMK4lR56Y9ya+AThoTpDCTxCmpRA==}
@@ -3202,6 +3217,9 @@ packages:
   saxes@6.0.0:
     resolution: {integrity: sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA==}
     engines: {node: '>=v12.22.7'}
+
+  scheduler@0.27.0-canary-38ef6550-20250508:
+    resolution: {integrity: sha512-l/2+YZga3C0ghyNhSuiuy0x0gRU0bR7vFCS1IVTAp8SiwGK15z1qKs0Szd5zVBtjbHxtLvL3weRMlw4ZoJdsYA==}
 
   scroll-into-view-if-needed@2.2.31:
     resolution: {integrity: sha512-dGCXy99wZQivjmjIqihaBQNjryrz5rueJY7eHfTdyWEiR4ttYpsajb14rn9s5d4DY4EcY6+4+U/maARBXJedkA==}
@@ -7048,7 +7066,14 @@ snapshots:
 
   queue-microtask@1.2.3: {}
 
+  react-dom@19.2.0-canary-38ef6550-20250508(react@19.2.0-canary-38ef6550-20250508):
+    dependencies:
+      react: 19.2.0-canary-38ef6550-20250508
+      scheduler: 0.27.0-canary-38ef6550-20250508
+
   react-is@18.3.1: {}
+
+  react@19.2.0-canary-38ef6550-20250508: {}
 
   read-cache@1.0.0:
     dependencies:
@@ -7181,6 +7206,8 @@ snapshots:
   saxes@6.0.0:
     dependencies:
       xmlchars: 2.2.0
+
+  scheduler@0.27.0-canary-38ef6550-20250508: {}
 
   scroll-into-view-if-needed@2.2.31:
     dependencies:

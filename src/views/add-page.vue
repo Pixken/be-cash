@@ -52,12 +52,13 @@ const validateForm = async (values: any) => {
     amount: z.number().min(1, "金额必须大于0"),
     categoryId: z.string().min(1, "请选择分类"),
     description: z.string().min(1, "请输入备注"),
-    accountId: z.string().min(1, "请选择账户"),
-    transactionDate: z.date(),
+    accountId: z.number().min(1, "请选择账户"),
+    transactionDate: z.string(),
   })
   try {
-    await schema.parseAsync(values);
-    return {};
+    const { transactionDate,...sss } = values;
+    await schema.parseAsync({ ...sss, transactionDate: transactionDate.format('YYYY-MM-DD HH:mm:ss') });
+    return false;
   } catch (err) {
     if (err instanceof z.ZodError) {
       const errors: Record<string, string> = {};
@@ -66,7 +67,7 @@ const validateForm = async (values: any) => {
       });
       return errors;
     }
-    return {};
+    return false;
   }
 }
 
@@ -173,11 +174,6 @@ const handleTOAccount = () => {
   router.push("/tabs/account");
   modal.value?.$el.dismiss();
 };
-
-const onInput = (e: Event, key: keyof typeof form.value) => {
-  const input = e.target as HTMLInputElement;
-  form.value[key] = input.value;
-};
 </script>
 <template>
   <ion-page>
@@ -266,9 +262,8 @@ const onInput = (e: Event, key: keyof typeof form.value) => {
             <input
               class="h-12 border border-gray-200 rounded-md p-2 focus:outline-none focus:border-blue-500 transition-all duration-300"
               type="text"
-              :value="form.description"
-              @input="onInput($event, 'description')"
-              @change="onInput($event, 'description')"
+              v-model="form.description"
+              @blur="form.description = $event.target?.value"
               placeholder="请输入备注"
             />
             <label for="account" class="text-gray-500">账户</label>

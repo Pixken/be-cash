@@ -131,15 +131,12 @@ const onInput = (e: Event, key: keyof typeof form.value) => {
                 <input 
                   type="text" 
                   id="register-username" 
-                  v-model="username"
-                  @input="onInput($event, 'username')"
-                  @change="onInput($event, 'username')"
-                  class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none" 
-                  :class="{ 'border-red-500 bg-red-50': errors.username }"
+                  v-model="form.username"
+                  @blur="onInput($event, 'username')"
+                  class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none"
                   placeholder="请输入用户名"
                 />
               </div>
-              <div class="text-red-500 text-xs h-5 mt-1">{{ errors.username }}</div>
             </div>
             
             <!-- 邮箱输入框 -->
@@ -155,15 +152,12 @@ const onInput = (e: Event, key: keyof typeof form.value) => {
                 <input 
                   type="text" 
                   id="email" 
-                  v-model="email"
-                  @input="onInput($event, 'email')"
-                  @change="onInput($event, 'email')"
-                  class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none" 
-                  :class="{ 'border-red-500 bg-red-50': errors.email }"
+                  v-model="form.email"
+                  @blur="onInput($event, 'email')"
+                  class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none"
                   placeholder="请输入邮箱" 
                 />
               </div>
-              <div class="text-red-500 text-xs h-5 mt-1">{{ errors.email }}</div>
             </div>
 
             <!-- 密码输入框 -->
@@ -178,15 +172,12 @@ const onInput = (e: Event, key: keyof typeof form.value) => {
                 <input 
                   type="password" 
                   id="register-password" 
-                  v-model="password"
-                  @input="onInput($event, 'password')"
-                  @change="onInput($event, 'password')"
-                  class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none" 
-                  :class="{ 'border-red-500 bg-red-50': errors.password }"
+                  v-model="form.password"
+                  @blur="onInput($event, 'password')"
+                  class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none"
                   placeholder="请输入密码" 
                 />
               </div>
-              <div class="text-red-500 text-xs h-5 mt-1">{{ errors.password }}</div>
             </div>
 
             <!-- 确认密码输入框 -->
@@ -201,15 +192,12 @@ const onInput = (e: Event, key: keyof typeof form.value) => {
                 <input 
                   type="password" 
                   id="confirmPassword" 
-                  v-model="confirmPassword"
-                  @input="onInput($event, 'confirmPassword')"
-                  @change="onInput($event, 'confirmPassword')"
-                  class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none" 
-                  :class="{ 'border-red-500 bg-red-50': errors.confirmPassword }"
+                  v-model="form.confirmPassword"
+                  @blur="onInput($event, 'confirmPassword')"
+                  class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none"
                   placeholder="请确认密码" 
                 />
               </div>
-              <div class="text-red-500 text-xs h-5 mt-1">{{ errors.confirmPassword }}</div>
             </div>
             
             <!-- 用户协议 -->
