@@ -19,25 +19,8 @@ import { deepClone } from "@/utils/common";
 import { useRouter } from "vue-router";
 import dayjs from "dayjs";
 import locale from "ant-design-vue/es/date-picker/locale/zh_CN";
-import { useForm } from "vee-validate";
-import * as yup from "yup";
+import { z } from "zod";
 
-const { errors, handleSubmit, defineField, resetForm } = useForm({
-  validationSchema: yup.object({
-    description: yup.string().required("请输入备注"),
-    amount: yup.number().required("请输入金额"),
-    categoryId: yup.string().required("请选择分类"),
-    transactionDate: yup.string().required("请选择日期"),
-    accountId: yup.string().required("请选择账户"),
-  }),
-});
-
-const [description, descriptionAttrs] = defineField("description");
-const [amount, amountAttrs] = defineField("amount");
-const [categoryId, categoryIdAttrs] = defineField("categoryId");
-const [transactionDate, transactionDateAttrs] = defineField("transactionDate");
-const [accountId, accountIdAttrs] = defineField("accountId");
-transactionDate.value = dayjs();
 const userStore = useUserStore();
 const activeTab = ref("EXPENSE");
 const router = useRouter();
@@ -45,6 +28,47 @@ const modal = ref();
 const accounts = ref<any[]>([]);
 
 const noAccount = ref(false);
+
+const form = ref({
+  amount: 0,
+  categoryId: "",
+  description: "",
+  accountId: "",
+  transactionDate: dayjs(),
+});
+
+const resetForm = () => {
+  form.value = {
+    amount: 0,
+    categoryId: "",
+    description: "",
+    accountId: accounts.value[0]?.value,
+    transactionDate: dayjs()
+  };
+};
+
+const validateForm = async (values: any) => {
+  const schema = z.object({
+    amount: z.number().min(1, "金额必须大于0"),
+    categoryId: z.string().min(1, "请选择分类"),
+    description: z.string().min(1, "请输入备注"),
+    accountId: z.string().min(1, "请选择账户"),
+    transactionDate: z.date(),
+  })
+  try {
+    await schema.parseAsync(values);
+    return {};
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      const errors: Record<string, string> = {};
+      err.issues.forEach((issue) => {
+        errors[issue.path[0]] = issue.message;
+      });
+      return errors;
+    }
+    return {};
+  }
+}
 
 const getAccounts = async () => {
   const res = await getAccount();
@@ -56,15 +80,30 @@ const getAccounts = async () => {
     label: item.name,
     value: item.id,
   }));
-  accountId.value = accounts.value[0]?.value;
+  form.value.accountId = accounts.value[0]?.value;
 };
 
 // 表单提交处理
-const onSubmit = handleSubmit((values) => {
-  const { transactionDate, amount } = values;
-  values.transactionDate = dayjs(transactionDate).format("YYYY-MM-DD HH:mm:ss");
-  values.amount = Number(amount);
-  addCash({ ...values }, activeTab.value)
+const onSubmit = async (e: Event) => {
+  e.preventDefault();
+  // 验证表单
+  const errors = await validateForm(form.value);
+  if (errors) {
+    console.log(errors);
+    
+    emitter.emit("message", { msg: errors[Object.keys(errors)[0]], type: "error" });
+    return;
+  }
+  // 提交表单
+  const { transactionDate, amount, ...values } = form.value;
+  addCash(
+    {
+      ...values,
+      amount: Number(amount),
+      transactionDate: dayjs(transactionDate).format("YYYY-MM-DD HH:mm:ss"),
+    },
+    activeTab.value
+  )
     .then(async (res) => {
       emitter.emit("message", { msg: "记账成功", type: "success" });
     })
@@ -75,17 +114,6 @@ const onSubmit = handleSubmit((values) => {
       resetForm();
       router.push("/");
     });
-});
-
-const a = () => {
-  setTimeout(() => {
-    if (Object.keys(errors.value).length) {
-      emitter.emit("message", {
-        msg: "请填写完整",
-        type: "error",
-      });
-    }
-  }, 100);
 };
 
 const categories = ref([]);
@@ -99,7 +127,7 @@ const filterCategories = computed<any[]>(() => {
 });
 
 watch(activeTab, () => {
-  categoryId.value = "";
+  form.value.categoryId = "";
 });
 const getCashCategorys = async () => {
   try {
@@ -133,17 +161,22 @@ const handleAmountInput = () => {
 };
 
 const formateamount = computed(() => {
-  return (amount.value || 0).toFixed(2);
+  return (form.value.amount || 0).toFixed(2);
 });
 
 const handleSelectCategory = (item: any) => {
-  categoryId.value = item.id;
+  form.value.categoryId = item.id;
 };
 
 const handleTOAccount = () => {
   noAccount.value = false;
   router.push("/tabs/account");
   modal.value?.$el.dismiss();
+};
+
+const onInput = (e: Event, key: keyof typeof form.value) => {
+  const input = e.target as HTMLInputElement;
+  form.value[key] = input.value;
 };
 </script>
 <template>
@@ -204,8 +237,7 @@ const handleTOAccount = () => {
             type="number"
             class="opacity-0 absolute top-[-9999%] left-[-9999%] w-full h-full"
             ref="amountInput"
-            v-model="amount"
-            v-bind="amountAttrs"
+            v-model="form.amount"
           />
         </div>
         <div class="mt-4 border border-gray-200 rounded-2xl p-4">
@@ -215,7 +247,7 @@ const handleTOAccount = () => {
               v-for="item in filterCategories"
               :key="item.id"
               class="flex flex-col items-center justify-center gap-1 py-2 border border-white rounded-xl"
-              :class="{ '!bg-gray-200': item.id === categoryId }"
+              :class="{ '!bg-gray-200': item.id === form.categoryId }"
               @click="handleSelectCategory(item)"
             >
               <div
@@ -234,41 +266,26 @@ const handleTOAccount = () => {
             <input
               class="h-12 border border-gray-200 rounded-md p-2 focus:outline-none focus:border-blue-500 transition-all duration-300"
               type="text"
-              v-model="description"
-              v-bind="descriptionAttrs"
+              v-model="form.description"
               placeholder="请输入备注"
-              :class="{ 'border-red-500': errors.description }"
             />
-            <div class="text-red-500 text-xs h-5 mt-1">
-              {{ errors.description }}
-            </div>
             <label for="account" class="text-gray-500">账户</label>
             <Select
-              :status="errors.accountId ? 'error' : ''"
-              aria-placeholder="请选择账户"
-              v-model:value="accountId"
-              v-bind="accountIdAttrs"
+              placeholder="请选择账户"
+              v-model:value="form.accountId"
               :options="accounts"
               size="large"
               class="h-12"
             />
-            <div class="text-red-500 text-xs h-5 mt-1">
-              {{ errors.accountId }}
-            </div>
 
             <label for="date" class="text-gray-500">日期</label>
             <DatePicker
-              :status="errors.transactionDate ? 'error' : ''"
-              aria-placeholder="请选择日期"
-              v-model:value="transactionDate"
-              v-bind="transactionDateAttrs"
+              placeholder="请选择日期"
+              v-model:value="form.transactionDate"
               size="large"
               :locale="locale"
               class="w-full h-12"
             />
-            <div class="text-red-500 text-xs h-5 mt-1">
-              {{ errors.transactionDate }}
-            </div>
             <button
               class="w-full bg-blue-500 text-white rounded-md h-12 mt-4"
               type="submit"

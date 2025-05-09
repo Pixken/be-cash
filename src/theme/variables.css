@@ -39,3 +39,10 @@ http://ionicframework.com/docs/theming/ */
 .ant-select-selection-item {
   line-height: 3rem !important;
 }
+
+.ant-select-selector, .ant-select-selection-search-input, .ant-input {
+  height: 3rem !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

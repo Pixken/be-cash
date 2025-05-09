@@ -1,28 +1,67 @@
 <script setup lang='ts'>
 import { IonContent, IonPage, onIonViewDidEnter } from '@ionic/vue'
-import { useForm } from 'vee-validate';
-import * as yup from 'yup';
+import { z } from "zod";
 import { register } from '@/api/user';
 import { useRouter } from 'vue-router';
 import emitter from '@/utils/emitter';
 
 const router = useRouter();
-const { errors, handleSubmit, defineField, resetForm } = useForm({
-  validationSchema: yup.object({
-    username: yup.string().required('请输入用户名'),
-    email: yup.string().email('请输入正确的邮箱').required('请输入邮箱'),
-    password: yup.string().min(8, '密码长度至少为8位').matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, '密码必须包含大小写字母和数字').required('请输入密码'),
-    confirmPassword: yup.string().oneOf([yup.ref('password')], '密码不一致').required('请确认密码'),
-  }),
-});
+
+const form = ref({
+  username: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+})
+
+const validateForm = async (values: any) => {
+  const schema = z.object({
+    username: z.string().min(1, "用户名不能为空"),
+    email: z.string().email("请输入正确的邮箱"),
+    password: z.string().min(8, "密码长度至少为8位"),
+    confirmPassword: z.string().min(8, "确认密码长度至少为8位"),
+  });
+  try {
+    await schema.parseAsync(values);
+    return false;
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      const errors: Record<string, string> = {};
+      err.issues.forEach((issue) => {
+        errors[issue.path[0]] = issue.message;
+      });
+      return errors;
+    }
+    return false;
+  }
+}
 
 // 注册状态
 const isLoading = ref(false);
 
 // Creates a submission handler
 // It validate all fields and doesn't call your function unless all fields are valid
-const onSubmit = handleSubmit(values => {
+const onSubmit = async (e: Event) => {
+  e.preventDefault();
+  const values = form.value;
   isLoading.value = true;
+  // 验证表单
+  const errors = await validateForm(form.value);
+  if (errors) {
+    emitter.emit('message', { msg: '请检查表单', type: 'error' });
+    return;
+  }
+  // 验证密码是否一致
+  if (form.value.password !== form.value.confirmPassword) {
+    emitter.emit('message', { msg: '密码不一致', type: 'error' });
+    return;
+  }
+  // 验证是否同意条款
+  if (!acceptTerms.value) {
+    emitter.emit('message', { msg: '请同意条款', type: 'error' });
+    return;
+  }
+  // 提交表单
   register({ username: values.username, email: values.email, password: values.password }).then(res => {
     emitter.emit('message', { msg: '注册成功，请登录', type: 'success' });
     router.push('/login');
@@ -31,12 +70,16 @@ const onSubmit = handleSubmit(values => {
   }).finally(() => {
     isLoading.value = false;
   });
-});
+}
 
-const [username, usernameAttrs] = defineField('username');
-const [email, emailAttrs] = defineField('email');
-const [password, passwordAttrs] = defineField('password');
-const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
+const resetForm = () => {
+  form.value = {
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  }
+}
 
 const acceptTerms = ref(false);
 
@@ -49,6 +92,11 @@ onIonViewDidEnter(() => {
   // 重置接受条款复选框
   acceptTerms.value = false;
 });
+
+const onInput = (e: Event, key: keyof typeof form.value) => {
+  const input = e.target as HTMLInputElement;
+  form.value[key] = input.value;
+};
 </script>
 
 <template>
@@ -83,8 +131,9 @@ onIonViewDidEnter(() => {
                 <input 
                   type="text" 
                   id="register-username" 
-                  v-model="username" 
-                  v-bind="usernameAttrs"
+                  v-model="username"
+                  @input="onInput($event, 'username')"
+                  @change="onInput($event, 'username')"
                   class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none" 
                   :class="{ 'border-red-500 bg-red-50': errors.username }"
                   placeholder="请输入用户名"
@@ -106,8 +155,9 @@ onIonViewDidEnter(() => {
                 <input 
                   type="text" 
                   id="email" 
-                  v-model="email" 
-                  v-bind="emailAttrs"
+                  v-model="email"
+                  @input="onInput($event, 'email')"
+                  @change="onInput($event, 'email')"
                   class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none" 
                   :class="{ 'border-red-500 bg-red-50': errors.email }"
                   placeholder="请输入邮箱" 
@@ -128,8 +178,9 @@ onIonViewDidEnter(() => {
                 <input 
                   type="password" 
                   id="register-password" 
-                  v-model="password" 
-                  v-bind="passwordAttrs"
+                  v-model="password"
+                  @input="onInput($event, 'password')"
+                  @change="onInput($event, 'password')"
                   class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none" 
                   :class="{ 'border-red-500 bg-red-50': errors.password }"
                   placeholder="请输入密码" 
@@ -150,8 +201,9 @@ onIonViewDidEnter(() => {
                 <input 
                   type="password" 
                   id="confirmPassword" 
-                  v-model="confirmPassword" 
-                  v-bind="confirmPasswordAttrs"
+                  v-model="confirmPassword"
+                  @input="onInput($event, 'confirmPassword')"
+                  @change="onInput($event, 'confirmPassword')"
                   class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 transition-all outline-none" 
                   :class="{ 'border-red-500 bg-red-50': errors.confirmPassword }"
                   placeholder="请确认密码" 

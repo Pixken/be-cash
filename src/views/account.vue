@@ -19,7 +19,7 @@ const getAccounts = async () => {
 const modal = ref();
 const form = ref({
   cardNumber: '',
-  name: '',
+  name: undefined,
   balance: 0,
 });
 const dismiss = () => {
@@ -169,7 +169,7 @@ const handleDelete = async () => {
                 <div class="flex items-center justify-between mt-4">
                   <Form ref="formRef" :model="form" :rules="rules" class="w-full" layout="horizontal" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
                     <FormItem label="账户类型" name="name">
-                      <Select v-model:value="form.name" :options="accounts_select"></Select>
+                      <Select placeholder="请选择账户类型" v-model:value="form.name" :options="accounts_select"></Select>
                     </FormItem>
                     <!-- <FormItem label="卡号" name="cardNumber" v-if="form.name === '储蓄卡' || form.name === '信用卡'">
                       <Input v-model:value="form.cardNumber" />
@@ -254,7 +254,7 @@ const handleDelete = async () => {
             <div class="flex items-center justify-between mt-4">
               <Form ref="editFormRef" :model="editForm" :rules="rules" class="w-full" layout="horizontal" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
                 <FormItem label="账户类型" name="name">
-                  <Select v-model:value="editForm.name" :options="accounts_select" class="h-12"></Select>
+                  <Select placeholder="请选择账户类型" v-model:value="editForm.name" :options="accounts_select" class="h-12"></Select>
                 </FormItem>
                 <!-- <FormItem label="卡号" name="cardNumber" v-if="editForm.name === '储蓄卡' || editForm.name === '信用卡'">
                   <Input v-model:value="editForm.cardNumber" class="h-14" />
