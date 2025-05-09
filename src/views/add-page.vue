@@ -266,7 +266,9 @@ const onInput = (e: Event, key: keyof typeof form.value) => {
             <input
               class="h-12 border border-gray-200 rounded-md p-2 focus:outline-none focus:border-blue-500 transition-all duration-300"
               type="text"
-              v-model="form.description"
+              :value="form.description"
+              @input="onInput($event, 'description')"
+              @change="onInput($event, 'description')"
               placeholder="请输入备注"
             />
             <label for="account" class="text-gray-500">账户</label>
