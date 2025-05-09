@@ -241,12 +241,12 @@ onIonViewDidEnter(() => {
             </div>
             <span class="text-sm text-gray-600">记一笔</span>
           </div>
-          <div @click="router.push('/tabs/transfer')" class="flex flex-col items-center cursor-pointer">
+          <!-- <div @click="router.push('/tabs/transfer')" class="flex flex-col items-center cursor-pointer">
             <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mb-2">
               <ion-icon :icon="swapHorizontalOutline" class="text-green-500 text-2xl"></ion-icon>
             </div>
             <span class="text-sm text-gray-600">转账</span>
-          </div>
+          </div> -->
           <div @click="router.push('/tabs/chart')" class="flex flex-col items-center cursor-pointer">
             <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center mb-2">
               <ion-icon :icon="pieChart" class="text-yellow-500 text-2xl"></ion-icon>
@@ -265,7 +265,7 @@ onIonViewDidEnter(() => {
         <div class="bg-white rounded-3xl shadow-xl p-6 mb-6 animate-slide-up">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-gray-800">支出分析</h2>
-            <span class="text-sm text-indigo-600 cursor-pointer">查看更多</span>
+            <span class="text-sm text-indigo-600 cursor-pointer" @click="router.push('/tabs/chart')">查看更多</span>
           </div>
           <div class="h-64">
             <v-chart class="w-full h-full" :option="chartOption" autoresize />
@@ -344,7 +344,7 @@ onIonViewDidEnter(() => {
                       </div>
                       <div>
                         <span class="text-gray-500 text-sm">日期</span>
-                        <p class="text-gray-800 font-medium">{{ formatDate(billDetail.date) }}</p>
+                        <p class="text-gray-800 font-medium">{{ dayjs(billDetail.date).format('YYYY-MM-DD HH:mm:ss') }}</p>
                       </div>
                     </div>
                     

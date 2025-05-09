@@ -31,11 +31,11 @@ http://ionicframework.com/docs/theming/ */
   align-items: center;
 }
 .ant-input-number-input {
-  height: 3.5rem !important;
+  height: 3rem !important;
 }
 .ant-select-selector {
   height: 100% !important;
 }
 .ant-select-selection-item {
-  line-height: 3.5rem !important;
+  line-height: 3rem !important;
 }
