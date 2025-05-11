@@ -3,10 +3,16 @@ import { IonPage, IonContent, IonToggle, onIonViewDidEnter } from '@ionic/vue';
 import { useRouter } from 'vue-router';
 import emitter from '@/utils/emitter';
 import useUserStore from '@/store/user';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Dialog } from '@capacitor/dialog';
+import { getCashByDaterange, exportTransactionsToExcel } from '@/api/cash';
+import dayjs from 'dayjs';
+import fs from 'fs';
 
 const userStore = useUserStore();
 const router = useRouter();
 const isLoading = ref(false);
+const isExporting = ref(false);
 
 const logout = () => {
   isLoading.value = true;
@@ -16,6 +22,61 @@ const logout = () => {
     router.push('/login');
     isLoading.value = false;
   }, 1000);
+};
+
+// 导出数据为Excel文件
+const exportData = async () => {
+  try {
+    isExporting.value = true;
+    
+    // 获取日期范围
+    const startDate = dayjs().subtract(3, 'month').startOf('month').format('YYYY-MM-DD HH:mm:ss');
+    const endDate = dayjs().endOf('month').format('YYYY-MM-DD HH:mm:ss');
+    
+    // 调用后端API直接获取Excel文件
+    const response = await exportTransactionsToExcel({
+      startDate,
+      endDate
+    });
+
+    console.log(response)
+    
+    // 生成文件名
+    const fileName = `鸟蛋记账导出_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`;
+    
+    // 将ArrayBuffer转换为Base64字符串
+    const uint8Array = new Uint8Array(response);
+    console.log(uint8Array)
+    let binary = '';
+    for (let i = 0; i < uint8Array.byteLength; i++) {
+      binary += String.fromCharCode(uint8Array[i]);
+    }
+    const base64Data = btoa(binary);
+    // 将Base64数据写入文件系统
+    const result = await Filesystem.writeFile({
+      path: fileName,
+      data: base64Data,
+      directory: Directory.Documents
+    });
+
+    
+
+    console.log('文件已保存:', result); // 打印文件保存结果，包括文件路径等相关信息
+    
+    // 显示成功消息，包含文件路径
+    await Dialog.alert({
+      title: '导出成功',
+      message: `文件已保存到: ${result.uri}`,
+      buttonTitle: '确定'
+    });
+    
+    emitter.emit('message', { msg: '数据导出成功', type: 'success' });
+  } catch (error) {
+    console.error('导出失败:', error);
+    emitter.emit('message', { msg: '导出失败' + error, type: 'error' });
+  } finally {
+    isExporting.value = false;
+  }
 };
 
 const content = ref();
@@ -244,7 +305,7 @@ onIonViewDidEnter(() => {
                 </svg>
               </div>
               
-              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+              <div @click="exportData" class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
                 <div class="flex items-center">
                   <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
@@ -253,9 +314,12 @@ onIonViewDidEnter(() => {
                   </div>
                   <span class="text-gray-800 font-medium">数据导出</span>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                </svg>
+                <div class="flex items-center gap-2">
+                  <span v-if="isExporting" class="text-gray-500">导出中...</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>

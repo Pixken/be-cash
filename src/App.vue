@@ -18,6 +18,13 @@ import { IonApp, IonRouterOutlet, IonToast } from '@ionic/vue';
 import { ref, watch } from 'vue';
 import emitter from './utils/emitter';
 
+import { checkNativeUpdate } from '@/services/update/nativeUpdate';
+
+// 在应用启动时检查更新
+checkNativeUpdate((progress) => {
+  console.log(`下载进度: ${progress}%`);
+});
+
 const isOpen = ref(false);
 const message = ref('');
 const type = ref<'success' | 'error' | ''>('');

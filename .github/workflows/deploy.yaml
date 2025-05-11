@@ -22,15 +22,6 @@ jobs:
     - name: 构建项目
       run: pnpm build
 
-    - name: 上传 public/apk-update.json 文件
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.KEY }}
-        source: "public/apk-update.json"
-        target: "/home/be-cash/public/apk-update.json"
-
     - name: 上传文件到云服务器
       uses: appleboy/scp-action@master
       with:

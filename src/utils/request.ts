@@ -63,8 +63,10 @@ const retryRequest = async (config: AxiosRequestConfig, retries = 0): Promise<an
 };
 
 request.interceptors.response.use((response: AxiosResponse) => {
-  console.log(response.data)
+  console.log(response)
   if (response.data.code == '0000') {
+    return response;
+  } else if (response.status == 200) {
     return response;
   } else {
     emitter.emit('message', { msg: response.data.info, type: 'error'  })

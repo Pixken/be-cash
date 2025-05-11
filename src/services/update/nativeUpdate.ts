@@ -5,6 +5,8 @@ import { App } from '@capacitor/app'
 import { Device } from '@capacitor/device'
 import { Network } from '@capacitor/network'
 import { Dialog } from '@capacitor/dialog'
+import { get } from '@/utils/request'
+import axios from 'axios'
 
 interface ApkUpdateInfo {
   version: string
@@ -19,19 +21,21 @@ export async function checkNativeUpdate(
   onProgress?: (progress: number) => void
 ): Promise<boolean> {
   try {
-    // 0. 检查网络状况
-    const { connected } = await Network.getStatus()
-    if (!connected) return false
-    
-    // 1. 获取当前版本信息
-    const { version: currentVersion } = await App.getInfo()
+
     const { platform } = await Device.getInfo()
     
     // 只在 Android 平台执行更新
     if (platform !== 'android') return false
+
+    // 0. 检查网络状况
+    const { connected } = await Network.getStatus()
+    if (!connected) return false
+
+    // 1. 获取当前版本信息
+    const { version: currentVersion } = await App.getInfo()
     
     // 2. 获取服务器更新信息
-    const res = await fetch(`${import.meta.env.VITE_API_BASE}/apk-update.json`)
+    const res = await fetch(`${import.meta.env.VITE_STATIC_URL}/apk-update.json`)
     const { android }: { android: ApkUpdateInfo } = await res.json()
     
     // 3. 版本比较

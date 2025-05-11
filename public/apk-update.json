@@ -1,6 +1,6 @@
 {
   "android": {
-    "version": "1.2.0",
+    "version": "1.0.0",
     "minVersion": "1.0.0",
     "url": "https://your-server.com/downloads/your-app-1.2.0.apk",
     "size": 15000000,

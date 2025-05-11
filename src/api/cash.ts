@@ -16,3 +16,7 @@ export const getCashByType = (type: string) => {
 export const getCashByDaterange = ({ startDate, endDate }: DateRange) => {
   return get(`/finance/transactions/date-range?startDate=${startDate}&endDate=${endDate}`);
 };
+
+export const exportTransactionsToExcel = ({ startDate, endDate }: DateRange) => {
+  return get(`/finance/transactions/export/excel?startDate=${startDate}&endDate=${endDate}`, { responseType: 'arraybuffer' });
+};
