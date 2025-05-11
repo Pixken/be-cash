@@ -20,6 +20,7 @@ import { useRouter } from "vue-router";
 import dayjs from "dayjs";
 import locale from "ant-design-vue/es/date-picker/locale/zh_CN";
 import { z } from "zod";
+import { debounce } from '@/utils/common';
 
 const userStore = useUserStore();
 const activeTab = ref("EXPENSE");
@@ -85,8 +86,15 @@ const getAccounts = async () => {
 };
 
 // 表单提交处理
-const onSubmit = async (e: Event) => {
+// 创建防抖提交函数
+const debouncedSubmit = debounce((e: Event) => {
+  // 阻止默认的表单提交行为
   e.preventDefault();
+  onSubmit(e);
+}, 500);
+
+// 修改原来的onSubmit函数，移除preventDefault
+const onSubmit = async (e: Event) => {
   // 验证表单
   const errors = await validateForm(form.value);
   if (errors) {
@@ -116,7 +124,6 @@ const onSubmit = async (e: Event) => {
       router.push("/");
     });
 };
-
 const categories = ref([]);
 const filterCategories = computed<any[]>(() => {
   // 把其他类型放到最后
@@ -257,7 +264,10 @@ const handleTOAccount = () => {
           </ul>
         </div>
         <div class="mt-4 border border-gray-200 rounded-2xl p-4">
-          <form class="flex flex-col gap-2 w-full" @submit="onSubmit">
+          <form class="flex flex-col gap-2 w-full" @submit="debounce((e: Event) => {
+              e.preventDefault();
+              onSubmit(e)
+            }, 500)">
             <label for="description" class="text-gray-500">备注</label>
             <input
               class="h-12 border border-gray-200 rounded-md p-2 focus:outline-none focus:border-blue-500 transition-all duration-300"
@@ -286,7 +296,6 @@ const handleTOAccount = () => {
             <button
               class="w-full bg-blue-500 text-white rounded-md h-12 mt-4"
               type="submit"
-              @click="a"
             >
               提交
             </button>

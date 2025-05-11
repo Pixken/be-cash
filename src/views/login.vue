@@ -71,17 +71,16 @@ const getCaptchaInfo = async () => {
 onMounted(async () => {
   await getCaptchaInfo();
 
-  // 加载保存的用户信息
-  form.value.username = storage.getItem("user").username
-    ? ""
-    : import.meta.env.VITE_ENV === "local"
-    ? "test1"
-    : "lgb";
-  form.value.password = storage.getItem("user").password
-    ? ""
-    : import.meta.env.VITE_ENV === "local"
-    ? "Test123456"
-    : "123LGBlgb";
+  // 获取存储的用户信息，并处理可能为空的情况
+  const savedUser = storage.getItem("user") || {};
+  
+  // 设置默认值
+  const defaultUsername = import.meta.env.VITE_ENV === "local" ? "test1" : "lgb";
+  const defaultPassword = import.meta.env.VITE_ENV === "local" ? "Test123456" : "123LGBlgb";
+  
+  // 优先使用保存的值，如果没有则使用默认值
+  form.value.username = savedUser.username || defaultUsername;
+  form.value.password = savedUser.password || defaultPassword;
 });
 
 // 登录状态

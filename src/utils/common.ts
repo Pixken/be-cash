@@ -14,3 +14,16 @@ export const isObject = (obj: any) => {
 export const deepClone = (obj: any) => {
   return JSON.parse(JSON.stringify(obj))
 }
+
+export const debounce = (fn: Function, delay: number) => {
+  let timer: any = null
+  return function () {
+    const args = arguments
+    if (timer) {
+      clearTimeout(timer)
+    }
+    timer = setTimeout(() => {
+      fn.apply(this, args)
+    }, delay)
+  }
+}

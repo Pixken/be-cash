@@ -38,6 +38,13 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { Drivers, Storage } from '@ionic/storage';
 import { createPinia } from 'pinia';
 
+import { checkNativeUpdate } from '@/services/update/nativeUpdate';
+
+// 在应用启动时检查更新
+checkNativeUpdate((progress) => {
+  console.log(`下载进度: ${progress}%`);
+});
+
 // 设置状态栏为透明沉浸式
 StatusBar.setOverlaysWebView({ overlay: true });
 StatusBar.setBackgroundColor({ color: '#00000000' });

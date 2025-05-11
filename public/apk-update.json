@@ -1,0 +1,10 @@
+{
+  "android": {
+    "version": "1.2.0",
+    "minVersion": "1.0.0",
+    "url": "https://your-server.com/downloads/your-app-1.2.0.apk",
+    "size": 15000000,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "isCritical": false
+  }
+}
