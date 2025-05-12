@@ -5,9 +5,7 @@ import emitter from '@/utils/emitter';
 import useUserStore from '@/store/user';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Dialog } from '@capacitor/dialog';
-import { getCashByDaterange, exportTransactionsToExcel } from '@/api/cash';
 import dayjs from 'dayjs';
-import fs from 'fs';
 
 const userStore = useUserStore();
 const router = useRouter();
