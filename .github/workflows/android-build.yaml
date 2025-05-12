@@ -72,6 +72,9 @@ jobs:
       if: github.ref == 'refs/heads/main'
       run: |
         ls
+        ls android
+        ls android/app
+        ls android/app/release
         APK_SIZE=$(stat -c%s "android/app/release/app-release.apk")
         APK_SHA256=$(sha256sum "android/app/release/app-release.apk" | cut -d' ' -f1)
         VERSION=$(grep '"version":' package.json | cut -d'"' -f4)
@@ -98,6 +101,6 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
-        source: "android/app/build/outputs/apk/release/app-release.apk,public/apk-update.json"
+        source: "android/app/release/app-release.apk,public/apk-update.json"
         target: "/home/be-cash/downloads/"
         strip_components: 3
