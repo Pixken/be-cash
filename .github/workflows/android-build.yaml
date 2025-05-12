@@ -37,7 +37,9 @@ jobs:
       run: npm install -g @ionic/cli @capacitor/cli
       
     - name: 复制Web资源到Android平台
-      run: npx cap copy android
+      run: |
+        npx cap copy android
+        npx cap sync android
       
     - name: 设置Gradle权限
       run: chmod +x ./android/gradlew
