@@ -71,8 +71,9 @@ jobs:
     - name: 更新APK信息
       if: github.ref == 'refs/heads/main'
       run: |
-        APK_SIZE=$(stat -c%s "android/app/build/outputs/apk/release/app-release.apk")
-        APK_SHA256=$(sha256sum "android/app/build/outputs/apk/release/app-release.apk" | cut -d' ' -f1)
+        ls
+        APK_SIZE=$(stat -c%s "android/app/release/app-release.apk")
+        APK_SHA256=$(sha256sum "android/app/release/app-release.apk" | cut -d' ' -f1)
         VERSION=$(grep '"version":' package.json | cut -d'"' -f4)
         
         # 更新apk-update.json文件
