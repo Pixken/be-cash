@@ -152,9 +152,10 @@ const onInput = (e: Event, key: keyof typeof form.value) => {
 <template>
   <ion-page>
     <ion-content ref="content" class="ion-padding">
+      <div class="content-wapper">
       <!-- 背景渐变和装饰元素 -->
       <div
-        class="absolute top-0 left-0 w-full h-64 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-b-[40px] z-0"
+        class="absolute top-0 left-0 w-full h-80 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-b-[40px] z-0"
       ></div>
       <div
         class="absolute top-10 right-10 w-24 h-24 bg-white opacity-10 rounded-full"
@@ -386,6 +387,7 @@ const onInput = (e: Event, key: keyof typeof form.value) => {
           </div>
         </div>
       </div>
+    </div>
     </ion-content>
   </ion-page>
 </template>

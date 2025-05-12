@@ -20,6 +20,7 @@ import type { EChartsOption } from 'echarts';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 import { deleteCash } from '@/api/cash';
+import defaultAvatar from '@/assets/zxd.png'
 
 dayjs.locale('zh-cn');
 
@@ -183,6 +184,7 @@ onIonViewDidEnter(() => {
 <template>
   <ion-page>
     <ion-content ref="content" class="ion-padding">
+      <div class="content-wapper">
       <!-- 背景渐变和装饰元素 -->
       <div class="absolute top-0 left-0 w-full h-64 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-b-[40px] z-0"></div>
       <div class="absolute top-10 right-10 w-24 h-24 bg-white opacity-10 rounded-full"></div>
@@ -194,10 +196,10 @@ onIonViewDidEnter(() => {
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center">
             <div class="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center overflow-hidden mr-4">
-              <img src="@/assets/zxd.png" alt="" class="w-full h-full object-cover">
+              <img :src="userStore.user.profile.avatar || defaultAvatar" alt="" class="w-full h-full object-cover">
             </div>
             <div>
-              <h1 class="text-xl font-bold text-white">小蛋</h1>
+              <h1 class="text-xl font-bold text-white">{{ userStore.user.profile.nickname }}</h1>
               <p class="text-gray-100 text-sm">欢迎回来</p>
             </div>
           </div>
@@ -418,6 +420,7 @@ onIonViewDidEnter(() => {
 
       <!-- AI助手按钮 -->
       <AI />
+    </div>
     </ion-content>
   </ion-page>
 </template>

@@ -13,14 +13,14 @@ defineProps<{
 </script>
 
 <template>
-  <ion-header class="ion-no-border relative border-b border-gray-200 h-12 flex items-center">
+  <ion-header class="ion-no-border relative border-b border-gray-200 h-20 flex items-center">
     <div>
       <ion-back-button :icon="chevronBackOutline" v-if="showBack" class="text-gray-500"
         @click="router.back()"></ion-back-button>
       <slot name="start" v-else></slot>
     </div>
 
-    <div class="absolute left-[50%] translate-x-[-50%] top-[50%] translate-y-[-50%] font-semibold text-lg">
+    <div class="absolute left-[50%] translate-x-[-50%] top-[50%] translate-y-[-50%] font-semibold text-lg content-wapper">
       <span v-if="title">{{ title }}</span>
       <slot v-else />
     </div>

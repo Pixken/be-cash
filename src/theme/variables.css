@@ -24,6 +24,10 @@ http://ionicframework.com/docs/theming/ */
   box-sizing: border-box !important;
 }
 
+.content-wapper {
+  padding-top: 36px;
+}
+
 .ant-select-item-option {
   height: 3rem !important;
   display: flex;

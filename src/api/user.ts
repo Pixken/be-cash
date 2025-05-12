@@ -1,5 +1,6 @@
 import { get, post } from "@/utils/request"
 import useUserStore from "@/store/user"
+import { Password } from "@/types"
 
 const userStore = useUserStore()
 
@@ -19,4 +20,7 @@ export const userInfo = () => {
 }
 export const getCaptcha = () => {
   return get('/identity/captcha')
+}
+export const updatePassword = (data: Password) => {
+  return post('/identity/change-password', data)
 }

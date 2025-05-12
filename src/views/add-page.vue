@@ -264,10 +264,7 @@ const handleTOAccount = () => {
           </ul>
         </div>
         <div class="mt-4 border border-gray-200 rounded-2xl p-4">
-          <form class="flex flex-col gap-2 w-full" @submit="debounce((e: Event) => {
-              e.preventDefault();
-              onSubmit(e)
-            }, 500)">
+          <form class="flex flex-col gap-2 w-full" @submit.prevent="debouncedSubmit">
             <label for="description" class="text-gray-500">备注</label>
             <input
               class="h-12 border border-gray-200 rounded-md p-2 focus:outline-none focus:border-blue-500 transition-all duration-300"

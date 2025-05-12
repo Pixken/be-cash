@@ -7,7 +7,7 @@ import emitter from './emitter'
 const userStore = useUserStore()
 
 export interface ApiResponse<T> {
-  message: string
+  info: string
   code: string
   data: T
 }

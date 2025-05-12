@@ -21,3 +21,9 @@ export interface Analysis {
     }
   }
 }
+
+export interface Password {
+  oldPassword: string
+  newPassword: string
+  username: string
+}
