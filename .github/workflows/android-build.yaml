@@ -97,7 +97,20 @@ jobs:
         echo "APK 文件已移动到:"
         ls -la android/app/build/outputs/apk/release/
         
-    # 可选：将APK上传到服务器
+    # 新增一个步骤：将文件移动到临时目录以便上传
+    - name: 准备上传文件
+      if: github.ref == 'refs/heads/main'
+      run: |
+        # 创建临时目录
+        mkdir -p ./upload_temp
+        # 复制文件到临时目录
+        cp android/app/build/outputs/apk/release/be-cash-${{ env.VERSION }}.apk ./upload_temp/
+        cp public/apk-update.json ./upload_temp/
+        # 显示临时目录内容
+        echo "准备上传的文件:"
+        ls -la ./upload_temp/
+
+    # 修改上传步骤
     - name: 上传APK到服务器
       if: github.ref == 'refs/heads/main'
       uses: appleboy/scp-action@master
@@ -105,6 +118,6 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
-        source: "android/app/build/outputs/apk/release/be-cash-${{ env.VERSION }}.apk,public/apk-update.json"
+        source: "./upload_temp/*"  # 从临时目录上传所有文件
         target: "/home/be-cash/downloads/"
-        strip_components: 3
+        strip_components: 1  # 只去掉 upload_temp 这一级目录
