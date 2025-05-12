@@ -109,6 +109,8 @@ const onSubmit = async (e: Event) => {
       // await userStore.setToken(res.data.access_token, res.data.refresh_token);
       // const user = await userInfo()
       await userStore.setUser(res.data);
+      alert(JSON.stringify(res.data))
+      
       emitter.emit("message", { msg: "登录成功", type: "success" });
       router.replace("/tabs/home");
     })

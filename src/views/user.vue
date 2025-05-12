@@ -34,43 +34,37 @@ const exportData = async () => {
     const endDate = dayjs().endOf('month').format('YYYY-MM-DD HH:mm:ss');
     
     // 调用后端API直接获取Excel文件
-    const response = await exportTransactionsToExcel({
-      startDate,
-      endDate
-    });
+    const response = await fetch(`http://116.198.241.147:8091/api/finance/transactions/export/excel?startDate=${startDate}&endDate=${endDate}`, {
+      method: 'GET',
+      headers: {
+        'X-User-ID': userStore.user.id?.value || '',
+      },
+    })
 
-    console.log(response)
-    
-    // 生成文件名
-    const fileName = `鸟蛋记账导出_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`;
-    
-    // 将ArrayBuffer转换为Base64字符串
-    const uint8Array = new Uint8Array(response);
-    console.log(uint8Array)
-    let binary = '';
-    for (let i = 0; i < uint8Array.byteLength; i++) {
-      binary += String.fromCharCode(uint8Array[i]);
+    const blob = await response.blob();
+
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onload = async () => {
+      const base64Data = reader.result?.toString().split(',')[1];
+      // 生成文件名
+      const fileName = `鸟蛋记账导出_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`;
+      console.log(base64Data)
+      // 将Base64数据写入文件系统
+      const result = await Filesystem.writeFile({
+        path: fileName,
+        data: base64Data,
+        directory: Directory.Documents
+      });
+      // 显示成功消息，包含文件路径
+      await Dialog.alert({
+        title: '导出成功',
+        message: `文件已保存到: ${result.uri}`,
+        buttonTitle: '确定'
+      });
+      
+      emitter.emit('message', { msg: '数据导出成功', type: 'success' });
     }
-    const base64Data = btoa(binary);
-    // 将Base64数据写入文件系统
-    const result = await Filesystem.writeFile({
-      path: fileName,
-      data: base64Data,
-      directory: Directory.Documents
-    });
-
-    
-
-    console.log('文件已保存:', result); // 打印文件保存结果，包括文件路径等相关信息
-    
-    // 显示成功消息，包含文件路径
-    await Dialog.alert({
-      title: '导出成功',
-      message: `文件已保存到: ${result.uri}`,
-      buttonTitle: '确定'
-    });
-    
-    emitter.emit('message', { msg: '数据导出成功', type: 'success' });
   } catch (error) {
     console.error('导出失败:', error);
     emitter.emit('message', { msg: '导出失败' + error, type: 'error' });
