@@ -71,10 +71,6 @@ jobs:
     - name: 更新APK信息
       if: github.ref == 'refs/heads/main'
       run: |
-        ls
-        ls android
-        ls android/app
-        ls android/app/release
         APK_SIZE=$(stat -c%s "android/app/build/outputs/apk/release/app-release-unsigned.apk")
         APK_SHA256=$(sha256sum "android/app/build/outputs/apk/release/app-release-unsigned.apk" | cut -d' ' -f1)
         VERSION=$(grep '"version":' package.json | cut -d'"' -f4)
@@ -85,13 +81,19 @@ jobs:
           "android": {
             "version": "$VERSION",
             "minVersion": "1.0.0",
-            "url": "https://your-server.com/downloads/your-app-$VERSION.apk",
+            "url": "http://117.72.49.27/downloads/be-cash-$VERSION.apk",
             "size": $APK_SIZE,
             "sha256": "$APK_SHA256",
             "isCritical": false
           }
         }
         EOL
+        
+        # 重命名APK文件
+        mv android/app/build/outputs/apk/release/app-release-unsigned.apk android/app/build/outputs/apk/release/be-cash-$VERSION.apk
+
+        # 清理旧版本 apk
+        # find /home/be-cash/downloads/ -name "be-cash-*.apk" -mtime +30 -exec rm {} \;
         
     # 可选：将APK上传到服务器
     - name: 上传APK到服务器
@@ -101,6 +103,6 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
-        source: "android/app/release/app-release.apk,public/apk-update.json"
+        source: "android/app/build/outputs/apk/release/be-cash-$VERSION.apk,public/apk-update.json"
         target: "/home/be-cash/downloads/"
         strip_components: 3
