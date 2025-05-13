@@ -71,8 +71,8 @@ jobs:
     - name: 更新APK信息
       if: github.ref == 'refs/heads/main'
       run: |
-        APK_SIZE=$(stat -c%s "android/app/build/outputs/apk/release/app-release-unsigned.apk")
-        APK_SHA256=$(sha256sum "android/app/build/outputs/apk/release/app-release-unsigned.apk" | cut -d' ' -f1)
+        APK_SIZE=$(stat -c%s "android/app/build/outputs/apk/release/app-release.apk")
+        APK_SHA256=$(sha256sum "android/app/build/outputs/apk/release/app-release.apk" | cut -d' ' -f1)
         VERSION=$(grep '"version":' package.json | cut -d'"' -f4)
         echo "VERSION=$VERSION" >> $GITHUB_ENV
         
@@ -91,7 +91,7 @@ jobs:
         EOL
         
         # 重命名APK文件
-        mv android/app/build/outputs/apk/release/app-release-unsigned.apk android/app/build/outputs/apk/release/be-cash-$VERSION.apk
+        mv android/app/build/outputs/apk/release/app-release.apk android/app/build/outputs/apk/release/be-cash-$VERSION.apk
         
         # 添加调试信息
         echo "APK 文件已移动到:"
