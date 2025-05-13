@@ -24,3 +24,6 @@ export const getCaptcha = () => {
 export const updatePassword = (data: Password) => {
   return post('/identity/change-password', data)
 }
+export const updateProfile = (userId: string, data: any) => {
+  return post(`/identity/profile/${userId}`, data)
+}

@@ -17,6 +17,7 @@
     "@capacitor/android": "6.2.0",
     "@capacitor/app": "6.0.2",
     "@capacitor/browser": "^6.0.5",
+    "@capacitor/camera": "6",
     "@capacitor/core": "6.2.0",
     "@capacitor/device": "^6.0.2",
     "@capacitor/dialog": "^6.0.2",

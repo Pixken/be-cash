@@ -186,7 +186,7 @@ onIonViewDidEnter(() => {
     <ion-content ref="content" class="ion-padding">
       <div class="content-wapper">
       <!-- 背景渐变和装饰元素 -->
-      <div class="absolute top-0 left-0 w-full h-64 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-b-[40px] z-0"></div>
+      <div class="absolute top-0 left-0 w-full h-80 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-b-[40px] z-0"></div>
       <div class="absolute top-10 right-10 w-24 h-24 bg-white opacity-10 rounded-full"></div>
       <div class="absolute top-40 left-10 w-16 h-16 bg-white opacity-10 rounded-full"></div>
       
@@ -194,7 +194,7 @@ onIonViewDidEnter(() => {
       <div class="relative z-10 h-full flex flex-col">
         <!-- 顶部用户信息 -->
         <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center">
+          <div class="flex items-center" @click="router.push('/tabs/user')">
             <div class="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center overflow-hidden mr-4">
               <img :src="userStore.user.profile.avatar || defaultAvatar" alt="" class="w-full h-full object-cover">
             </div>

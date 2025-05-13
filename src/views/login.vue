@@ -6,8 +6,6 @@ import { login, userInfo, getCaptcha } from "@/api/user";
 import emitter from "@/utils/emitter";
 import useUserStore from "@/store/user";
 import { storage } from "@/utils/storage";
-import { App } from '@capacitor/app';
-const { version: currentVersion } = await App.getInfo()
 const userStore = useUserStore();
 const router = useRouter();
 
@@ -111,8 +109,6 @@ const onSubmit = async (e: Event) => {
       // await userStore.setToken(res.data.access_token, res.data.refresh_token);
       // const user = await userInfo()
       await userStore.setUser(res.data);
-      alert(JSON.stringify(res.data))
-      
       emitter.emit("message", { msg: "登录成功", type: "success" });
       router.replace("/tabs/home");
     })
@@ -185,7 +181,6 @@ const onInput = (e: Event, key: keyof typeof form.value) => {
         <div class="flex flex-col items-center mt-6 mb-8">
           <h1 class="text-3xl font-bold text-white">欢迎回来</h1>
           <p class="text-gray-100 mt-1">登录您的账户继续使用</p>
-          <span>{{currentVersion}}</span>
         </div>
 
         <!-- 登录卡片 -->

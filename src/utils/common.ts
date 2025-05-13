@@ -1,3 +1,7 @@
+
+import { App } from '@capacitor/app';
+import packageJson from '../../package.json'
+
 export const isJson = (str: string) => {
   try {
     JSON.parse(str)
@@ -25,5 +29,16 @@ export const debounce = (fn: Function, delay: number) => {
     timer = setTimeout(() => {
       fn.apply(this, args)
     }, delay)
+  }
+}
+
+export const getVersion = async (): Promise<string> => {
+  try {
+    const { version } = await App.getInfo();
+    return version
+  } catch (error) {
+    console.error('获取应用信息失败:', error);
+    // 回退到 package.json 中的版本
+    return packageJson.version
   }
 }

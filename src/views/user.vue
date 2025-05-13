@@ -1,33 +1,32 @@
 <script setup lang="ts">
-import { IonPage, IonContent, IonToggle, onIonViewDidEnter, IonModal } from '@ionic/vue';
+import { IonPage, IonContent, IonToggle, onIonViewDidEnter, IonModal, toastController } from '@ionic/vue';
 import { useRouter } from 'vue-router';
 import emitter from '@/utils/emitter';
 import useUserStore from '@/store/user';
-import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Dialog } from '@capacitor/dialog';
 import dayjs from 'dayjs';
 import { Button, Select } from 'ant-design-vue'
-import { key } from 'ionicons/icons';
 import { getAccount } from '@/api/account';
 import { storage } from '@/utils/storage';
-import { updatePassword } from '@/api/user';
-import { Item } from 'ant-design-vue/es/menu';
-import { App } from '@capacitor/app';
+import { updatePassword, updateProfile } from '@/api/user';
+import { getVersion } from '@/utils/common';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 const userStore = useUserStore();
 const router = useRouter();
 const isLoading = ref(false);
 const isExporting = ref(false);
 
-const { version: currentVersion } = await App.getInfo()
+const version = ref('')
 
 const logout = () => {
   isLoading.value = true;
-  userStore.logout();
   setTimeout(() => {
     emitter.emit('message', { msg: '退出成功', type: 'success' });
     router.push('/login');
     isLoading.value = false;
+    userStore.logout();
   }, 1000);
 };
 
@@ -98,7 +97,8 @@ const selectDefaultAccount = (value: string) => {
   storage.setItem('defaultAccount', value)
 }
 
-onIonViewDidEnter(() => {
+onIonViewDidEnter(async () => {
+  version.value = await getVersion()
   getAccounts()
   content.value?.$el.scrollToTop(0);
 });
@@ -126,7 +126,7 @@ const modalData = ref<ModalData>({
   }]
 })
 
-const defaultAccount = ref(storage.getItem('defaultAccount') || null)
+const defaultAccount = ref(JSON.stringify(storage.getItem('defaultAccount')) === '{}' ? null : storage.getItem('defaultAccount'))
 
 const modal = ref()
 
@@ -135,8 +135,15 @@ const openModal = (data: ModalData) => {
   modal.value?.$el.present()
 }
 
-const editProfile = (key: string, value: any) => {
-
+const editProfile = async (key: 'nickname' | 'avatar' | 'phoneNumber', value: any) => {
+  const profile = {
+    nickname: userStore.user.nickname || '',
+    avatar: userStore.user.avatar || '',
+    phoneNumber: userStore.user.phoneNumber || ''
+  }
+  profile[key] = value
+  const res = await updateProfile(userStore.user.id?.value, profile)
+  console.log(res);
 }
 
 const dismissModal = () => {
@@ -167,11 +174,54 @@ const handleSubmit = async () => {
       selectDefaultAccount(defaultAccount.value)
       return
     }
-    dismissModal()
+    const { key, value } = modalData.value.form[0]
+    await editProfile(key as 'nickname' | 'avatar' | 'phoneNumber', value)
   } catch(err) {
 
+  } finally {
+    dismissModal()
   }
 }
+
+const imageData = ref()
+const selectedFile = ref()
+
+const handleSelectAvatar = async () => {
+  try {
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.Uri,
+      source: CameraSource.Photos // 从相册选择
+    });
+
+    console.log(image);
+    
+    
+    imageData.value = image.webPath;
+    selectedFile.value = await readFile(image.webPath as string);
+    
+    emitter.emit("message", { msg: '选择图片成功', type: 'success' })
+  } catch (error) {
+    emitter.emit("message", { msg: '选择图片出错:' + error, type: 'success' })
+  }
+}
+
+// 读取图片文件
+const readFile = async (filePath: string) => {
+  console.log(filePath);
+  
+  try {
+    const file = await Filesystem.readFile({
+      path: filePath,
+      directory: Directory.Data
+    });
+    return file;
+  } catch (error) {
+    console.error('读取文件出错:', error);
+    throw error;
+  }
+};
 
 </script>
 <template>
@@ -179,7 +229,7 @@ const handleSubmit = async () => {
     <ion-content ref="content" class="ion-padding">
       <div class="content-wapper">
       <!-- 背景渐变和装饰元素 -->
-      <div class="absolute top-0 left-0 w-full h-64 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-b-[40px] z-0"></div>
+      <div class="absolute top-0 left-0 w-full h-80 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-b-[40px] z-0"></div>
       <div class="absolute top-10 right-10 w-24 h-24 bg-white opacity-10 rounded-full"></div>
       <div class="absolute top-40 left-10 w-16 h-16 bg-white opacity-10 rounded-full"></div>
       
@@ -197,7 +247,7 @@ const handleSubmit = async () => {
         
         <!-- 用户头像和名称 -->
         <div class="flex flex-col items-center mt-6 mb-8">
-          <div class="w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center mb-4 overflow-hidden">
+          <div class="w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center mb-4 overflow-hidden" @click="handleSelectAvatar">
             <img src="@/assets/zxd.png" alt="" class="w-full h-full object-cover">
           </div>
           <h1 class="text-2xl font-bold text-white">{{ userStore.user.profile.nickname }}</h1>
@@ -212,7 +262,14 @@ const handleSubmit = async () => {
               <div class="w-full text-left text-xl font-bold">{{modalData.title}}</div>
               <template  v-for="form in modalData.form">
                 <Select v-if="form.type === 'select'" placeholder="请选择默认账户" v-model:value="defaultAccount" :options="options" class="h-12 w-full"></Select>
-                <input v-else :type="form.type" :placeholder="form.placeholder" v-model="form.value" class="w-full h-12 pl-4 pr-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all outline-none">
+                <input
+                  v-else
+                  :type="form.type"
+                  :placeholder="form.placeholder"
+                  v-model="form.value"
+                  @blur="form.value = $event.target?.value"
+                  class="w-full h-12 pl-4 pr-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all outline-none"
+                >
               </template>
               <div class="flex justify-between w-full">
                 <Button @click="dismissModal">取消</Button>
@@ -230,8 +287,8 @@ const handleSubmit = async () => {
                 form: [{
                   type: 'text',
                 placeholder: '请输入用户名',
-                key: 'username',
-                value: userStore.user.username
+                key: 'nickname',
+                value: userStore.user.nickname
                 }]
               })">
                 <div class="flex items-center">
@@ -247,7 +304,7 @@ const handleSubmit = async () => {
                 </svg>
               </div>
               
-              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer" @click="openModal({
+              <!-- <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer" @click="openModal({
                 title: '修改邮箱',
                 form: [{
                   type: 'text',
@@ -268,9 +325,9 @@ const handleSubmit = async () => {
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                 </svg>
-              </div>
+              </div> -->
 
-              <!-- <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer" @click="openModal({
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer" @click="openModal({
                 title: '绑定手机',
                 form: [{
                   type: 'text',
@@ -291,7 +348,7 @@ const handleSubmit = async () => {
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                 </svg>
-              </div> -->
+              </div>
               
               <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer" @click="openModal({
                 title: '修改密码',
@@ -481,7 +538,7 @@ const handleSubmit = async () => {
                   <span class="text-gray-800 font-medium">关于我们</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="text-gray-500">v{{currentVersion}}</span>
+                  <span class="text-gray-500">v{{version}}</span>
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                   </svg>
