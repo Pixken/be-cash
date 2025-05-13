@@ -225,7 +225,7 @@ async function verifyFile(filePath: string, expectedHash: string): Promise<boole
       path: filePath,
       directory: Directory.External
     })
-    
+    console.log(fileData)
     // 计算 SHA-256 哈希
     // 注意：Web 环境中可以使用 SubtleCrypto API
     const msgBuffer = new TextEncoder().encode(fileData.data as string)
