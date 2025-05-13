@@ -16,7 +16,15 @@ const config: CapacitorConfig = {
     allowMixedContent: true, // 允许HTTP和HTTPS混合内容
     captureInput: true, // 改善输入体验
     // 网络安全配置
-    webContentsDebuggingEnabled: true // 允许调试WebView
+    webContentsDebuggingEnabled: true, // 允许调试WebView
+    initialFocus: false // 禁用自动获取焦点
+  },
+  // 添加键盘配置
+  plugins: {
+    Keyboard: {
+      resize: true, // 调整WebView大小
+      style: 'RESIZE' // 键盘样式为RESIZE
+    }
   }
 };
 
