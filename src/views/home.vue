@@ -21,6 +21,15 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 import { deleteCash } from '@/api/cash';
 import defaultAvatar from '@/assets/zxd.png'
+import { getNotifications } from '@/api/notifications';
+
+const timmer = ref<ReturnType<typeof setTimeout> | null>(null);
+
+const getNotificationsInfo = async () => {
+  const res = await getNotifications();
+  const { data } = res;
+  userStore.alerts = data.data
+}
 
 dayjs.locale('zh-cn');
 
@@ -127,6 +136,10 @@ onMounted(() => {
     return;
   }
   fetchBills();
+
+  timmer.value = setInterval(() => {
+    getNotificationsInfo();
+  }, 2000)
 });
 
 const content = ref();

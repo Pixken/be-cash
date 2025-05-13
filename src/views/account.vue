@@ -21,6 +21,7 @@ const form = ref({
   cardNumber: '',
   name: undefined,
   balance: 0,
+  alertThreshold: 0,
 });
 const dismiss = () => {
   modal.value?.$el.dismiss()
@@ -73,6 +74,7 @@ const handleSubmit = () => {
       name: form.value.name,
       type: form.value.name,
       initialBalance: form.value.balance,
+      alertThreshold: form.value.alertThreshold,
     });
     console.log(res);
     dismiss();
@@ -94,6 +96,7 @@ const editForm = ref({
   cardNumber: '',
   name: '',
   balance: 0,
+  alertThreshold: 0,
 });
 const editingAccount = ref<any>(null);
 
@@ -176,6 +179,9 @@ const handleDelete = async () => {
                     </FormItem> -->
                     <FormItem label="账户金额" name="balance">
                       <InputNumber v-model:value="form.balance" class="w-full" />
+                    </FormItem>
+                    <FormItem label="预警值" name="alertThreshold">
+                      <InputNumber v-model:value="form.alertThreshold" class="w-full" />
                     </FormItem>
                     <FormItem>
                       <Button type="primary" @click="handleSubmit" class="w-full">添加</Button>
@@ -261,6 +267,9 @@ const handleDelete = async () => {
                 </FormItem> -->
                 <FormItem label="账户金额" name="balance">
                   <InputNumber v-model:value="editForm.balance" class="w-full h-12 leading-[3rem]" />
+                </FormItem>
+                <FormItem label="预警值" name="alertThreshold">
+                  <InputNumber v-model:value="editForm.alertThreshold" class="w-full h-12 leading-[3rem]" />
                 </FormItem>
                 <FormItem>
                   <Button type="primary" @click="handleEdit" class="w-full h-12">保存</Button>

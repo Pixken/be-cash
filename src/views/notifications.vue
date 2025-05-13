@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import useUserStore from '@/store/user';
 import { IonPage, IonContent, onIonViewDidEnter } from '@ionic/vue';
+import { format } from 'timeago.js';
 
-const content = ref();
+
+const userStore = useUserStore();
 
 onIonViewDidEnter(() => {
   content.value?.$el.scrollToTop(0);
@@ -16,19 +19,19 @@ onIonViewDidEnter(() => {
         <div>
           <p>今天</p>
           <ul>
-            <li class="flex items-center justify-between py-4 px-2 not-last-border-b">
+            <li class="flex items-center justify-between py-4 px-2 not-last-border-b" v-for="alert in userStore.alerts">
               <div class="flex items-start gap-2">
                 <span class="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center">
                   <svg-icon icon="bx:bxs-error" color="#fff" />
                 </span>
                 <div class="flex flex-col gap-1 flex-1">
                   <span class="font-bold">预算提醒</span>
-                  <span class="text-gray-500">您的餐饮预算已使用93%，请注意控制支出。</span>
+                  <span class="text-gray-500">{{alert.message}}</span>
                 </div>
               </div>
-              <span class="text-gray-500">12:30</span>
+              <span class="text-gray-500 inline-block w-32">{{format(alert.createdAt, 'zh_CN')}}</span>
             </li>
-            <li class="flex items-center justify-between py-4 px-2 not-last-border-b">
+            <!-- <li class="flex items-center justify-between py-4 px-2 not-last-border-b">
               <div class="flex items-start gap-2">
                 <span class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center">
                   <svg-icon icon="mingcute:bill-fill" color="#fff" />
@@ -39,7 +42,7 @@ onIonViewDidEnter(() => {
                 </div>
               </div>
               <span class="text-gray-500">12:30</span>
-            </li>
+            </li> -->
           </ul>
         </div>
       </div>

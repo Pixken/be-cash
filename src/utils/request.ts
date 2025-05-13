@@ -119,7 +119,7 @@ export const post = async (url: string, data: any) => {
   }
 }
 
-export const put = async (url: string, data: any) => {
+export const put = async (url: string, data?: any) => {
   try {
     const res = await request.put(url, data);
     return res.data as ApiResponse<any>;
