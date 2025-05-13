@@ -171,62 +171,50 @@ async function downloadFile(options: {
     // 文件不存在，继续下载
   }
   
-  // 下载文件
-  const response = await fetch(url)
-  alert(url)
-  if (!response.ok) throw new Error('下载失败')
-  
-  const reader = response.body?.getReader()
-  if (!reader) throw new Error('无法读取响应')
-  
-  const contentLength = Number(response.headers.get('Content-Length') || expectedSize)
-  let receivedLength = 0
-  const chunks: Uint8Array[] = []
-  
-  while (true) {
-    const { done, value } = await reader.read()
+  try {
+    // 下载文件
+    const response = await fetch(url)
+    if (!response.ok) throw new Error('下载失败')
     
-    if (done) break
+    // 获取总大小
+    const contentLength = Number(response.headers.get('Content-Length') || expectedSize)
     
-    chunks.push(value)
-    receivedLength += value.length
+    // 创建响应的 Blob 对象
+    const blob = await response.blob()
     
     if (onProgress) {
-      onProgress(Math.min(Math.round((receivedLength / contentLength) * 100), 99))
+      // 下载完成后更新进度为 99%
+      onProgress(99)
     }
+    
+    // 使用 FileReader 读取 Blob 数据
+    const base64Data = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        // 结果是 DataURL 格式，需要移除前缀 "data:application/octet-stream;base64,"
+        const result = reader.result as string
+        const base64 = result.split(',')[1]
+        resolve(base64)
+      }
+      reader.onerror = () => reject(reader.error)
+      reader.readAsDataURL(blob)
+    })
+    
+    // 保存文件
+    const result = await Filesystem.writeFile({
+      path: fileName,
+      data: base64Data,
+      directory: Directory.External
+    })
+    
+    if (onProgress) onProgress(100)
+    
+    return result.uri
+  } catch (error) {
+    console.error('文件下载失败:', error)
+    emitter.emit('message', { msg: '文件下载失败:' + error, type: 'error' })
+    throw error
   }
-  
-  // 合并数据
-  const allChunks = new Uint8Array(receivedLength)
-  let position = 0
-  for (const chunk of chunks) {
-    allChunks.set(chunk, position)
-    position += chunk.length
-  }
-  
-  // 使用分块处理避免栈溢出
-  const chunkSize = 8192; // 每次处理 8KB
-  let base64Data = '';
-  for (let i = 0; i < allChunks.length; i += chunkSize) {
-    const chunk = allChunks.slice(i, i + chunkSize);
-    // 将每个块转换为字符串
-    base64Data += btoa(
-      Array.from(chunk)
-        .map(b => String.fromCharCode(b))
-        .join('')
-    );
-  }
-  
-  // 保存文件
-  const result = await Filesystem.writeFile({
-    path: fileName,
-    data: base64Data,
-    directory: Directory.External
-  })
-  
-  if (onProgress) onProgress(100)
-  
-  return result.uri
 }
 
 // 验证文件

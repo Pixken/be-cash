@@ -20,7 +20,7 @@ onIonViewDidEnter(() => {
         <div>
           <!-- <p>今天</p> -->
           <ul>
-            <li class="flex items-center justify-between py-4 px-2 not-last-border-b" v-for="alert in userStore.alerts">
+            <li class="flex items-center justify-between py-4 px-2 not-last-border-b relative" v-for="alert in userStore.alerts">
               <div class="flex items-start gap-2">
                 <span class="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center">
                   <svg-icon icon="bx:bxs-error" color="#fff" />
@@ -30,7 +30,7 @@ onIonViewDidEnter(() => {
                   <span class="text-gray-500">{{alert.message}}</span>
                 </div>
               </div>
-              <span class="text-gray-500 inline-block w-32">{{format(alert.createdAt, 'zh_CN')}}</span>
+              <span class="text-gray-500 text-sm absolute right-0 top-4">{{format(alert.createdAt, 'zh_CN')}}</span>
             </li>
             <!-- <li class="flex items-center justify-between py-4 px-2 not-last-border-b">
               <div class="flex items-start gap-2">
