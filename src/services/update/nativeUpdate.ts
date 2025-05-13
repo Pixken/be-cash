@@ -7,6 +7,7 @@ import { Network } from '@capacitor/network'
 import { Dialog } from '@capacitor/dialog'
 import { get } from '@/utils/request'
 import axios from 'axios'
+import emitter from '@/utils/emitter'
 
 interface ApkUpdateInfo {
   version: string
@@ -37,6 +38,8 @@ export async function checkNativeUpdate(
     // 2. 获取服务器更新信息
     const res = await fetch(`${import.meta.env.VITE_STATIC_URL}/apk-update.json`)
     const { android }: { android: ApkUpdateInfo } = await res.json()
+
+    emitter.emit("message", { msg: `${android.version}, ${currentVersion}`, type: 'success' })
     
     // 3. 版本比较
     if (compareVersions(android.version, currentVersion) <= 0) {
