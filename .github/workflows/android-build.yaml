@@ -6,12 +6,18 @@ on:
   pull_request:
     branches: [ "main" ]
 
+# 添加权限配置
+permissions:
+  contents: write
+
 jobs:
   build-android:
     runs-on: ubuntu-latest
     
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # 获取完整的提交历史，便于版本更新
     
     - name: 设置JDK
       uses: actions/setup-java@v3
@@ -90,6 +96,28 @@ jobs:
         # 设置环境变量供后续步骤使用
         echo "APP_VERSION=$NEW_VERSION" >> $GITHUB_ENV
         echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
+        
+    # 新增步骤：将版本更新提交回仓库
+    - name: 提交版本更新
+      if: github.ref == 'refs/heads/main'
+      run: |
+        # 配置Git用户
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # 检查是否有变更
+        if git diff --quiet package.json android/app/build.gradle; then
+          echo "没有版本号变更，跳过提交"
+        else
+          # 添加并提交变更
+          git add package.json android/app/build.gradle
+          git commit -m "chore: 更新版本号到 ${{ env.APP_VERSION }} [skip ci]"
+          
+          # 推送变更回仓库 (使用GitHub_TOKEN进行身份验证)
+          git push https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+          
+          echo "✅ 已将版本更新提交回仓库"
+        fi
 
     - name: 复制Web资源到Android平台
       run: |
@@ -140,7 +168,8 @@ jobs:
             "url": "http://117.72.49.27/downloads/be-cash-$VERSION.apk",
             "size": $APK_SIZE,
             "sha256": "$APK_SHA256",
-            "isCritical": false
+            "isCritical": false,
+            "releaseDate": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
           }
         }
         EOL
