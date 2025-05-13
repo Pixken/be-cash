@@ -191,36 +191,63 @@ const handleSelectAvatar = async () => {
     const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: false,
-      resultType: CameraResultType.Uri,
-      source: CameraSource.Photos // 从相册选择
+      resultType: CameraResultType.DataUrl,
+      source: CameraSource.Photos
     });
 
-    console.log(image);
+    console.log('获取到的图片信息:', image);
     
+    imageData.value = image.dataUrl;
     
-    imageData.value = image.webPath;
-    selectedFile.value = await readFile(image.webPath as string);
+    selectedFile.value = {
+      data: image.dataUrl,
+      format: image.format
+    };
     
     emitter.emit("message", { msg: '选择图片成功', type: 'success' })
   } catch (error) {
-    emitter.emit("message", { msg: '选择图片出错:' + error, type: 'success' })
+    console.error('选择图片出错:', error);
+    emitter.emit("message", { msg: '选择图片出错:' + error, type: 'error' })
   }
 }
 
-// 读取图片文件
-const readFile = async (filePath: string) => {
-  console.log(filePath);
-  
+// 如需要从文件系统读取文件
+const readFileFromFilesystem = async (path: string) => {
   try {
-    const file = await Filesystem.readFile({
-      path: filePath,
+    return await Filesystem.readFile({
+      path: path,
       directory: Directory.Data
     });
-    return file;
   } catch (error) {
-    console.error('读取文件出错:', error);
+    console.error('读取文件系统出错:', error);
     throw error;
   }
+};
+
+// 如需要从Blob URL读取内容并转换为Base64
+const convertBlobToBase64 = (blobUrl: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    fetch(blobUrl)
+      .then(response => response.blob())
+      .then(blob => {
+        const reader = new FileReader();
+        reader.addEventListener('load', function(this: FileReader, _event) {
+          // 使用this关键字访问FileReader的result属性
+          if (typeof this.result === 'string') {
+            resolve(this.result);
+          } else {
+            reject(new Error('Result is not a string'));
+          }
+        });
+        reader.addEventListener('error', () => {
+          reject(new Error('Failed to convert blob to base64'));
+        });
+        reader.readAsDataURL(blob);
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
 };
 
 </script>
@@ -267,7 +294,6 @@ const readFile = async (filePath: string) => {
                   :type="form.type"
                   :placeholder="form.placeholder"
                   v-model="form.value"
-                  @blur="form.value = $event.target?.value"
                   class="w-full h-12 pl-4 pr-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all outline-none"
                 >
               </template>
