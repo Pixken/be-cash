@@ -15,7 +15,7 @@ defineProps<{
 <template>
   <ion-header class="ion-no-border relative border-b border-gray-200 h-20 flex items-center">
     <div>
-      <ion-back-button :icon="chevronBackOutline" v-if="showBack" class="text-gray-500"
+      <ion-back-button :icon="chevronBackOutline" v-if="showBack" class="text-gray-500 mt-[36px]"
         @click="router.back()"></ion-back-button>
       <slot name="start" v-else></slot>
     </div>
