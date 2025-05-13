@@ -129,6 +129,7 @@ const modalData = ref<ModalData>({
 const defaultAccount = ref(JSON.stringify(storage.getItem('defaultAccount')) === '{}' ? null : storage.getItem('defaultAccount'))
 
 const modal = ref()
+const budgetModal = ref()
 
 const openModal = (data: ModalData) => {
   modalData.value = data
@@ -250,6 +251,29 @@ const convertBlobToBase64 = (blobUrl: string): Promise<string> => {
   });
 };
 
+const showHelpCenter = async () => {
+  await Dialog.alert({
+    title: '帮助中心',
+    message: '如果您在使用过程中遇到任何问题，请联系我们的客服团队：\n\n电子邮件：support@birdeggnote.com\n电话：400-123-4567\n\n我们的工作时间是周一至周五 9:00-18:00。',
+    buttonTitle: '我知道了'
+  });
+};
+
+const showPrivacyPolicy = async () => {
+  await Dialog.alert({
+    title: '隐私政策',
+    message: '鸟蛋记账非常重视您的隐私保护。我们承诺：\n\n1. 不会收集与应用功能无关的个人信息\n2. 不会在未经您同意的情况下分享您的数据\n3. 采用加密技术保护您的账户信息\n4. 您可以随时删除您的账户及相关数据\n\n详细隐私政策请访问我们的官方网站。',
+    buttonTitle: '我知道了'
+  });
+};
+
+const showAboutUs = async () => {
+  await Dialog.alert({
+    title: '关于鸟蛋记账',
+    message: `鸟蛋记账是一款简单易用的个人财务管理工具，帮助您轻松记录日常收支，分析消费习惯，实现财务目标。\n\n当前版本：v${version.value}\n\n© ${new Date().getFullYear()} 鸟蛋科技 保留所有权利`,
+    buttonTitle: '我知道了'
+  });
+};
 </script>
 <template>
   <ion-page>
@@ -453,30 +477,55 @@ const convertBlobToBase64 = (blobUrl: string): Promise<string> => {
                   <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                 </svg>
               </div>
-              
-              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+
+              <!-- <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"  id="open-modal">
                 <div class="flex items-center">
                   <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                      <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
                     </svg>
                   </div>
-                  <span class="text-gray-800 font-medium">预算提醒</span>
+                  <span class="text-gray-800 font-medium">预算设置</span>
                 </div>
-                <ion-toggle :checked="true"></ion-toggle>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 数据管理 -->
-          <div class="mb-8">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">数据管理</h2>
-            <div class="space-y-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div> -->
+              <ion-modal ref="budgetModal" trigger="open-modal">
+                <div class="flex flex-col items-center justify-center gap-5 h-full wrapper px-4">
+                  <div class="w-full text-left text-xl font-bold">预算设置</div>
+                    <ul class="w-full flex flex-col gap-2">
+                      <li class="w-full border rounded-md flex flex-col justify-center gap-2 items-start p-2 relative">
+                        <div>
+                          <label for="" class="text-gray-600 text-sm mr-3 w-14 inline-block text-right">预算周期</label>
+                          <input type="text" class="outline-none border rounded-md px-2 py-1" placeholder="例如：3000">
+                        </div>
+                        <div>
+                          
+                        <label for="" class="text-gray-600 text-sm mr-3 w-14 inline-block text-right">预算值</label>
+                        <input type="text" class="outline-none border rounded-md px-2 py-1" placeholder="例如：3000">
+                        </div>
+                        <div>
+                          
+                          <label for="" class="text-gray-600 text-sm mr-3 w-14 inline-block text-right">预警值</label>
+                          <input type="text" class="outline-none border rounded-md px-2 py-1" placeholder="例如：80%">
+                          </div>
+                        <SvgIcon icon="material-symbols:add" class="absolute right-2"></SvgIcon>
+                      </li>
+                    </ul>
+                  <div class="flex justify-between w-full">
+                    <Button @click="() => budgetModal.$el.dismiss()">取消</Button>
+                    <Button type="primary" @click="handleSubmit">确定</Button>
+                  </div>
+                </div>
+              </ion-modal>
+              
+              <h2 class="text-xl font-semibold text-gray-800 mb-4 pt-4">数据管理</h2>
               <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
                 <div class="flex items-center">
                   <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      <path d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                   </div>
                   <span class="text-gray-800 font-medium">数据备份</span>
@@ -526,7 +575,7 @@ const convertBlobToBase64 = (blobUrl: string): Promise<string> => {
           <div class="mb-8">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">关于与帮助</h2>
             <div class="space-y-4">
-              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer" @click="showHelpCenter">
                 <div class="flex items-center">
                   <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
@@ -540,7 +589,7 @@ const convertBlobToBase64 = (blobUrl: string): Promise<string> => {
                 </svg>
               </div>
               
-              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer" @click="showPrivacyPolicy">
                 <div class="flex items-center">
                   <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
@@ -554,7 +603,7 @@ const convertBlobToBase64 = (blobUrl: string): Promise<string> => {
                 </svg>
               </div>
               
-              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer" @click="showAboutUs">
                 <div class="flex items-center">
                   <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
