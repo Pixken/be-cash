@@ -121,3 +121,10 @@ jobs:
         source: "./upload_temp/*"  # 从临时目录上传所有文件
         target: "/home/be-cash/downloads/"
         strip_components: 1  # 只去掉 upload_temp 这一级目录
+
+    - name: 查看生成的文件
+      if: github.ref == 'refs/heads/main'
+      run: |
+        ls -la android/app/build/outputs/apk/release/
+        # 验证APK是否已签名
+        jarsigner -verify -verbose android/app/build/outputs/apk/release/*.apk
