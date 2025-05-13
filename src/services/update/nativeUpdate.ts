@@ -49,6 +49,7 @@ export async function checkNativeUpdate(
     // 4. 检查最低支持版本
     if (compareVersions(currentVersion, android.minVersion) < 0) {
       console.warn(`当前版本(${currentVersion})过低，必须升级`)
+      emitter.emit('message', { msg: `当前版本(${currentVersion})过低，必须升级`, type: 'error' })
       return await downloadAndInstallApk(android, true, onProgress)
     }
     
@@ -234,6 +235,7 @@ async function verifyFile(filePath: string, expectedHash: string): Promise<boole
     return hashHex === expectedHash
   } catch (error) {
     console.error('文件校验失败:', error)
+    emitter.emit('message', { msg: '文件校验失败:'+ error, type: 'error' })
     return false
   }
 }
