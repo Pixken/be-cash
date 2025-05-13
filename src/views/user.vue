@@ -234,7 +234,7 @@ const readFile = async (filePath: string) => {
       <div class="absolute top-40 left-10 w-16 h-16 bg-white opacity-10 rounded-full"></div>
       
       <!-- 用户信息区域 -->
-      <div class="relative z-10 h-full flex flex-col items-center pt-[var(--ion-safe-area-top,20px)]">
+      <div class="relative z-10 h-full flex flex-col items-center pt-[var(--ion-safe-area-top,20px)] pb-4">
         <!-- 返回按钮 -->
         <div class="self-start">
           <div @click="router.push('/')" class="flex items-center text-white cursor-pointer">

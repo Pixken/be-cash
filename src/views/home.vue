@@ -191,7 +191,7 @@ onIonViewDidEnter(() => {
       <div class="absolute top-40 left-10 w-16 h-16 bg-white opacity-10 rounded-full"></div>
       
       <!-- 主要内容区域 -->
-      <div class="relative z-10 h-full flex flex-col">
+      <div class="relative z-10 h-full flex flex-col pb-4">
         <!-- 顶部用户信息 -->
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center" @click="router.push('/tabs/user')">

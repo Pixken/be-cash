@@ -173,6 +173,7 @@ async function downloadFile(options: {
   
   // 下载文件
   const response = await fetch(url)
+  alert(url)
   if (!response.ok) throw new Error('下载失败')
   
   const reader = response.body?.getReader()
