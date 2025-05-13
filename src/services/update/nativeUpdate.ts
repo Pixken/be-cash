@@ -39,7 +39,7 @@ export async function checkNativeUpdate(
     const res = await fetch(`${import.meta.env.VITE_STATIC_URL}/apk-update.json`)
     const { android }: { android: ApkUpdateInfo } = await res.json()
 
-    emitter.emit("message", { msg: `${android.version}, ${currentVersion}`, type: 'success' })
+    // emitter.emit("message", { msg: `${android.version}, ${currentVersion}`, type: 'success' })
     
     // 3. 版本比较
     if (compareVersions(android.version, currentVersion) <= 0) {
@@ -61,6 +61,7 @@ export async function checkNativeUpdate(
     return false
   } catch (error) {
     console.error('原生更新检查失败:', error)
+    emitter.emit('message', { msg: '原生更新检查失败:'+ error, type: 'error' })
     return false
   }
 }
@@ -95,6 +96,7 @@ async function downloadAndInstallApk(
     return true
   } catch (error) {
     console.error('APK更新失败:', error)
+    emitter.emit('message', { msg: 'APK更新失败:'+ error, type: 'error' })
     if (isForce) {
       await showCriticalUpdateError()
     }
