@@ -3,6 +3,7 @@ import useUserStore from '@/store/user';
 import { IonPage, IonContent, onIonViewDidEnter } from '@ionic/vue';
 import { format } from 'timeago.js';
 
+const content = ref(null);
 
 const userStore = useUserStore();
 
@@ -17,7 +18,7 @@ onIonViewDidEnter(() => {
     <ion-content ref="content">
       <div class="p-4">
         <div>
-          <p>今天</p>
+          <!-- <p>今天</p> -->
           <ul>
             <li class="flex items-center justify-between py-4 px-2 not-last-border-b" v-for="alert in userStore.alerts">
               <div class="flex items-start gap-2">

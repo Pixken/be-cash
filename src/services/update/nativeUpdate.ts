@@ -204,8 +204,20 @@ async function downloadFile(options: {
     position += chunk.length
   }
   
+  // 使用分块处理避免栈溢出
+  const chunkSize = 8192; // 每次处理 8KB
+  let base64Data = '';
+  for (let i = 0; i < allChunks.length; i += chunkSize) {
+    const chunk = allChunks.slice(i, i + chunkSize);
+    // 将每个块转换为字符串
+    base64Data += btoa(
+      Array.from(chunk)
+        .map(b => String.fromCharCode(b))
+        .join('')
+    );
+  }
+  
   // 保存文件
-  const base64Data = btoa(String.fromCharCode.apply(null, [...new Uint8Array(allChunks)]))
   const result = await Filesystem.writeFile({
     path: fileName,
     data: base64Data,
