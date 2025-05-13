@@ -165,7 +165,7 @@ jobs:
           "android": {
             "version": "$VERSION",
             "minVersion": "0.0.1",
-            "url": "http://117.72.49.27/downloads/be-cash-$VERSION.apk",
+            "url": "http://117.72.49.27:9522/downloads/be-cash-$VERSION.apk",
             "size": $APK_SIZE,
             "sha256": "$APK_SHA256",
             "isCritical": false,
