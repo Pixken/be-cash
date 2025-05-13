@@ -174,7 +174,7 @@ async function downloadFile(options: {
   try {
     // 下载文件
     const response = await fetch(url)
-    if (!response.ok) throw new Error('下载失败')
+    if (!response.ok) throw new Error('下载失败 ')
     
     // 获取总大小
     const contentLength = Number(response.headers.get('Content-Length') || expectedSize)
