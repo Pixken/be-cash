@@ -206,6 +206,7 @@ async function downloadFile(options: {
       data: base64Data,
       directory: Directory.External
     })
+    console.log('downloadFile', result);
     
     if (onProgress) onProgress(100)
     
