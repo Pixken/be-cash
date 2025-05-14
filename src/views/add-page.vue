@@ -131,7 +131,7 @@ const filterCategories = computed<any[]>(() => {
   // const other = categories.value.filter((item: any) => item.name === '其他' && item.type === activeTab.value);
   // return [...current, ...other];
 
-  return categories.value.filter((item: any) => item.type === activeTab.value);
+  return categories.value.filter((item: any) => item.type === activeTab.value || item.type === activeTab.value.toLowerCase());
 });
 
 watch(activeTab, () => {
@@ -142,7 +142,7 @@ const getCashCategorys = async () => {
     const res = await getCashCategory();
     // console.log(res);
     categories.value = res.data.map((item: any) => ({
-      id: item.id.value,
+      id: item.id.value || item.id,
       name: item.name,
       type: item.type,
       icon: item.icon,
@@ -203,14 +203,14 @@ const handleTOAccount = () => {
         >
           <p
             class="text-center w-1/2 z-10 transition-all duration-300"
-            :class="{ 'text-white': activeTab === 'INCOME' }"
+            :class="{ 'text-white': activeTab === 'INCOME' || activeTab === 'income' }"
             @click="activeTab = 'INCOME'"
           >
             收入
           </p>
           <p
             class="text-center w-1/2 z-10 transition-all duration-300"
-            :class="{ 'text-white': activeTab === 'EXPENSE' }"
+            :class="{ 'text-white': activeTab === 'EXPENSE' || activeTab === 'expense' }"
             @click="activeTab = 'EXPENSE'"
           >
             支出
@@ -218,8 +218,8 @@ const handleTOAccount = () => {
           <div
             class="absolute left-2 w-[calc(50%-1rem)] h-12 bg-[#4f46e5] rounded-md transition-all duration-300"
             :class="{
-              'translate-x-0': activeTab === 'INCOME',
-              'translate-x-[calc(100%+1rem)]': activeTab === 'EXPENSE',
+              'translate-x-0': activeTab === 'INCOME' || activeTab === 'income',
+              'translate-x-[calc(100%+1rem)]': activeTab === 'EXPENSE' || activeTab === 'expense',
             }"
           ></div>
         </div>

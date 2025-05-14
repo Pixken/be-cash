@@ -63,17 +63,17 @@ const fetchBills = async () => {
 // 计算收支统计
 const income = computed(() => {
   return bills.value
-    .filter(bill => bill.type === 'INCOME')
+    .filter(bill => bill.type === 'INCOME' || bill.type === 'income')
     .reduce((sum, bill) => sum + bill.amount, 0).toFixed(2);
 });
 const expense = computed(() => {
   return bills.value
-    .filter(bill => bill.type === 'EXPENSE')
+    .filter(bill => bill.type === 'EXPENSE' || bill.type === 'expense')
     .reduce((sum, bill) => sum + bill.amount, 0).toFixed(2);
 });
-
 // 图表配置
-const chartOption = computed<EChartsOption>(() => ({
+const chartOption = computed<EChartsOption>(() => {
+  return ({
   color: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444'],
   tooltip: {
     trigger: 'item',
@@ -84,7 +84,7 @@ const chartOption = computed<EChartsOption>(() => ({
     bottom: '1%',
     left: 'center',
     data: bills.value
-      .filter(bill => bill.type === 'EXPENSE')
+      .filter(bill => bill.type === 'EXPENSE' || bill.type === 'expense')
       .map(bill => bill.category.name),
     itemWidth: 20,
     itemHeight: 20,
@@ -96,7 +96,7 @@ const chartOption = computed<EChartsOption>(() => ({
       radius: ['45%', '80%'],
       center: ['50%', '45%'],
       data: bills.value
-        .filter(bill => bill.type === 'EXPENSE')
+        .filter(bill => bill.type === 'EXPENSE' || bill.type === 'expense')
         .map(bill => ({
           value: bill.amount,
           name: bill.category.name,
@@ -116,7 +116,8 @@ const chartOption = computed<EChartsOption>(() => ({
       },
     },
   ],
-}));
+})
+});
 
 // 格式化金额
 const formatAmount = (amount: number) => {
@@ -148,9 +149,9 @@ const activeTabBills = computed(() => {
   if (activeTab.value === '全部') {
     return billStore.bills;
   } else if (activeTab.value === '收入') {
-    return billStore.bills.filter(bill => bill.type === 'INCOME');
+    return billStore.bills.filter(bill => bill.type === 'INCOME' || bill.type === 'income');
   } else if (activeTab.value === '支出') {
-    return billStore.bills.filter(bill => bill.type === 'EXPENSE');
+    return billStore.bills.filter(bill => bill.type === 'EXPENSE' || bill.type === 'expense');
   } else {
     return billStore.bills;
   }

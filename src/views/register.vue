@@ -49,16 +49,19 @@ const onSubmit = async (e: Event) => {
   const errors = await validateForm(form.value);
   if (errors) {
     emitter.emit('message', { msg: '请检查表单', type: 'error' });
+    isLoading.value = false;
     return;
   }
   // 验证密码是否一致
   if (form.value.password !== form.value.confirmPassword) {
     emitter.emit('message', { msg: '密码不一致', type: 'error' });
+    isLoading.value = false;
     return;
   }
   // 验证是否同意条款
   if (!acceptTerms.value) {
     emitter.emit('message', { msg: '请同意条款', type: 'error' });
+    isLoading.value = false;
     return;
   }
   // 提交表单

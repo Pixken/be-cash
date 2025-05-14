@@ -157,7 +157,7 @@ const editProfile = async (key: 'nickname' | 'avatar' | 'phoneNumber', value: an
     phoneNumber: userStore.user.phoneNumber || ''
   }
   profile[key] = value
-  const res = await updateProfile(userStore.user.id?.value, profile)
+  const res = await updateProfile(userStore.user.id?.value || userStore.user.id || '', profile)
   if (res.code === '0000') {
     emitter.emit("message", { msg: res.info, type: 'success' })
     const userInfoRes = await userInfo()
