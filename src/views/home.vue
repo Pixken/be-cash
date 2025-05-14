@@ -436,7 +436,7 @@ onIonViewDidEnter(() => {
       </div>
 
       <!-- AI助手按钮 -->
-      <AI />
+      <!-- <AI /> -->
     </div>
     </ion-content>
   </ion-page>
