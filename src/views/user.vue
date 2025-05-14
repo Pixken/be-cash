@@ -14,7 +14,7 @@ import { getVersion } from '@/utils/common';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { getCashCategory, addCashCategory, updateCashCategory, deleteCashCategory } from '@/api/cashCategory';
 import { userInfo } from '@/api/user';
-
+import defaultAvatar from '@/assets/zxd.png'
 // 定义分类类型
 interface Category {
   id: string;
@@ -37,6 +37,7 @@ const logout = () => {
   setTimeout(() => {
     emitter.emit('message', { msg: '退出成功', type: 'success' });
     router.push('/login');
+    clearInterval(userStore.alertInterval)
     isLoading.value = false;
     userStore.logout();
   }, 1000);
@@ -523,7 +524,7 @@ onMounted(() => {
         <!-- 用户头像和名称 -->
         <div class="flex flex-col items-center mt-6 mb-8">
           <div class="w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center mb-4 overflow-hidden" @click="handleSelectAvatar">
-            <img src="@/assets/zxd.png" alt="" class="w-full h-full object-cover">
+            <img :src="userStore.user.avatar || defaultAvatar" alt="" class="w-full h-full object-cover">
           </div>
           <h1 class="text-2xl font-bold text-white">{{ userStore.user.profile.nickname }}</h1>
           <p class="text-gray-100 mt-1">{{ userStore.user.phoneNumber || userStore.user.email.value }}</p>

@@ -23,8 +23,6 @@ import { deleteCash } from '@/api/cash';
 import defaultAvatar from '@/assets/zxd.png'
 import { getNotifications } from '@/api/notifications';
 
-const timmer = ref<ReturnType<typeof setTimeout> | null>(null);
-
 const getNotificationsInfo = async () => {
   const res = await getNotifications();
   const { data } = res;
@@ -137,7 +135,7 @@ onMounted(() => {
   }
   fetchBills();
 
-  timmer.value = setInterval(() => {
+  userStore.alertInterval = setInterval(() => {
     getNotificationsInfo();
   }, 2000)
 });
@@ -214,7 +212,7 @@ onIonViewDidEnter(() => {
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center" @click="router.push('/tabs/user')">
             <div class="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center overflow-hidden mr-4">
-              <img :src="userStore.user.profile.avatar || defaultAvatar" alt="" class="w-full h-full object-cover">
+              <img :src="userStore.user.avatar || defaultAvatar" alt="" class="w-full h-full object-cover">
             </div>
             <div>
               <h1 class="text-xl font-bold text-white">{{ userStore.user.profile.nickname }}</h1>

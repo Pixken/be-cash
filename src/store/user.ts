@@ -6,6 +6,7 @@ const useUserStore = defineStore('user', () => {
   const refresh_token = ref(storage.getItem('refresh_token') || '')
   const user = ref(storage.getItem('user') || {})
   const alerts = ref<any[]>([])
+  const alertInterval = ref(0)
 
   const setToken = async (at: string, rt: string) => {
     access_token.value = at
@@ -28,6 +29,8 @@ const useUserStore = defineStore('user', () => {
     storage.removeItem('user')
   }
 
+
+
   return {
     setToken,
     setUser,
@@ -35,7 +38,8 @@ const useUserStore = defineStore('user', () => {
     refresh_token,
     user,
     logout,
-    alerts
+    alerts,
+    alertInterval
   }
 })
 export default useUserStore

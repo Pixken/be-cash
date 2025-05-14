@@ -108,9 +108,14 @@ const onSubmit = async (e: Event) => {
       console.log(res);
       // await userStore.setToken(res.data.access_token, res.data.refresh_token);
       // const user = await userInfo()
-      await userStore.setUser(res.data);
-      emitter.emit("message", { msg: "登录成功", type: "success" });
-      router.replace("/tabs/home");
+      if (res.code === '0000') {
+        await userStore.setUser(res.data);
+        emitter.emit("message", { msg: "登录成功", type: "success" });
+        router.replace("/tabs/home");
+      } else {
+        emitter.emit("message", { msg: res.info, type: "error" });
+        await getCaptchaInfo();
+      }
     })
     .catch(async (err) => {
       // 登录失败时刷新验证码
@@ -123,7 +128,7 @@ const onSubmit = async (e: Event) => {
     });
 };
 
-const remember = ref(storage.getItem("user").username ? true : false);
+const remember = ref(storage.getItem("user")?.username ? true : false);
 watch(remember, (val) => {
   if (val) {
     storage.setItem("user", {

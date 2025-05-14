@@ -77,7 +77,7 @@ router.beforeEach((to, from, next) => {
 // 检查用户是否登录的方法
 function checkAuth() {
   // 实际项目中可以从 localStorage/Vuex/store 中获取登录状态
-  return storage.getItem('user').id !== undefined
+  return storage.getItem('user')?.id !== undefined
   // 或 return store.getters.isAuthenticated
 }
 
