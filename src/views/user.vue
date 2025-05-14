@@ -752,7 +752,8 @@ onMounted(() => {
                           <label class="block text-sm font-medium text-gray-700 mb-1">分类名称</label>
                           <input 
                             type="text" 
-                            v-model="categoryForm.name" 
+                            v-model="categoryForm.name"
+                            @blur="categoryForm.name = $event.target?.value"
                             class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="请输入分类名称"
                           />

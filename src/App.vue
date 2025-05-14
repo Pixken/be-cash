@@ -9,6 +9,20 @@
       :duration="1000"
       @didDismiss="isOpen = false"
     ></ion-toast>
+    
+    <!-- 更新下载进度条 -->
+    <div v-if="showUpdateProgress" class="update-progress-container">
+      <div class="update-progress-overlay"></div>
+      <div class="update-progress-dialog">
+        <h3>正在下载更新</h3>
+        <div class="progress-bar-container">
+          <div class="progress-bar" :style="{ width: `${updateProgress}%` }"></div>
+        </div>
+        <div class="progress-text">{{ updateProgress }}%</div>
+        <p class="update-message">{{ updateMessage }}</p>
+      </div>
+    </div>
+    
     <ion-router-outlet></ion-router-outlet>
   </ion-app>
 </template>
@@ -21,9 +35,52 @@ import { Keyboard } from '@capacitor/keyboard';
 
 import { checkNativeUpdate } from '@/services/update/nativeUpdate';
 
+// 更新进度状态
+const showUpdateProgress = ref(false);
+const updateProgress = ref(0);
+const updateMessage = ref('正在准备下载...');
+
+// 更新下载阶段的消息映射
+const updateStageMessages = {
+  0: '正在准备下载...',
+  10: '正在连接服务器...',
+  20: '开始下载更新包...',
+  50: '下载中，请耐心等待...',
+  80: '即将完成下载...',
+  95: '正在准备安装...',
+  100: '下载完成，即将安装...'
+};
+
 // 在应用启动时检查更新
 checkNativeUpdate((progress) => {
   console.log(`下载进度: ${progress}%`);
+  
+  // 只有在确实在下载时才显示进度条（避免在检查更新等阶段显示）
+  if (progress > 0) {
+    showUpdateProgress.value = true;
+    updateProgress.value = progress;
+    
+    // 根据进度设置不同的消息
+    if (progress >= 100) {
+      updateMessage.value = updateStageMessages[100];
+      // 下载完成后3秒隐藏进度条
+      setTimeout(() => {
+        showUpdateProgress.value = false;
+      }, 3000);
+    } else if (progress >= 95) {
+      updateMessage.value = updateStageMessages[95];
+    } else if (progress >= 80) {
+      updateMessage.value = updateStageMessages[80];
+    } else if (progress >= 50) {
+      updateMessage.value = updateStageMessages[50];
+    } else if (progress >= 20) {
+      updateMessage.value = updateStageMessages[20];
+    } else if (progress >= 10) {
+      updateMessage.value = updateStageMessages[10];
+    } else {
+      updateMessage.value = updateStageMessages[0];
+    }
+  }
 });
 
 // 添加键盘处理
@@ -115,6 +172,74 @@ ion-toast.custom-toast {
   font-size: 14px;
   letter-spacing: 0.3px;
   margin-top: 16px;
+}
+
+/* 更新进度条样式 */
+.update-progress-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.update-progress-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.update-progress-dialog {
+  background-color: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 80%;
+  max-width: 320px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.update-progress-dialog h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 18px;
+  color: #333;
+}
+
+.progress-bar-container {
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(to right, #4f46e5, #8b5cf6);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-weight: bold;
+  color: #4f46e5;
+  margin-bottom: 12px;
+}
+
+.update-message {
+  font-size: 14px;
+  color: #666;
+  margin: 8px 0 0;
 }
 
 /* 确保页面内容可以滚动，适应键盘弹出 */

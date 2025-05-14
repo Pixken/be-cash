@@ -74,34 +74,34 @@ async function downloadAndInstallApk(
   onProgress?: (progress: number) => void
 ): Promise<boolean> {
   try {
-    // 1. 请求存储权限 - 在 Android 上，文件系统操作会自动请求权限
+    // 1. 生成一个唯一的文件名避免缓存问题
+    const timestamp = new Date().getTime();
+    const fileName = `update_${info.version}_${timestamp}.apk`;
+    console.log(`开始下载更新，版本: ${info.version}, 文件名: ${fileName}`);
     
     // 2. 下载文件
-    const fileName = `${info.version}.apk`
     const filePath = await downloadFile({
       url: info.url,
       fileName,
       expectedSize: info.size,
       onProgress,
-    })
+    });
+    
+    console.log('APK下载完成，文件路径:', filePath);
     
     // 3. 验证文件完整性
-    // const isValid = await verifyFile(filePath, info.sha256)
-    // if (!isValid) {
-    //   await Filesystem.deleteFile({ path: filePath, directory: Directory.External })
-    //   throw new Error('文件校验失败')
-    // }
+    // 暂时跳过SHA256验证
     
     // 4. 安装APK
-    await installApk(filePath)
-    return true
+    await installApk(filePath);
+    return true;
   } catch (error) {
-    console.error('APK更新失败:', error)
-    emitter.emit('message', { msg: 'APK更新失败:'+ error, type: 'error' })
+    console.error('APK更新失败:', error);
+    emitter.emit('message', { msg: 'APK更新失败: ' + error, type: 'error' });
     if (isForce) {
-      await showCriticalUpdateError()
+      await showCriticalUpdateError();
     }
-    return false
+    return false;
   }
 }
 
@@ -156,65 +156,207 @@ async function downloadFile(options: {
 }): Promise<string> {
   const { url, fileName, expectedSize, onProgress } = options
   
-  // 检查文件是否已存在
   try {
-    const fileInfo = await Filesystem.stat({
-      path: fileName,
-      directory: Directory.External
-    })
-    
-    // 如果文件已存在且大小正确，直接返回
-    if (fileInfo.size === expectedSize) {
-      return fileInfo.uri
+    // 检查文件是否已存在
+    let existingFile = null;
+    try {
+      const fileInfo = await Filesystem.stat({
+        path: fileName,
+        directory: Directory.External
+      })
+      
+      existingFile = fileInfo;
+      console.log('找到已存在的文件:', fileInfo);
+      
+      // 如果文件已存在且大小正确，直接返回
+      if (fileInfo.size === expectedSize) {
+        console.log('文件已存在且大小正确，直接使用:', fileInfo.uri);
+        // 已有文件，进度直接设为100%
+        if (onProgress) onProgress(100);
+        return fileInfo.uri
+      } else {
+        console.log('文件存在但大小不正确，将重新下载');
+      }
+    } catch (e) {
+      // 文件不存在，继续下载
+      console.log('文件不存在，开始下载');
     }
-  } catch (e) {
-    // 文件不存在，继续下载
-  }
-  
-  try {
+    
     // 下载文件
-    const response = await fetch(url)
-    if (!response.ok) throw new Error('下载失败 ')
+    console.log(`开始从 ${url} 下载文件 ${fileName}`);
+    
+    // 使用fetch API但以流的方式处理以获取下载进度
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`下载失败: ${response.status} ${response.statusText}`);
     
     // 获取总大小
-    const contentLength = Number(response.headers.get('Content-Length') || expectedSize)
+    const contentLength = Number(response.headers.get('Content-Length') || expectedSize);
+    console.log(`文件大小: ${contentLength} 字节`);
     
-    // 创建响应的 Blob 对象
-    const blob = await response.blob()
-    
-    if (onProgress) {
-      // 下载完成后更新进度为 99%
-      onProgress(99)
-    }
-    
-    // 使用 FileReader 读取 Blob 数据
-    const base64Data = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => {
-        // 结果是 DataURL 格式，需要移除前缀 "data:application/octet-stream;base64,"
-        const result = reader.result as string
-        const base64 = result.split(',')[1]
-        resolve(base64)
+    // 使用ReadableStream处理下载进度
+    if (response.body) {
+      if (onProgress) onProgress(0); // 初始进度为0%
+      
+      // 创建 ReadableStreamReader
+      const reader = response.body.getReader();
+      
+      // 用于累积接收到的数据
+      const chunks: Uint8Array[] = [];
+      let receivedLength = 0;
+      
+      // 循环读取数据块，直到下载完成
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) {
+          console.log('数据流已接收完成');
+          break;
+        }
+        
+        // 累加数据块
+        chunks.push(value);
+        receivedLength += value.length;
+        
+        // 更新进度
+        if (onProgress && contentLength) {
+          const progress = Math.round((receivedLength / contentLength) * 97); // 留出3%用于后续处理
+          onProgress(progress);
+          console.log(`下载进度: ${progress}%`);
+        }
       }
-      reader.onerror = () => reject(reader.error)
-      reader.readAsDataURL(blob)
-    })
-    
-    // 保存文件
-    const result = await Filesystem.writeFile({
-      path: fileName,
-      data: base64Data,
-      directory: Directory.External
-    })
-    console.log('downloadFile', result);
-    
-    if (onProgress) onProgress(100)
-    
-    return result.uri
+      
+      // 合并数据块为一个Uint8Array
+      const chunksAll = new Uint8Array(receivedLength);
+      let position = 0;
+      for (const chunk of chunks) {
+        chunksAll.set(chunk, position);
+        position += chunk.length;
+      }
+      
+      // 创建Blob对象
+      const blob = new Blob([chunksAll]);
+      console.log(`Blob 已创建，大小: ${blob.size} 字节`);
+      
+      if (onProgress) onProgress(98); // 设置为98%，表示下载完成，正在处理
+      
+      // 使用 FileReader 读取 Blob 数据
+      const base64Data = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          // 结果是 DataURL 格式，需要移除前缀 "data:application/octet-stream;base64,"
+          const result = reader.result as string;
+          const base64 = result.split(',')[1];
+          console.log(`已将文件转换为 Base64 格式`);
+          resolve(base64);
+        };
+        reader.onerror = () => {
+          console.error('FileReader 错误:', reader.error);
+          reject(reader.error);
+        };
+        reader.readAsDataURL(blob);
+      });
+      
+      if (onProgress) onProgress(99); // 设置为99%，表示即将写入文件系统
+      
+      // 如果文件已存在但大小不对，先删除
+      if (existingFile && existingFile.size !== expectedSize) {
+        try {
+          await Filesystem.deleteFile({
+            path: fileName,
+            directory: Directory.External
+          });
+          console.log('已删除大小不正确的现有文件');
+        } catch (deleteError) {
+          console.warn('删除现有文件失败:', deleteError);
+        }
+      }
+      
+      // 保存文件
+      console.log(`开始将文件保存到: ${fileName}`);
+      const result = await Filesystem.writeFile({
+        path: fileName,
+        data: base64Data,
+        directory: Directory.External
+      });
+      console.log('文件下载完成并保存，URI:', result.uri);
+      
+      if (onProgress) onProgress(100); // 设置为100%，下载完成
+      
+      try {
+        // 验证文件是否成功写入
+        const fileInfo = await Filesystem.stat({
+          path: fileName,
+          directory: Directory.External
+        });
+        console.log('已下载文件信息:', fileInfo);
+        
+        // 返回文件的URI
+        return fileInfo.uri;
+      } catch (statError) {
+        console.warn('无法验证已下载文件状态:', statError);
+        // 虽然无法验证，但仍返回写入操作返回的URI
+        return result.uri;
+      }
+    } else {
+      // 如果不支持ReadableStream，退回到原来的方法
+      const blob = await response.blob();
+      console.log(`Blob 已创建，大小: ${blob.size} 字节`);
+      
+      if (onProgress) onProgress(80); // 假设已完成80%
+      
+      // 使用 FileReader 读取 Blob 数据
+      const base64Data = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          const base64 = result.split(',')[1];
+          console.log(`已将文件转换为 Base64 格式`);
+          resolve(base64);
+        };
+        reader.onerror = () => {
+          console.error('FileReader 错误:', reader.error);
+          reject(reader.error);
+        };
+        reader.readAsDataURL(blob);
+      });
+      
+      if (onProgress) onProgress(90); // 设置为90%
+      
+      // 如果文件已存在但大小不对，先删除
+      if (existingFile && existingFile.size !== expectedSize) {
+        try {
+          await Filesystem.deleteFile({
+            path: fileName,
+            directory: Directory.External
+          });
+        } catch (deleteError) {
+          console.warn('删除现有文件失败:', deleteError);
+        }
+      }
+      
+      // 保存文件
+      const result = await Filesystem.writeFile({
+        path: fileName,
+        data: base64Data,
+        directory: Directory.External
+      });
+      
+      if (onProgress) onProgress(100); // 设置为100%
+      
+      try {
+        const fileInfo = await Filesystem.stat({
+          path: fileName,
+          directory: Directory.External
+        });
+        return fileInfo.uri;
+      } catch (statError) {
+        return result.uri;
+      }
+    }
   } catch (error) {
-    console.error('文件下载失败:', error)
-    emitter.emit('message', { msg: '文件下载失败:' + error, type: 'error' })
-    throw error
+    console.error('文件下载失败:', error);
+    emitter.emit('message', { msg: '文件下载失败: ' + error, type: 'error' });
+    throw error;
   }
 }
 
@@ -244,24 +386,35 @@ async function verifyFile(filePath: string, expectedHash: string): Promise<boole
 
 // 安装APK
 async function installApk(filePath: string) {
-  console.log('installApk', filePath);
+  console.log('开始安装APK，路径:', filePath);
   
   try {
-    // 确保文件存在
-    await Filesystem.stat({
-      path: filePath,
-      directory: Directory.External
-    });
-    
-    // 使用系统默认应用打开APK文件
-    // 注意：这需要安装 @capacitor-community/file-opener 插件
-    // npm install @capacitor-community/file-opener
-    // npx cap sync
+    // 转换文件路径格式
+    // Android上，FileOpener需要完整的file://路径
+    if (!filePath.startsWith('file://')) {
+      // 如果不是完整路径，尝试获取完整路径
+      try {
+        const fileInfo = await Filesystem.stat({
+          path: filePath,
+          directory: Directory.External
+        });
+        console.log('获取到文件信息:', fileInfo);
+        
+        // 使用文件的完整uri
+        if (fileInfo && fileInfo.uri) {
+          filePath = fileInfo.uri;
+          console.log('使用文件的完整URI:', filePath);
+        }
+      } catch (error) {
+        console.warn('获取文件信息失败, 尝试继续使用原始路径:', error);
+      }
+    }
     
     // 导入插件
     const { FileOpener } = await import('@capacitor-community/file-opener');
     
     // 打开APK文件进行安装
+    console.log('调用FileOpener打开文件:', filePath);
     await FileOpener.open({
       filePath: filePath,
       contentType: 'application/vnd.android.package-archive',
@@ -271,7 +424,7 @@ async function installApk(filePath: string) {
     console.log('APK安装程序已启动');
   } catch (error) {
     console.error('安装APK失败:', error);
-    emitter.emit('message', { msg: '安装APK失败:' + error, type: 'error' });
+    emitter.emit('message', { msg: '安装APK失败: ' + error, type: 'error' });
     throw error;
   }
 }
