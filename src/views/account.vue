@@ -25,6 +25,12 @@ const form = ref({
 });
 const dismiss = () => {
   modal.value?.$el.dismiss()
+  form.value = {
+    cardNumber: '',
+    name: undefined,
+    balance: 0,
+    alertThreshold: 0,
+  }
 };
 
 const accounts_select = ref([
@@ -157,7 +163,7 @@ const handleDelete = async () => {
         <div style="background: linear-gradient(135deg, #4f46e5 0%, #818cf8 100%);"
           class="w-full h-32 rounded-2xl text-white p-4 flex flex-col">
           <h2 class="text-lg mb-1">总资产</h2>
-          <p class="text-4xl font-bold mt-3">¥ {{ accounts.reduce((acc, item) => acc + item.balance, 0) }}</p>
+          <p class="text-4xl font-bold mt-3">¥ {{ accounts.reduce((acc, item) => acc + item.balance, 0).toFixed(2) }}</p>
         </div>
         <div class="w-full mt-4">
           <div class="flex items-center justify-between">

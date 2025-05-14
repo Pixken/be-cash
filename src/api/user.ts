@@ -27,3 +27,6 @@ export const updatePassword = (data: Password) => {
 export const updateProfile = (userId: string, data: any) => {
   return post(`/identity/profile/${userId}`, data)
 }
+export const uploadFile = (data: any, config: any) => {
+  return post('/identity/avatar/upload', data, config)
+}

@@ -110,9 +110,9 @@ export const get = async (url: string, params?: any) => {
   }
 }
 
-export const post = async (url: string, data: any) => {
+export const post = async (url: string, data: any, config?: any) => {
   try {
-    const res = await request.post(url, data);
+    const res = await request.post(url, data, config);
     return res.data as ApiResponse<any>;
   } catch (error) {
     return Promise.reject(error)

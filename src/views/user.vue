@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IonPage, IonContent, IonToggle, onIonViewDidEnter, IonModal, toastController } from '@ionic/vue';
+import { IonPage, IonContent, onIonViewDidEnter, IonModal } from '@ionic/vue';
 import { useRouter } from 'vue-router';
 import emitter from '@/utils/emitter';
 import useUserStore from '@/store/user';
@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 import { Button, Select } from 'ant-design-vue'
 import { getAccount } from '@/api/account';
 import { storage } from '@/utils/storage';
-import { updatePassword, updateProfile } from '@/api/user';
+import { updatePassword, updateProfile, uploadFile } from '@/api/user';
 import { getVersion } from '@/utils/common';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
@@ -144,7 +144,13 @@ const editProfile = async (key: 'nickname' | 'avatar' | 'phoneNumber', value: an
   }
   profile[key] = value
   const res = await updateProfile(userStore.user.id?.value, profile)
-  console.log(res);
+  if (res.code === '0000') {
+    emitter.emit("message", { msg: res.info, type: 'success' })
+    console.log(res.data);
+    
+  } else {
+    emitter.emit("message", { msg: res.info, type: 'error' })
+  }
 }
 
 const dismissModal = () => {
@@ -196,14 +202,21 @@ const handleSelectAvatar = async () => {
       source: CameraSource.Photos
     });
 
-    console.log('获取到的图片信息:', image);
-    
+    // 新增：将DataURL转换为Blob
+    const blob = dataURLtoBlob(image.dataUrl as string);
+    const file = new File([blob], `avatar.${image.format}`, {
+      type: `image/${image.format}`
+    });
+
     imageData.value = image.dataUrl;
     
     selectedFile.value = {
-      data: image.dataUrl,
+      data: file,  // 改为存储File对象
       format: image.format
     };
+    
+
+    await uploadAvatar()
     
     emitter.emit("message", { msg: '选择图片成功', type: 'success' })
   } catch (error) {
@@ -212,44 +225,39 @@ const handleSelectAvatar = async () => {
   }
 }
 
-// 如需要从文件系统读取文件
-const readFileFromFilesystem = async (path: string) => {
-  try {
-    return await Filesystem.readFile({
-      path: path,
-      directory: Directory.Data
-    });
-  } catch (error) {
-    console.error('读取文件系统出错:', error);
-    throw error;
+// 新增DataURL转Blob函数
+const dataURLtoBlob = (dataurl: string) => {
+  const arr = dataurl.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1]
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
   }
-};
+  return new Blob([u8arr], { type: mime });
+}
 
-// 如需要从Blob URL读取内容并转换为Base64
-const convertBlobToBase64 = (blobUrl: string): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    fetch(blobUrl)
-      .then(response => response.blob())
-      .then(blob => {
-        const reader = new FileReader();
-        reader.addEventListener('load', function(this: FileReader, _event) {
-          // 使用this关键字访问FileReader的result属性
-          if (typeof this.result === 'string') {
-            resolve(this.result);
-          } else {
-            reject(new Error('Result is not a string'));
-          }
-        });
-        reader.addEventListener('error', () => {
-          reject(new Error('Failed to convert blob to base64'));
-        });
-        reader.readAsDataURL(blob);
-      })
-      .catch(error => {
-        reject(error);
-      });
-  });
-};
+// 上传图片
+const uploadAvatar = async () => {
+  const formData = new FormData();
+  formData.append('file', selectedFile.value.data);
+  
+  // 使用特殊的请求配置
+  const config = {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  };
+  
+  const res = await uploadFile(formData, config);
+  if (res.code === '0000') {
+    const avatar = res.data
+    await editProfile('avatar', avatar)
+  } else {
+    throw new Error(res.info)
+  }
+}
 
 const showHelpCenter = async () => {
   await Dialog.alert({
@@ -318,6 +326,7 @@ const showAboutUs = async () => {
                   :type="form.type"
                   :placeholder="form.placeholder"
                   v-model="form.value"
+                  @blur="form.value = $event.target?.value"
                   class="w-full h-12 pl-4 pr-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all outline-none"
                 >
               </template>
