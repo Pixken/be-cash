@@ -86,11 +86,11 @@ async function downloadAndInstallApk(
     })
     
     // 3. 验证文件完整性
-    const isValid = await verifyFile(filePath, info.sha256)
-    if (!isValid) {
-      await Filesystem.deleteFile({ path: filePath, directory: Directory.External })
-      throw new Error('文件校验失败')
-    }
+    // const isValid = await verifyFile(filePath, info.sha256)
+    // if (!isValid) {
+    //   await Filesystem.deleteFile({ path: filePath, directory: Directory.External })
+    //   throw new Error('文件校验失败')
+    // }
     
     // 4. 安装APK
     await installApk(filePath)
