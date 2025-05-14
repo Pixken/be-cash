@@ -72,10 +72,11 @@ emitter.on('message', (msg) => {
 });
 
 // 为不同类型的消息添加前缀图标
-const formatMessage = (msg: string, messageType: 'success' | 'error'): string => {
+const formatMessage = (msg: string, messageType: 'success' | 'error' | 'warning'): string => {
   const icons = {
     success: '✓ ',
-    error: '✗ '
+    error: '✗ ',
+    warning: '⚠ '
   };
   return icons[messageType] + msg;
 };
@@ -83,7 +84,8 @@ const formatMessage = (msg: string, messageType: 'success' | 'error'): string =>
 // 为不同类型的消息设置不同颜色
 const colors: Record<string, string> = {
   success: '#10b981',
-  error: '#ef4444'
+  error: '#ef4444',
+  warning: '#f59e0b'
 };
 
 // 监听类型变化，应用相应样式

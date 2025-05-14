@@ -12,7 +12,8 @@ import { storage } from '@/utils/storage';
 import { updatePassword, updateProfile, uploadFile } from '@/api/user';
 import { getVersion } from '@/utils/common';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { getCashCategory } from '@/api/cashCategory';
+import { getCashCategory, addCashCategory, updateCashCategory, deleteCashCategory } from '@/api/cashCategory';
+import { userInfo } from '@/api/user';
 
 // 定义分类类型
 interface Category {
@@ -21,6 +22,7 @@ interface Category {
   type: string;
   icon: string;
   color: string;
+  isDefault: boolean;
 }
 
 const userStore = useUserStore();
@@ -157,8 +159,10 @@ const editProfile = async (key: 'nickname' | 'avatar' | 'phoneNumber', value: an
   const res = await updateProfile(userStore.user.id?.value, profile)
   if (res.code === '0000') {
     emitter.emit("message", { msg: res.info, type: 'success' })
-    console.log(res.data);
-    
+    const userInfoRes = await userInfo()
+    if (userInfoRes.code === '0000') {
+      userStore.setUser(userInfoRes.data)
+    }
   } else {
     emitter.emit("message", { msg: res.info, type: 'error' })
   }
@@ -299,6 +303,7 @@ const categoryType = ref('EXPENSE') // 默认显示支出分类
 const categories = ref<Category[]>([])
 const showCategoryForm = ref(false)
 const isEditingCategory = ref(false)
+const isSaving = ref(false) // 添加保存状态标记
 
 // 分类表单
 const categoryForm = ref<{
@@ -351,13 +356,18 @@ const colorOptions = ref([
 const getCashCategories = async () => {
   try {
     const res = await getCashCategory();
-    categories.value = res.data.map((item: any) => ({
-      id: item.id.value,
-      name: item.name,
-      type: item.type,
-      icon: item.icon,
-      color: item.color,
-    }));
+    if (res.code === '0000') {
+      categories.value = res.data.map((item: any) => ({
+        id: item.id?.value || item.id,
+        name: item.name,
+        type: item.type,
+        icon: item.icon || 'tabler:category',
+        color: item.color || '#4f46e5',
+        isDefault: item.userId === null,
+      }));
+    } else {
+      emitter.emit("message", { msg: res.info || '获取分类失败', type: 'error' });
+    }
   } catch (error) {
     console.error('获取分类失败:', error);
     emitter.emit("message", { msg: '获取分类失败', type: 'error' });
@@ -371,24 +381,51 @@ const filteredCategories = computed(() => {
 
 // 编辑分类
 const editCategory = (category: Category) => {
-  // 填充表单
+  if (category.isDefault) {
+    emitter.emit("message", { msg: '默认分类不能编辑', type: 'warning' as 'success' });
+    return;
+  }
+  
   categoryForm.value = { ...category };
   isEditingCategory.value = true;
   showCategoryForm.value = true;
 };
 
-// 删除分类（UI示例，实际逻辑暂不实现）
-const deleteCategory = (categoryId: string) => {
-  console.log('删除分类:', categoryId);
-  emitter.emit("message", { msg: '删除功能暂未实现', type: 'info' as 'success' });
+// 删除分类
+const deleteCategory = async (categoryId: string, isDefault: boolean) => {
+  if (isDefault) {
+    emitter.emit("message", { msg: '默认分类不能删除', type: 'warning' as 'success' });
+    return;
+  }
+  
+  try {
+    const { value } = await Dialog.confirm({
+      title: '确认删除',
+      message: '确定要删除这个分类吗？删除后无法恢复。',
+      okButtonTitle: '删除',
+      cancelButtonTitle: '取消'
+    });
+    
+    if (!value) return;
+    
+    const res = await deleteCashCategory({ categoryId });
+    if (res.code === '0000') {
+      categories.value = categories.value.filter(cat => cat.id !== categoryId);
+      emitter.emit("message", { msg: '删除成功', type: 'success' });
+    } else {
+      emitter.emit("message", { msg: res.info || '删除失败', type: 'error' });
+    }
+  } catch (error) {
+    console.error('删除分类失败:', error);
+    emitter.emit("message", { msg: '删除分类失败', type: 'error' });
+  }
 };
 
 // 显示添加分类表单
 const showAddCategoryForm = () => {
-  // 重置表单
   categoryForm.value = {
     name: '',
-    type: categoryType.value, // 使用当前选中的类型
+    type: categoryType.value,
     icon: 'tabler:category',
     color: '#4f46e5'
   };
@@ -402,28 +439,55 @@ const cancelCategoryForm = () => {
 };
 
 // 提交分类表单
-const submitCategoryForm = () => {
-  // 表单验证
+const submitCategoryForm = async () => {
   if (!categoryForm.value.name) {
     emitter.emit("message", { msg: '请输入分类名称', type: 'error' });
     return;
   }
-
-  // 模拟提交成功
-  if (isEditingCategory.value) {
-    emitter.emit("message", { msg: '编辑成功', type: 'success' });
-  } else {
-    emitter.emit("message", { msg: '添加成功', type: 'success' });
-  }
   
-  // 关闭表单
-  showCategoryForm.value = false;
+  try {
+    isSaving.value = true;
+    const formData = {
+      name: categoryForm.value.name,
+      type: categoryForm.value.type,
+      icon: categoryForm.value.icon,
+      color: categoryForm.value.color
+    };
+    
+    let res;
+    if (isEditingCategory.value && categoryForm.value.id) {
+      res = await updateCashCategory({
+        ...formData,
+        categoryId: categoryForm.value.id
+      });
+    } else {
+      res = await addCashCategory(formData);
+    }
+    
+    if (res.code === '0000') {
+      await getCashCategories();
+      
+      showCategoryForm.value = false;
+      emitter.emit("message", { 
+        msg: isEditingCategory.value ? '编辑成功' : '添加成功', 
+        type: 'success' 
+      });
+    } else {
+      emitter.emit("message", { 
+        msg: res.info || (isEditingCategory.value ? '编辑失败' : '添加失败'), 
+        type: 'error' 
+      });
+    }
+  } catch (error) {
+    console.error('保存分类失败:', error);
+    emitter.emit("message", { msg: '保存分类失败', type: 'error' });
+  } finally {
+    isSaving.value = false;
+  }
 };
 
-// 保存分类变更（UI示例，实际逻辑暂不实现）
+// 保存分类变更
 const saveCategoryChanges = () => {
-  console.log('保存分类变更');
-  emitter.emit("message", { msg: '保存成功', type: 'success' });
   categoryModal.value?.$el.dismiss();
 };
 
@@ -625,7 +689,7 @@ onMounted(() => {
                 </div>
               </div>
               
-              <div id="open-modal" class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+              <div id="open-categoryModal" class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
                 <div class="flex items-center">
                   <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
@@ -638,7 +702,7 @@ onMounted(() => {
                   <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                 </svg>
               </div>
-              <ion-modal ref="categoryModal" id="categoryModal" trigger="open-modal">
+              <ion-modal ref="categoryModal" id="categoryModal" trigger="open-categoryModal">
                 <div class="flex flex-col h-full wrapper px-4 py-6">
                   <div class="w-full flex justify-between items-center mb-6">
                     <h2 class="text-xl font-bold">分类管理</h2>
@@ -731,21 +795,29 @@ onMounted(() => {
                     <div class="mt-4">
                       <button 
                         @click="submitCategoryForm" 
-                        class="w-full p-3 bg-blue-500 text-white rounded-lg font-medium"
+                        class="w-full p-3 bg-blue-500 text-white rounded-lg font-medium disabled:bg-blue-300"
+                        :disabled="isSaving"
                       >
-                        保存
+                        <span v-if="isSaving" class="flex items-center justify-center">
+                          <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          保存中...
+                        </span>
+                        <span v-else>保存</span>
                       </button>
                     </div>
                   </div>
                   
                   <!-- 分类类型切换 -->
                   <div v-if="!showCategoryForm" class="flex items-center justify-between bg-gray-100 rounded-md h-12 mb-6 relative">
-                    <p class="text-center w-1/2 z-10 transition-all duration-300"
+                    <p class="text-center w-1/2 z-10 transition-all duration-300 cursor-pointer"
                       :class="{ 'text-white': categoryType === 'INCOME' }"
                       @click="categoryType = 'INCOME'">
                       收入
                     </p>
-                    <p class="text-center w-1/2 z-10 transition-all duration-300"
+                    <p class="text-center w-1/2 z-10 transition-all duration-300 cursor-pointer"
                       :class="{ 'text-white': categoryType === 'EXPENSE' }"
                       @click="categoryType = 'EXPENSE'">
                       支出
@@ -760,23 +832,51 @@ onMounted(() => {
                   
                   <!-- 分类列表区域 -->
                   <div v-if="!showCategoryForm" class="flex-1 overflow-y-auto mb-4 pr-1 custom-scrollbar">
-                    <ul class="w-full flex flex-col gap-3">
+                    <!-- 空状态显示 -->
+                    <div v-if="filteredCategories.length === 0" class="flex flex-col items-center justify-center h-60 text-gray-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mb-4 text-gray-300">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
+                      </svg>
+                      <p class="text-lg">还没有{{ categoryType === 'INCOME' ? '收入' : '支出' }}分类</p>
+                      <p class="text-sm mt-2">点击下方"添加新分类"按钮创建</p>
+                    </div>
+                    
+                    <!-- 分类列表 -->
+                    <ul v-else class="w-full flex flex-col gap-3">
                       <li v-for="(category, index) in filteredCategories" :key="index" 
-                          class="flex items-center justify-between p-3 border rounded-lg shadow-sm hover:bg-gray-50">
+                          class="flex items-center justify-between p-3 border rounded-lg shadow-sm hover:bg-gray-50"
+                          :class="{'bg-gray-50': category.isDefault}">
                         <div class="flex items-center gap-3">
                           <div class="w-10 h-10 rounded-full flex items-center justify-center"
                             :style="{ backgroundColor: category.color }">
                             <svg-icon :icon="category.icon" color="#ffffff"></svg-icon>
                           </div>
-                          <span class="font-medium">{{ category.name }}</span>
+                          <div class="flex flex-col">
+                            <span class="font-medium">{{ category.name }}</span>
+                            <span v-if="category.isDefault" class="text-xs text-gray-500 flex items-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                              </svg>
+                              系统默认
+                            </span>
+                          </div>
                         </div>
                         <div class="flex items-center gap-2">
-                          <button class="p-2 text-blue-500 hover:bg-blue-50 rounded-full" @click="editCategory(category)">
+                          <button 
+                            class="p-2 text-blue-500 hover:bg-blue-50 rounded-full" 
+                            @click="editCategory(category)"
+                            :class="{'opacity-50 cursor-not-allowed': category.isDefault}"
+                          >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                             </svg>
                           </button>
-                          <button class="p-2 text-red-500 hover:bg-red-50 rounded-full" @click="deleteCategory(category.id)">
+                          <button 
+                            class="p-2 text-red-500 hover:bg-red-50 rounded-full" 
+                            @click="deleteCategory(category.id, category.isDefault)"
+                            :class="{'opacity-50 cursor-not-allowed': category.isDefault}"
+                          >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                             </svg>
@@ -802,7 +902,7 @@ onMounted(() => {
                 </div>
               </ion-modal>
 
-              <!-- <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"  id="open-modal">
+              <!-- <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"  id="open-categoryModal">
                 <div class="flex items-center">
                   <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
@@ -815,7 +915,7 @@ onMounted(() => {
                   <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                 </svg>
               </div> -->
-              <!-- <ion-modal ref="budgetModal" trigger="open-modal">
+              <!-- <ion-modal ref="budgetModal" trigger="open-categoryModal">
                 <div class="flex flex-col items-center justify-center gap-5 h-full wrapper px-4">
                   <div class="w-full text-left text-xl font-bold">预算设置</div>
                     <ul class="w-full flex flex-col gap-2">

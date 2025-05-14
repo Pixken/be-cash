@@ -16,7 +16,7 @@ export const refreshToken = () => {
   })
 }
 export const userInfo = () => {
-  return get('/identity/profile')
+  return get('/identity/user/info')
 }
 export const getCaptcha = () => {
   return get('/identity/captcha')
