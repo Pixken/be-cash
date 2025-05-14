@@ -244,9 +244,34 @@ async function verifyFile(filePath: string, expectedHash: string): Promise<boole
 
 // 安装APK
 async function installApk(filePath: string) {
-  // 使用 Browser 插件打开文件 URL
   console.log('installApk', filePath);
   
-  // const { Browser } = await import('@capacitor/browser')
-  // await Browser.open({ url: filePath })
+  try {
+    // 确保文件存在
+    await Filesystem.stat({
+      path: filePath,
+      directory: Directory.External
+    });
+    
+    // 使用系统默认应用打开APK文件
+    // 注意：这需要安装 @capacitor-community/file-opener 插件
+    // npm install @capacitor-community/file-opener
+    // npx cap sync
+    
+    // 导入插件
+    const { FileOpener } = await import('@capacitor-community/file-opener');
+    
+    // 打开APK文件进行安装
+    await FileOpener.open({
+      filePath: filePath,
+      contentType: 'application/vnd.android.package-archive',
+      openWithDefault: true
+    });
+    
+    console.log('APK安装程序已启动');
+  } catch (error) {
+    console.error('安装APK失败:', error);
+    emitter.emit('message', { msg: '安装APK失败:' + error, type: 'error' });
+    throw error;
+  }
 }
