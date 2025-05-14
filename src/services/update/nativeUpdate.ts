@@ -244,6 +244,8 @@ async function verifyFile(filePath: string, expectedHash: string): Promise<boole
 // 安装APK
 async function installApk(filePath: string) {
   // 使用 Browser 插件打开文件 URL
-  const { Browser } = await import('@capacitor/browser')
-  await Browser.open({ url: filePath })
+  console.log('installApk', filePath);
+  
+  // const { Browser } = await import('@capacitor/browser')
+  // await Browser.open({ url: filePath })
 }

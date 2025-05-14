@@ -12,6 +12,16 @@ import { storage } from '@/utils/storage';
 import { updatePassword, updateProfile, uploadFile } from '@/api/user';
 import { getVersion } from '@/utils/common';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { getCashCategory } from '@/api/cashCategory';
+
+// 定义分类类型
+interface Category {
+  id: string;
+  name: string;
+  type: string;
+  icon: string;
+  color: string;
+}
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -130,6 +140,7 @@ const defaultAccount = ref(JSON.stringify(storage.getItem('defaultAccount')) ===
 
 const modal = ref()
 const budgetModal = ref()
+const categoryModal = ref()
 
 const openModal = (data: ModalData) => {
   modalData.value = data
@@ -282,6 +293,147 @@ const showAboutUs = async () => {
     buttonTitle: '我知道了'
   });
 };
+
+// 分类管理相关
+const categoryType = ref('EXPENSE') // 默认显示支出分类
+const categories = ref<Category[]>([])
+const showCategoryForm = ref(false)
+const isEditingCategory = ref(false)
+
+// 分类表单
+const categoryForm = ref<{
+  id?: string;
+  name: string;
+  type: string;
+  icon: string;
+  color: string;
+}>({
+  name: '',
+  type: 'EXPENSE',
+  icon: 'tabler:category',
+  color: '#4f46e5'
+})
+
+// 图标选项
+const iconOptions = ref([
+  'tabler:category',
+  'tabler:home',
+  'tabler:shopping-cart',
+  'tabler:car',
+  'tabler:device-mobile',
+  'tabler:book',
+  'tabler:plane',
+  'tabler:beer',
+  'tabler:briefcase',
+  'tabler:device-tv',
+  'tabler:heart',
+  'tabler:medical-cross',
+  'tabler:baby-carriage',
+  'tabler:report-money',
+  'tabler:coin'
+])
+
+// 颜色选项
+const colorOptions = ref([
+  '#4f46e5', // 蓝色
+  '#10b981', // 绿色
+  '#f59e0b', // 黄色
+  '#ef4444', // 红色
+  '#8b5cf6', // 紫色
+  '#ec4899', // 粉色
+  '#0ea5e9', // 天蓝色
+  '#f97316', // 橙色
+  '#6366f1', // 靛蓝色
+  '#14b8a6'  // 青色
+])
+
+// 获取分类数据
+const getCashCategories = async () => {
+  try {
+    const res = await getCashCategory();
+    categories.value = res.data.map((item: any) => ({
+      id: item.id.value,
+      name: item.name,
+      type: item.type,
+      icon: item.icon,
+      color: item.color,
+    }));
+  } catch (error) {
+    console.error('获取分类失败:', error);
+    emitter.emit("message", { msg: '获取分类失败', type: 'error' });
+  }
+};
+
+// 根据选择的类型过滤分类
+const filteredCategories = computed(() => {
+  return categories.value.filter(item => item.type === categoryType.value);
+});
+
+// 编辑分类
+const editCategory = (category: Category) => {
+  // 填充表单
+  categoryForm.value = { ...category };
+  isEditingCategory.value = true;
+  showCategoryForm.value = true;
+};
+
+// 删除分类（UI示例，实际逻辑暂不实现）
+const deleteCategory = (categoryId: string) => {
+  console.log('删除分类:', categoryId);
+  emitter.emit("message", { msg: '删除功能暂未实现', type: 'info' as 'success' });
+};
+
+// 显示添加分类表单
+const showAddCategoryForm = () => {
+  // 重置表单
+  categoryForm.value = {
+    name: '',
+    type: categoryType.value, // 使用当前选中的类型
+    icon: 'tabler:category',
+    color: '#4f46e5'
+  };
+  isEditingCategory.value = false;
+  showCategoryForm.value = true;
+};
+
+// 取消分类表单
+const cancelCategoryForm = () => {
+  showCategoryForm.value = false;
+};
+
+// 提交分类表单
+const submitCategoryForm = () => {
+  // 表单验证
+  if (!categoryForm.value.name) {
+    emitter.emit("message", { msg: '请输入分类名称', type: 'error' });
+    return;
+  }
+
+  // 模拟提交成功
+  if (isEditingCategory.value) {
+    emitter.emit("message", { msg: '编辑成功', type: 'success' });
+  } else {
+    emitter.emit("message", { msg: '添加成功', type: 'success' });
+  }
+  
+  // 关闭表单
+  showCategoryForm.value = false;
+};
+
+// 保存分类变更（UI示例，实际逻辑暂不实现）
+const saveCategoryChanges = () => {
+  console.log('保存分类变更');
+  emitter.emit("message", { msg: '保存成功', type: 'success' });
+  categoryModal.value?.$el.dismiss();
+};
+
+// 在页面加载时获取分类数据
+onMounted(() => {
+  getVersion().then(v => {
+    version.value = v;
+  });
+  getCashCategories();
+});
 </script>
 <template>
   <ion-page>
@@ -473,7 +625,7 @@ const showAboutUs = async () => {
                 </div>
               </div>
               
-              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+              <div id="open-modal" class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
                 <div class="flex items-center">
                   <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
@@ -486,6 +638,169 @@ const showAboutUs = async () => {
                   <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                 </svg>
               </div>
+              <ion-modal ref="categoryModal" id="categoryModal" trigger="open-modal">
+                <div class="flex flex-col h-full wrapper px-4 py-6">
+                  <div class="w-full flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold">分类管理</h2>
+                    <button @click="() => categoryModal.$el.dismiss()" class="text-gray-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <!-- 分类表单 -->
+                  <div v-if="showCategoryForm" class="absolute inset-0 bg-white z-20 px-4 py-6 flex flex-col">
+                    <div class="w-full flex justify-between items-center mb-6">
+                      <h2 class="text-xl font-bold">{{ isEditingCategory ? '编辑分类' : '添加分类' }}</h2>
+                      <button @click="cancelCategoryForm" class="text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                    
+                    <div class="flex-1 overflow-y-auto pr-1">
+                      <form class="space-y-4">
+                        <!-- 类型选择 -->
+                        <div class="form-group">
+                          <label class="block text-sm font-medium text-gray-700 mb-1">分类类型</label>
+                          <div class="flex gap-4">
+                            <div 
+                              class="flex-1 p-3 border rounded-lg flex items-center justify-center cursor-pointer"
+                              :class="{'bg-blue-50 border-blue-500': categoryForm.type === 'INCOME', 'border-gray-300': categoryForm.type !== 'INCOME'}"
+                              @click="categoryForm.type = 'INCOME'"
+                            >
+                              收入
+                            </div>
+                            <div 
+                              class="flex-1 p-3 border rounded-lg flex items-center justify-center cursor-pointer"
+                              :class="{'bg-blue-50 border-blue-500': categoryForm.type === 'EXPENSE', 'border-gray-300': categoryForm.type !== 'EXPENSE'}"
+                              @click="categoryForm.type = 'EXPENSE'"
+                            >
+                              支出
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- 分类名称 -->
+                        <div class="form-group">
+                          <label class="block text-sm font-medium text-gray-700 mb-1">分类名称</label>
+                          <input 
+                            type="text" 
+                            v-model="categoryForm.name" 
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="请输入分类名称"
+                          />
+                        </div>
+                        
+                        <!-- 分类图标 -->
+                        <div class="form-group">
+                          <label class="block text-sm font-medium text-gray-700 mb-1">分类图标</label>
+                          <div class="grid grid-cols-5 gap-2">
+                            <div 
+                              v-for="icon in iconOptions" 
+                              :key="icon"
+                              class="p-3 flex items-center justify-center border rounded-lg cursor-pointer"
+                              :class="{'bg-blue-50 border-blue-500': categoryForm.icon === icon, 'border-gray-300': categoryForm.icon !== icon}"
+                              @click="categoryForm.icon = icon"
+                            >
+                              <svg-icon :icon="icon" size="24"></svg-icon>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- 分类颜色 -->
+                        <div class="form-group">
+                          <label class="block text-sm font-medium text-gray-700 mb-1">分类颜色</label>
+                          <div class="grid grid-cols-5 gap-2">
+                            <div 
+                              v-for="color in colorOptions" 
+                              :key="color"
+                              class="h-10 rounded-lg cursor-pointer border-2"
+                              :style="{ backgroundColor: color }"
+                              :class="{'border-gray-800': categoryForm.color === color, 'border-transparent': categoryForm.color !== color}"
+                              @click="categoryForm.color = color"
+                            ></div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    
+                    <!-- 表单按钮 -->
+                    <div class="mt-4">
+                      <button 
+                        @click="submitCategoryForm" 
+                        class="w-full p-3 bg-blue-500 text-white rounded-lg font-medium"
+                      >
+                        保存
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- 分类类型切换 -->
+                  <div v-if="!showCategoryForm" class="flex items-center justify-between bg-gray-100 rounded-md h-12 mb-6 relative">
+                    <p class="text-center w-1/2 z-10 transition-all duration-300"
+                      :class="{ 'text-white': categoryType === 'INCOME' }"
+                      @click="categoryType = 'INCOME'">
+                      收入
+                    </p>
+                    <p class="text-center w-1/2 z-10 transition-all duration-300"
+                      :class="{ 'text-white': categoryType === 'EXPENSE' }"
+                      @click="categoryType = 'EXPENSE'">
+                      支出
+                    </p>
+                    <div class="absolute left-1 w-[calc(50%-0.5rem)] h-10 bg-[#4f46e5] rounded-md transition-all duration-300"
+                      :class="{
+                        'translate-x-0': categoryType === 'INCOME',
+                        'translate-x-[calc(100%+0.5rem)]': categoryType === 'EXPENSE',
+                      }">
+                    </div>
+                  </div>
+                  
+                  <!-- 分类列表区域 -->
+                  <div v-if="!showCategoryForm" class="flex-1 overflow-y-auto mb-4 pr-1 custom-scrollbar">
+                    <ul class="w-full flex flex-col gap-3">
+                      <li v-for="(category, index) in filteredCategories" :key="index" 
+                          class="flex items-center justify-between p-3 border rounded-lg shadow-sm hover:bg-gray-50">
+                        <div class="flex items-center gap-3">
+                          <div class="w-10 h-10 rounded-full flex items-center justify-center"
+                            :style="{ backgroundColor: category.color }">
+                            <svg-icon :icon="category.icon" color="#ffffff"></svg-icon>
+                          </div>
+                          <span class="font-medium">{{ category.name }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <button class="p-2 text-blue-500 hover:bg-blue-50 rounded-full" @click="editCategory(category)">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                          </button>
+                          <button class="p-2 text-red-500 hover:bg-red-50 rounded-full" @click="deleteCategory(category.id)">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                            </svg>
+                          </button>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <!-- 添加分类按钮 -->
+                  <button v-if="!showCategoryForm" @click="showAddCategoryForm" class="w-full flex items-center justify-center gap-2 p-3 mb-4 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 font-medium transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    添加新分类
+                  </button>
+                  
+                  <!-- 底部按钮区域 -->
+                  <div v-if="!showCategoryForm" class="flex justify-between w-full">
+                    <Button @click="() => categoryModal.$el.dismiss()" class="h-10">取消</Button>
+                    <Button type="primary" @click="saveCategoryChanges" class="h-10">保存</Button>
+                  </div>
+                </div>
+              </ion-modal>
 
               <!-- <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"  id="open-modal">
                 <div class="flex items-center">
@@ -500,7 +815,7 @@ const showAboutUs = async () => {
                   <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                 </svg>
               </div> -->
-              <ion-modal ref="budgetModal" trigger="open-modal">
+              <!-- <ion-modal ref="budgetModal" trigger="open-modal">
                 <div class="flex flex-col items-center justify-center gap-5 h-full wrapper px-4">
                   <div class="w-full text-left text-xl font-bold">预算设置</div>
                     <ul class="w-full flex flex-col gap-2">
@@ -527,10 +842,10 @@ const showAboutUs = async () => {
                     <Button type="primary" @click="handleSubmit">确定</Button>
                   </div>
                 </div>
-              </ion-modal>
+              </ion-modal> -->
               
               <h2 class="text-xl font-semibold text-gray-800 mb-4 pt-4">数据管理</h2>
-              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+              <!-- <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
                 <div class="flex items-center">
                   <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
@@ -559,7 +874,7 @@ const showAboutUs = async () => {
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                 </svg>
-              </div>
+              </div> -->
               
               <div @click="exportData" class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
                 <div class="flex items-center">
@@ -679,6 +994,44 @@ ion-modal {
   --min-width: 88%;
   --height: fit-content;
   --border-radius: 16px;
+}
+
+/* 分类管理模态框的样式 */
+ion-modal#categoryModal {
+  --height: 80%;
+  --max-height: 600px;
+}
+
+ion-modal#categoryModal .wrapper {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 自定义滚动条样式 */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a3a3a3;
+}
+
+/* 应用到所有具有overflow-y-auto的元素 */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f1f1f1;
 }
 
 ion-modal .wrapper {
