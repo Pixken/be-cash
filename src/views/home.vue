@@ -203,7 +203,7 @@ onIonViewDidEnter(() => {
     <ion-content ref="content" class="ion-padding">
       <div class="content-wapper">
       <!-- 背景渐变和装饰元素 -->
-      <div class="absolute top-0 left-0 w-full h-80 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-b-[40px] z-0"></div>
+      <div class="absolute top-0 left-0 w-full h-80 bg-gradient-to-b from-primary-600 to-primary-800 rounded-b-[40px] z-0"></div>
       <div class="absolute top-10 right-10 w-24 h-24 bg-white opacity-10 rounded-full"></div>
       <div class="absolute top-40 left-10 w-16 h-16 bg-white opacity-10 rounded-full"></div>
       
@@ -229,63 +229,57 @@ onIonViewDidEnter(() => {
         </div>
         
         <!-- 账单统计卡片 -->
-        <div class="bg-white rounded-3xl shadow-xl p-6 mb-6 animate-slide-up">
-          <h2 class="text-lg font-semibold text-gray-800 mb-4">本月账单统计</h2>
+        <div class="app-card bg-white animate-slide-up">
+          <h2 class="text-lg font-semibold text-neutral-800 mb-4">本月账单统计</h2>
           <div class="grid grid-cols-2 gap-4">
-            <div class="bg-indigo-50 rounded-xl p-4">
+            <div class="bg-primary-50 rounded-xl p-4">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-gray-600">收入</span>
+                <span class="text-neutral-600">收入</span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" />
                 </svg>
               </div>
-              <p class="text-2xl font-bold text-green-600">¥{{ income }}</p>
+              <p class="text-2xl font-bold text-accent-600">¥{{ income }}</p>
             </div>
-            <div class="bg-indigo-50 rounded-xl p-4">
+            <div class="bg-primary-50 rounded-xl p-4">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-gray-600">支出</span>
+                <span class="text-neutral-600">支出</span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M12 13a1 1 0 100 2h5a1 1 0 001-1V9a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586 3.707 5.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z" clip-rule="evenodd" />
                 </svg>
               </div>
-              <p class="text-2xl font-bold text-red-600">¥{{ expense }}</p>
+              <p class="text-2xl font-bold text-rose-600">¥{{ expense }}</p>
             </div>
           </div>
         </div>
         
         <!-- 快捷操作按钮 -->
-        <div class="flex justify-between mb-6 p-4">
+        <div class="flex justify-between my-6 p-4 bg-white rounded-2xl shadow-soft">
           <div @click="router.push('/tabs/add-page')" class="flex flex-col items-center cursor-pointer">
-            <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-2">
-              <ion-icon :icon="add" class="text-indigo-500 text-2xl"></ion-icon>
+            <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-2 transition-transform hover:scale-105">
+              <ion-icon :icon="add" class="text-primary-600 text-2xl"></ion-icon>
             </div>
-            <span class="text-sm text-gray-600">记一笔</span>
+            <span class="text-sm text-neutral-600">记一笔</span>
           </div>
-          <!-- <div @click="router.push('/tabs/transfer')" class="flex flex-col items-center cursor-pointer">
-            <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mb-2">
-              <ion-icon :icon="swapHorizontalOutline" class="text-green-500 text-2xl"></ion-icon>
-            </div>
-            <span class="text-sm text-gray-600">转账</span>
-          </div> -->
           <div @click="router.push('/tabs/chart')" class="flex flex-col items-center cursor-pointer">
-            <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center mb-2">
-              <ion-icon :icon="pieChart" class="text-yellow-500 text-2xl"></ion-icon>
+            <div class="w-12 h-12 bg-secondary-100 rounded-xl flex items-center justify-center mb-2 transition-transform hover:scale-105">
+              <ion-icon :icon="pieChart" class="text-secondary-600 text-2xl"></ion-icon>
             </div>
-            <span class="text-sm text-gray-600">统计</span>
+            <span class="text-sm text-neutral-600">统计</span>
           </div>
           <div @click="router.push('/tabs/account')" class="flex flex-col items-center cursor-pointer">
-            <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center mb-2">
-              <ion-icon :icon="wallet" class="text-red-500 text-2xl"></ion-icon>
+            <div class="w-12 h-12 bg-accent-100 rounded-xl flex items-center justify-center mb-2 transition-transform hover:scale-105">
+              <ion-icon :icon="wallet" class="text-accent-600 text-2xl"></ion-icon>
             </div>
-            <span class="text-sm text-gray-600">账户</span>
+            <span class="text-sm text-neutral-600">账户</span>
           </div>
         </div>
         
         <!-- 支出分析图表 -->
-        <div class="bg-white rounded-3xl shadow-xl p-6 mb-6 animate-slide-up">
+        <div class="app-card bg-white animate-slide-up">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-800">支出分析</h2>
-            <span class="text-sm text-indigo-600 cursor-pointer" @click="router.push('/tabs/chart')">查看更多</span>
+            <h2 class="text-lg font-semibold text-neutral-800">支出分析</h2>
+            <span class="text-sm text-primary-600 cursor-pointer" @click="router.push('/tabs/chart')">查看更多</span>
           </div>
           <div class="h-64">
             <v-chart class="w-full h-full" :option="chartOption" autoresize />
@@ -293,15 +287,15 @@ onIonViewDidEnter(() => {
         </div>
         
         <!-- 账单列表 -->
-        <div class="flex-1 bg-white rounded-3xl shadow-xl p-6 animate-slide-up">
+        <div class="flex-1 app-card bg-white animate-slide-up">
           <div class="flex items-center justify-between mb-6">
-            <h2 class="text-lg font-semibold text-gray-800">账单记录</h2>
+            <h2 class="text-lg font-semibold text-neutral-800">账单记录</h2>
             <div class="flex items-center space-x-2">
               <button 
-                class="px-3 py-1 text-sm rounded-lg hover:bg-indigo-100 transition-colors"
+                class="px-3 py-1 text-sm rounded-lg hover:bg-primary-100 transition-colors"
                 v-for="(tab, index) in tabs"
                 :key="index"
-                :class="{ 'bg-indigo-100 text-indigo-600': tab === activeTab }"
+                :class="{ 'bg-primary-100 text-primary-600 font-medium': tab === activeTab }"
                 @click="handleTabClick(tab)">
                 {{ tab }}
               </button>
@@ -310,19 +304,19 @@ onIonViewDidEnter(() => {
           
           <!-- 加载状态 -->
           <div v-if="isLoading" class="flex items-center justify-center h-40">
-            <svg class="animate-spin h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg class="animate-spin h-8 w-8 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
           </div>
           
           <!-- 空状态 -->
-          <div v-else-if="bills.length === 0" class="flex flex-col items-center justify-center h-40 text-gray-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div v-else-if="bills.length === 0" class="flex flex-col items-center justify-center h-40 text-neutral-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             <p class="text-lg">暂无账单记录</p>
-            <p class="text-sm mt-2 text-indigo-600 cursor-pointer" @click="router.push('/tabs/add-page')">+添加新账单</p>
+            <p class="text-sm mt-2 text-primary-600 cursor-pointer" @click="router.push('/tabs/add-page')">+添加新账单</p>
           </div>
           
           <!-- 账单列表 -->
@@ -330,162 +324,128 @@ onIonViewDidEnter(() => {
             <ion-modal ref="detailModal">
               <div class="p-6 max-w-md">
                 <div class="flex items-center justify-between mb-6">
-                  <h2 class="text-xl font-bold text-gray-800">账单详情</h2>
-                  <button @click="dismissDetailModal" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                  <h2 class="text-xl font-bold text-neutral-800">账单详情</h2>
+                  <button @click="dismissDetailModal" class="w-8 h-8 flex items-center justify-center rounded-full bg-neutral-100 hover:bg-neutral-200 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-neutral-600" viewBox="0 0 20 20" fill="currentColor">
                       <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                   </button>
                 </div>
                 <div v-if="billDetail" class="space-y-6">
                   <!-- 账单金额和类型 -->
-                  <div class="flex flex-col items-center p-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl text-white">
+                  <div class="flex flex-col items-center p-6 bg-gradient-to-r from-primary-500 to-primary-700 rounded-2xl text-white">
                     <span class="text-sm mb-2">{{ billDetail.type === 'INCOME' ? '收入' : '支出' }}</span>
                     <span class="text-3xl font-bold">¥{{ formatAmount(billDetail.amount) }}</span>
                   </div>
                   
                   <!-- 账单信息列表 -->
                   <div class="space-y-4">
-                    <div class="flex items-center p-4 bg-gray-50 rounded-xl">
-                      <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
-                        <svg-icon :icon="billDetail.category?.icon" color="#6366f1" size="20"></svg-icon>
+                    <div class="flex items-center p-4 bg-neutral-50 rounded-xl">
+                      <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg-icon :icon="billDetail.category?.icon" color="#0ea5e9" size="20"></svg-icon>
                       </div>
                       <div>
-                        <span class="text-gray-500 text-sm">类别</span>
-                        <p class="text-gray-800 font-medium">{{ billDetail.category?.name }}</p>
+                        <span class="text-neutral-500 text-sm">类别</span>
+                        <p class="text-neutral-800 font-medium">{{ billDetail.category?.name }}</p>
                       </div>
                     </div>
                     
-                    <div class="flex items-center p-4 bg-gray-50 rounded-xl">
-                      <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                    <div class="flex items-center p-4 bg-neutral-50 rounded-xl">
+                      <div class="w-10 h-10 bg-secondary-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-secondary-500" viewBox="0 0 20 20" fill="currentColor">
                           <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
                         </svg>
                       </div>
                       <div>
-                        <span class="text-gray-500 text-sm">日期</span>
-                        <p class="text-gray-800 font-medium">{{ dayjs(billDetail.date).format('YYYY-MM-DD HH:mm:ss') }}</p>
+                        <span class="text-neutral-500 text-sm">日期</span>
+                        <p class="text-neutral-800 font-medium">{{ dayjs(billDetail.date).format('YYYY-MM-DD HH:mm:ss') }}</p>
                       </div>
                     </div>
                     
-                    <div class="flex items-center p-4 bg-gray-50 rounded-xl">
-                      <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                    <div class="flex items-center p-4 bg-neutral-50 rounded-xl">
+                      <div class="w-10 h-10 bg-accent-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent-500" viewBox="0 0 20 20" fill="currentColor">
                           <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
                         </svg>
                       </div>
                       <div>
-                        <span class="text-gray-500 text-sm">备注</span>
-                        <p class="text-gray-800 font-medium">{{ billDetail.description || '无备注' }}</p>
+                        <span class="text-neutral-500 text-sm">备注</span>
+                        <p class="text-neutral-800 font-medium">{{ billDetail.description || '无备注' }}</p>
                       </div>
                     </div>
                     
-                    <div v-if="billDetail.account" class="flex items-center p-4 bg-gray-50 rounded-xl">
-                      <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                    <div v-if="billDetail.account" class="flex items-center p-4 bg-neutral-50 rounded-xl">
+                      <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
                           <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
                           <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd" />
                         </svg>
                       </div>
                       <div>
-                        <span class="text-gray-500 text-sm">账户</span>
-                        <p class="text-gray-800 font-medium">{{ billDetail.account.name }}</p>
+                        <span class="text-neutral-500 text-sm">账户</span>
+                        <p class="text-neutral-800 font-medium">{{ billDetail.account.name }}</p>
                       </div>
                     </div>
                   </div>
                   
                   <!-- 操作按钮 -->
                   <div class="flex space-x-4 pt-4">
-                    <!-- <button class="flex-1 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl transition-colors">
-                      编辑
-                    </button> -->
-                    <button
-                      class="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors"
-                      @click="handleDeleteBill(billDetail.id)"
-                    >
+                    <button @click="handleDeleteBill(billDetail.id)" class="flex-1 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl transition-colors font-medium">
                       删除
                     </button>
                   </div>
                 </div>
               </div>
             </ion-modal>
-            <div v-for="bill in activeTabBills" :key="bill.id" 
-              class="flex items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
-              @click="handleShowDetail(bill)"
-            >
-              <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
-                <svg-icon :icon="bill.category.icon" color="#6366f1" size="20"></svg-icon>
-              </div>
-              <div class="flex-1">
-                <div class="flex items-center justify-between">
-                  <h3 class="text-gray-800 font-medium">{{ bill.category.name }}</h3>
-                  <span :class="bill.type === 'INCOME' ? 'text-green-600' : 'text-red-600'" class="font-semibold">
-                    {{ bill.type === 'INCOME' ? '+' : '-' }}¥{{ formatAmount(bill.amount) }}
-                  </span>
+            
+            <!-- 单个账单项 -->
+            <div v-for="bill in activeTabBills" :key="bill.id" @click="handleShowDetail(bill)" class="p-3 bg-neutral-50 rounded-xl flex items-center justify-between cursor-pointer hover:shadow-md transition-shadow">
+              <div class="flex items-center">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center mr-4" :class="[
+                  bill.type === 'INCOME' || bill.type === 'income' ? 'bg-accent-100' : 'bg-rose-100',
+                ]">
+                  <svg-icon :icon="bill.category?.icon" :color="bill.type === 'INCOME' || bill.type === 'income' ? '#14b8a6' : '#ef4444'" size="24"></svg-icon>
                 </div>
-                <div class="flex items-center justify-between mt-1">
-                  <p class="text-gray-500 text-sm max-w-28 text-ellipsis whitespace-nowrap overflow-hidden">{{ bill.description }}</p>
-                  <span class="text-gray-400 text-sm">{{ formatDate(bill.date) }}</span>
+                <div>
+                  <h3 class="font-medium text-neutral-800">{{ bill.category?.name }}</h3>
+                  <p class="text-xs text-neutral-500">{{ formatDate(bill.date) }}</p>
                 </div>
               </div>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-              </svg>
+              <span class="text-lg font-medium" :class="[
+                bill.type === 'INCOME' || bill.type === 'income' ? 'text-accent-600' : 'text-rose-600',
+              ]">
+                {{ bill.type === 'INCOME' || bill.type === 'income' ? '+' : '-' }}¥{{ formatAmount(bill.amount) }}
+              </span>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- AI助手按钮 -->
-      <!-- <AI /> -->
     </div>
     </ion-content>
   </ion-page>
 </template>
 
 <style scoped>
-/* 自定义动画 */
+/* 添加一些动画 */
 @keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-slide-up {
   animation: slide-up 0.5s ease-out forwards;
 }
 
-/* 自定义滚动条样式 */
-::-webkit-scrollbar {
-  width: 6px;
+.animate-bounce-slow {
+  animation: bounce 3s infinite;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
-::-webkit-scrollbar-thumb {
-  background: #cbd5e0;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a0aec0;
-}
-
-ion-modal {
-  --width: fit-content;
-  --min-width: 95%;
-  --height: fit-content;
-  --border-radius: 16px;
-}
-
-ion-modal .wrapper {
-  margin: 20px 10px;
+.shadow-soft {
+  box-shadow: var(--app-box-shadow);
 }
 </style>

@@ -158,7 +158,7 @@ const onInput = (e: Event, key: keyof typeof form.value) => {
       <div class="content-wapper">
       <!-- 背景渐变和装饰元素 -->
       <div
-        class="absolute top-0 left-0 w-full h-80 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-b-[40px] z-0"
+        class="absolute top-0 left-0 w-full h-80 bg-gradient-to-b from-primary-500 to-primary-700 rounded-b-[40px] z-0"
       ></div>
       <div
         class="absolute top-10 right-10 w-24 h-24 bg-white opacity-10 rounded-full"
@@ -190,18 +190,20 @@ const onInput = (e: Event, key: keyof typeof form.value) => {
 
         <!-- 登录卡片 -->
         <div
-          class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 md:p-8 animate-slide-up"
+          class="w-full max-w-md app-card bg-white p-6 md:p-8 animate-slide-up"
         >
           <form @submit="onSubmit" class="flex flex-col">
-            <!-- 邮箱输入框 -->
+            <!-- 用户名输入框 -->
             <div class="form-group mb-4">
               <label
-                for="email"
-                class="text-gray-600 text-sm font-medium block mb-2"
+                for="username"
+                class="text-neutral-600 text-sm font-medium block mb-2"
                 >用户名</label
               >
-              <div class="relative">
-                <div class="absolute left-3 top-3.5 text-gray-400">
+              <div
+                class="relative flex items-center bg-neutral-50 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-primary-400"
+              >
+                <span class="absolute left-4 text-neutral-400">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
@@ -214,31 +216,29 @@ const onInput = (e: Event, key: keyof typeof form.value) => {
                       clip-rule="evenodd"
                     />
                   </svg>
-                </div>
+                </span>
                 <input
-                  type="text"
                   id="username"
+                  type="text"
                   v-model="form.username"
-                  @blur="onInput($event, 'username')"
-                  class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all outline-none"
+                  @input="onInput($event, 'username')"
+                  class="app-input border-none bg-transparent pl-12 pr-4 py-3 w-full focus:outline-none text-neutral-800"
                   placeholder="请输入用户名"
-                  enterkeyhint="next"
                 />
-              </div>
-              <div class="text-red-500 text-xs h-5 mt-1">
-                <!-- {{ errors.username }} -->
               </div>
             </div>
 
             <!-- 密码输入框 -->
-            <div class="form-group mb-5">
+            <div class="form-group mb-4">
               <label
                 for="password"
-                class="text-gray-600 text-sm font-medium block mb-2"
+                class="text-neutral-600 text-sm font-medium block mb-2"
                 >密码</label
               >
-              <div class="relative">
-                <div class="absolute left-3 top-3.5 text-gray-400">
+              <div
+                class="relative flex items-center bg-neutral-50 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-primary-400"
+              >
+                <span class="absolute left-4 text-neutral-400">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
@@ -251,143 +251,122 @@ const onInput = (e: Event, key: keyof typeof form.value) => {
                       clip-rule="evenodd"
                     />
                   </svg>
-                </div>
+                </span>
                 <input
-                  type="password"
                   id="password"
+                  type="password"
                   v-model="form.password"
-                  @blur="onInput($event, 'password')"
-                  class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all outline-none"
+                  @input="onInput($event, 'password')"
+                  class="app-input border-none bg-transparent pl-12 pr-4 py-3 w-full focus:outline-none text-neutral-800"
                   placeholder="请输入密码"
-                  enterkeyhint="next"
                 />
-              </div>
-              <div class="text-red-500 text-xs h-5 mt-1">
-                <!-- {{ errors.password }} -->
               </div>
             </div>
 
-            <!-- 验证码 -->
-            <div class="form-group mb-5">
+            <!-- 验证码区域 -->
+            <div class="form-group mb-6">
               <label
-                for="code"
-                class="text-gray-600 text-sm font-medium block mb-2"
+                for="captcha"
+                class="text-neutral-600 text-sm font-medium block mb-2"
                 >验证码</label
               >
-              <div class="flex gap-2">
-                <div class="relative flex-1">
-                  <div class="absolute left-3 top-3.5 text-gray-400">
+              <div class="flex space-x-3">
+                <div
+                  class="relative flex items-center flex-1 bg-neutral-50 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-primary-400"
+                >
+                  <span class="absolute left-4 text-neutral-400">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       class="h-5 w-5"
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
+                      <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
                       <path
                         fill-rule="evenodd"
-                        d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                        d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
                         clip-rule="evenodd"
                       />
                     </svg>
-                  </div>
+                  </span>
                   <input
+                    id="captcha"
                     type="text"
-                    id="code"
                     v-model="form.code"
-                    @blur="onInput($event, 'code')"
-                    class="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all outline-none"
+                    @input="onInput($event, 'code')"
+                    class="app-input border-none bg-transparent pl-12 pr-4 py-3 w-full focus:outline-none text-neutral-800"
                     placeholder="请输入验证码"
-                    enterkeyhint="next"
                   />
                 </div>
                 <div
-                  class="w-32 h-12 bg-gray-100 rounded-xl border border-gray-200 flex items-center justify-center overflow-hidden"
+                  class="flex-shrink-0 overflow-hidden rounded-xl border border-neutral-100 cursor-pointer"
+                  @click="getCaptchaInfo()"
                 >
                   <img
                     :src="formatCaptchaUrl"
                     alt="验证码"
-                    class="w-full h-full object-cover cursor-pointer"
-                    @click="getCaptchaInfo"
+                    class="h-full w-28 object-cover"
+                    v-if="captchaUrl"
                   />
                 </div>
               </div>
-              <!-- <div class="text-red-500 text-xs h-5 mt-1">{{ errors.code }}</div> -->
-              <div class="text-xs text-gray-500 mt-1">点击图片可刷新验证码</div>
             </div>
 
-            <!-- 记住我和忘记密码 -->
+            <!-- 记住密码选项 -->
             <div class="flex items-center justify-between mb-6">
-              <div class="flex items-center gap-2">
-                <div
-                  class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in"
-                >
-                  <input
-                    type="checkbox"
-                    id="remember"
-                    v-model="remember"
-                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-gray-300 appearance-none cursor-pointer"
-                    enterkeyhint="next"
-                  />
-                  <label
-                    for="remember"
-                    class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"
-                  ></label>
-                </div>
-                <label for="remember" class="text-gray-600 text-sm"
-                  >记住我</label
-                >
-              </div>
-              <a href="#" class="text-blue-500 text-sm hover:underline"
-                >忘记密码？</a
+              <label class="inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  v-model="remember"
+                  class="form-checkbox h-5 w-5 text-primary-600 rounded-md border-neutral-300 focus:ring-primary-500"
+                />
+                <span class="ml-2 text-sm text-neutral-600">记住账号密码</span>
+              </label>
+              <span class="text-sm text-primary-600 cursor-pointer"
+                >忘记密码?</span
               >
             </div>
 
             <!-- 登录按钮 -->
             <button
               type="submit"
-              class="h-12 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center relative overflow-hidden"
+              class="app-button-primary app-button h-12 flex items-center justify-center relative mb-5"
               :disabled="isLoading"
-              enterkeyhint="done"
             >
-              <span class="relative z-10 flex items-center">
-                <svg
-                  v-if="isLoading"
-                  class="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                <span>{{ isLoading ? "登录中..." : "登录" }}</span>
-              </span>
-              <div
-                class="absolute top-0 left-0 w-full h-full bg-white opacity-0 hover:opacity-20 transition-opacity"
-              ></div>
+              <span class="text-white font-medium">{{ isLoading ? '登录中...' : '登录' }}</span>
+              <svg
+                v-if="isLoading"
+                class="animate-spin ml-2 h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
             </button>
-          </form>
 
-          <!-- 注册链接 -->
-          <div class="flex items-center justify-center gap-2 mt-6">
-            <p class="text-gray-600">还没有账号？</p>
-            <span
-              class="text-blue-500 font-medium cursor-pointer"
-              @click="toRegister"
-              >立即注册</span
-            >
-          </div>
+            <!-- 注册链接 -->
+            <div class="text-center">
+              <span class="text-neutral-600 text-sm">还没有账号? </span>
+              <a
+                @click="toRegister"
+                class="text-primary-600 hover:text-primary-800 text-sm font-medium cursor-pointer"
+                >注册</a
+              >
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -396,58 +375,30 @@ const onInput = (e: Event, key: keyof typeof form.value) => {
 </template>
 
 <style scoped>
-/* 自定义动画 */
-@keyframes bounce-slow {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
+/* 添加一些动画 */
 @keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-bounce-slow {
-  animation: bounce-slow 3s infinite;
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-slide-up {
   animation: slide-up 0.5s ease-out forwards;
 }
 
-/* 自定义开关样式 */
-.toggle-checkbox:checked {
-  right: 0;
-  border-color: #3b82f6;
+.animate-bounce-slow {
+  animation: bounce 3s infinite;
 }
 
-.toggle-checkbox:checked + .toggle-label {
-  background-color: #3b82f6;
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
-/* 聚焦效果 */
-input:focus {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+input[type="checkbox"] {
+  @apply accent-primary-600;
 }
 
-/* 适配沉浸式状态栏 */
-ion-content::part(scroll) {
-  padding-top: var(--ion-safe-area-top, 0);
-}
-
-/* 按钮发光效果 */
-button[type="submit"]:not(:disabled):hover {
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+input[type="text"], input[type="password"] {
+  padding-left: 3em;
 }
 </style>

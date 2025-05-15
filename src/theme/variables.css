@@ -8,6 +8,78 @@ http://ionicframework.com/docs/theming/ */
 :root {
   --ion-safe-area-top: env(safe-area-inset-top, 200px);
   
+  /* Ionic Variables (overrides) */
+  --ion-background-color: #f8fafc;
+  --ion-background-color-rgb: 248, 250, 252;
+  
+  --ion-text-color: #0f172a;
+  --ion-text-color-rgb: 15, 23, 42;
+  
+  --ion-color-primary: #0ea5e9;
+  --ion-color-primary-rgb: 14, 165, 233;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #0c91ce;
+  --ion-color-primary-tint: #26aeeb;
+  
+  --ion-color-secondary: #d946ef;
+  --ion-color-secondary-rgb: 217, 70, 239;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #bf3dd2;
+  --ion-color-secondary-tint: #dd59f1;
+  
+  --ion-color-tertiary: #14b8a6;
+  --ion-color-tertiary-rgb: 20, 184, 166;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #12a292;
+  --ion-color-tertiary-tint: #2cbfaf;
+  
+  --ion-color-success: #10b981;
+  --ion-color-success-rgb: 16, 185, 129;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #0ea372;
+  --ion-color-success-tint: #28c08e;
+  
+  --ion-color-warning: #f59e0b;
+  --ion-color-warning-rgb: 245, 158, 11;
+  --ion-color-warning-contrast: #ffffff;
+  --ion-color-warning-contrast-rgb: 255, 255, 255;
+  --ion-color-warning-shade: #d88b0a;
+  --ion-color-warning-tint: #f6a823;
+  
+  --ion-color-danger: #ef4444;
+  --ion-color-danger-rgb: 239, 68, 68;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #d23c3c;
+  --ion-color-danger-tint: #f15757;
+  
+  --ion-color-medium: #94a3b8;
+  --ion-color-medium-rgb: 148, 163, 184;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #828fa2;
+  --ion-color-medium-tint: #9facbf;
+  
+  --ion-color-light: #f1f5f9;
+  --ion-color-light-rgb: 241, 245, 249;
+  --ion-color-light-contrast: #0f172a;
+  --ion-color-light-contrast-rgb: 15, 23, 42;
+  --ion-color-light-shade: #d4dae0;
+  --ion-color-light-tint: #f2f6fa;
+  
+  /* Custom UI Variables */
+  --app-border-radius: 1rem;
+  --app-box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+  --app-header-height: 56px;
+  --app-gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  --app-gradient-secondary: linear-gradient(135deg, #d946ef 0%, #a21caf 100%);
+  --app-gradient-accent: linear-gradient(135deg, #14b8a6 0%, #0f766e 100%);
+  
+  /* Platform-specific adjustments */
   .md {
     --ion-safe-area-top: env(safe-area-inset-top, 320px);
   }
@@ -16,7 +88,6 @@ http://ionicframework.com/docs/theming/ */
     --ion-safe-area-top: env(safe-area-inset-top, 47px);
   }
 }
-
 
 * {
   margin: 0;
@@ -28,18 +99,68 @@ http://ionicframework.com/docs/theming/ */
   padding-top: 36px;
 }
 
+/* Common Card Style */
+.app-card {
+  background-color: white;
+  border-radius: var(--app-border-radius);
+  box-shadow: var(--app-box-shadow);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Custom Button Styles */
+.app-button {
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.app-button-primary {
+  background: var(--app-gradient-primary);
+  color: white;
+}
+
+.app-button-secondary {
+  background: var(--app-gradient-secondary);
+  color: white;
+}
+
+.app-button-accent {
+  background: var(--app-gradient-accent);
+  color: white;
+}
+
+/* Custom Form Controls */
+.app-input {
+  border-radius: 0.75rem;
+  border: 1px solid var(--ion-color-light-shade);
+  padding: 0.75rem 1rem;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.app-input:focus {
+  border-color: var(--ion-color-primary);
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+}
+
+/* Ant Design Overrides */
 .ant-select-item-option {
   height: 3rem !important;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .ant-input-number-input {
   height: 3rem !important;
 }
+
 .ant-select-selector {
   height: 100% !important;
+  border-radius: 0.75rem !important;
 }
+
 .ant-select-selection-item {
   line-height: 3rem !important;
 }
@@ -49,4 +170,5 @@ http://ionicframework.com/docs/theming/ */
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: 0.75rem !important;
 }

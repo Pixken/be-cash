@@ -140,9 +140,9 @@ const formatMessage = (msg: string, messageType: 'success' | 'error' | 'warning'
 
 // 为不同类型的消息设置不同颜色
 const colors: Record<string, string> = {
-  success: '#10b981',
-  error: '#ef4444',
-  warning: '#f59e0b'
+  success: 'var(--ion-color-success)',
+  error: 'var(--ion-color-danger)',
+  warning: 'var(--ion-color-warning)'
 };
 
 // 监听类型变化，应用相应样式
@@ -160,10 +160,10 @@ watch(type, (newVal) => {
 <style>
 /* 自定义Toast样式 */
 ion-toast.custom-toast {
-  --background: #f4f4fa;
-  --border-radius: 12px;
-  --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  --color: #4b4a50;
+  --background: var(--ion-color-light);
+  --border-radius: var(--app-border-radius);
+  --box-shadow: var(--app-box-shadow);
+  --color: var(--ion-text-color);
   --padding-top: 12px;
   --padding-bottom: 12px;
   --padding-start: 16px;
@@ -193,15 +193,16 @@ ion-toast.custom-toast {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(4px);
 }
 
 .update-progress-dialog {
   background-color: white;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  width: 80%;
+  padding: 2rem;
+  border-radius: var(--app-border-radius);
+  box-shadow: var(--app-box-shadow);
+  width: 85%;
   max-width: 320px;
   text-align: center;
   position: relative;
@@ -210,36 +211,47 @@ ion-toast.custom-toast {
 
 .update-progress-dialog h3 {
   margin-top: 0;
-  margin-bottom: 16px;
-  font-size: 18px;
-  color: #333;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ion-text-color);
 }
 
 .progress-bar-container {
-  height: 8px;
-  background-color: #e0e0e0;
-  border-radius: 4px;
+  height: 0.5rem;
+  background-color: var(--ion-color-light);
+  border-radius: 0.25rem;
   overflow: hidden;
-  margin-bottom: 8px;
+  margin-bottom: 0.75rem;
 }
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(to right, #4f46e5, #8b5cf6);
-  border-radius: 4px;
+  background: var(--app-gradient-primary);
+  border-radius: 0.25rem;
   transition: width 0.3s ease;
 }
 
 .progress-text {
-  font-weight: bold;
-  color: #4f46e5;
-  margin-bottom: 12px;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  margin-bottom: 1rem;
 }
 
 .update-message {
-  font-size: 14px;
-  color: #666;
-  margin: 8px 0 0;
+  font-size: 0.875rem;
+  color: var(--ion-color-medium);
+  margin: 0.5rem 0 0;
+}
+
+/* Page transitions */
+.ion-page {
+  animation: fadein 0.3s ease-out;
+}
+
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* 确保页面内容可以滚动，适应键盘弹出 */
@@ -257,6 +269,8 @@ ion-input:focus, ion-textarea:focus {
 html, body {
   height: 100%;
   overflow: hidden;
+  background-color: var(--ion-background-color);
+  color: var(--ion-text-color);
 }
 
 /* 确保在键盘弹出时内容可以滚动 */
@@ -264,6 +278,7 @@ ion-app {
   display: flex;
   flex-direction: column;
   height: 100%;
+  background-color: var(--ion-background-color);
 }
 
 /* 允许内容区域自适应调整大小 */
@@ -285,12 +300,103 @@ body.keyboard-is-open ion-content {
 /* 确保输入框周围有足够的视觉空间 */
 ion-input, ion-textarea, input, textarea {
   margin-bottom: 8px;
-  padding: 4px;
+  padding: 8px;
+  border-radius: 0.75rem;
+  background-color: var(--ion-color-light);
 }
 
 /* 修复光标位置 */
 ion-input, ion-textarea {
-  --padding-start: 4px;
-  --padding-end: 4px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  --border-radius: 0.75rem;
+}
+
+/* 全局页面容器样式 */
+.page-container {
+  padding: 1.5rem;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* 标题样式 */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--ion-text-color);
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+}
+
+/* 段落样式 */
+p {
+  color: var(--ion-color-medium);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+/* 表单元素改进 */
+ion-item {
+  --border-radius: 0.75rem;
+  --background: var(--ion-color-light);
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --padding-top: 0.5rem;
+  --padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+ion-button {
+  --border-radius: 0.75rem;
+  --box-shadow: none;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: none;
+  height: 3rem;
+}
+
+/* 卡片容器改进 */
+ion-card {
+  border-radius: var(--app-border-radius);
+  box-shadow: var(--app-box-shadow);
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+ion-card-header {
+  padding: 1.25rem 1.25rem 0.75rem;
+}
+
+ion-card-content {
+  padding: 0.75rem 1.25rem 1.25rem;
+}
+
+/* 列表样式改进 */
+ion-list {
+  background: transparent;
+  padding: 0;
+}
+
+ion-item-divider {
+  --background: transparent;
+  --color: var(--ion-color-medium);
+  font-size: 0.875rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding-bottom: 0.5rem;
 }
 </style>

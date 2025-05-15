@@ -97,20 +97,13 @@ const chartOptions = computed<EChartsOption>(() => {
           支出: item.expense
         }
       })
-      // [
-      //   { month: '1月', '收入': 43.3, '支出': 85.8 },
-      //   { month: '2月', '收入': 83.1, '支出': 73.4 },
-      //   { month: '3月', '收入': 86.4, '支出': 65.2 },
-      // ]
     },
     xAxis: { type: 'category' },
     yAxis: {},
-    // Declare several bar series, each will be mapped
-    // to a column of dataset.source by default.
     series: [
       {
         type: 'bar',
-        color: '#10b981',
+        color: '#14b8a6',
         itemStyle: { borderRadius: [10, 10, 0, 0] }
       },
       {
@@ -142,7 +135,14 @@ const totalEI = computed(() => {
 const legendData = computed(() => {
   return Object.keys(analysis.value).length ? Object.keys(analysis.value[EI.value]) : []
 })
-const colors =  ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#f97316', '#9333ea', '#6366f1', '#3b82f6', '#2563eb', '#1d4ed8', '#1e40af', '#1e3a8a']
+
+// 使用我们的调色板定义饼图颜色
+const colors = [
+  '#0ea5e9', '#0284c7', '#0369a1', '#075985', // 蓝色系 (primary)
+  '#d946ef', '#c026d3', '#a21caf', '#86198f', // 紫色系 (secondary)
+  '#14b8a6', '#0d9488', '#0f766e', '#115e59'  // 青色系 (accent)
+]
+
 const chartOptions2 = computed<EChartsOption>(() => {
   return {
     color: colors,
@@ -194,69 +194,90 @@ onIonViewDidEnter(() => {
 <template>
   <ion-page>
     <be-header title="报表" />
-    <ion-content ref="content">
-      <div class="p-4">
-        <div class="flex items-center justify-between">
-          <button class="w-10 h-10 flex items-center justify-center" @click="date = dayjs(date).subtract(1, 'month')">
-            <svg-icon icon="material-symbols:arrow-back-ios-rounded" color="#000" />
+    <ion-content ref="content" class="bg-neutral-50">
+      <div class="p-5">
+        <!-- 月份选择器 -->
+        <div class="flex items-center justify-between mb-6 app-card bg-white py-3">
+          <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-neutral-100 transition-colors" @click="date = dayjs(date).subtract(1, 'month')">
+            <svg-icon icon="material-symbols:arrow-back-ios-rounded" color="#475569" />
           </button>
-          <div>{{ currentDate }}</div>
-          <button class="w-10 h-10 flex items-center justify-center rotate-180"
+          <div class="text-lg font-medium text-neutral-800">{{ currentDate }}</div>
+          <button class="w-10 h-10 flex items-center justify-center rotate-180 rounded-full hover:bg-neutral-100 transition-colors"
             @click="date = dayjs(date).add(1, 'month')" :disabled="date.isSame(dayjs(), 'month')">
-            <svg-icon icon="material-symbols:arrow-back-ios-rounded" color="#000"
+            <svg-icon icon="material-symbols:arrow-back-ios-rounded" 
+              :color="date.isSame(dayjs(), 'month') ? '#94a3b8' : '#475569'"
               :class="{ 'opacity-50': date.isSame(dayjs(), 'month') }" />
           </button>
         </div>
-        <div class="mt-4 grid grid-cols-3 gap-2 rounded-2xl border border-gray-200 p-4">
-          <div class="bg-gray-100 rounded-2xl p-2 flex flex-col items-center justify-center">
-            <span>收入</span>
-            <span class="text-xl font-bold text-green-500">¥{{monthstatistics.income.toFixed(2)}}</span>
+
+        <!-- 月度统计卡片 -->
+        <div class="app-card bg-white mb-6 overflow-hidden">
+          <h2 class="text-lg font-semibold text-neutral-800 mb-4">月度概览</h2>
+          <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="bg-primary-50 rounded-xl p-4 flex flex-col items-center">
+              <span class="text-neutral-600 mb-1">收入</span>
+              <span class="text-xl font-bold text-accent-600">¥{{monthstatistics.income.toFixed(2)}}</span>
+            </div>
+            <div class="bg-primary-50 rounded-xl p-4 flex flex-col items-center">
+              <span class="text-neutral-600 mb-1">支出</span>
+              <span class="text-xl font-bold text-rose-600">¥{{monthstatistics.expense.toFixed(2)}}</span>
+            </div>
+            <div class="bg-primary-50 rounded-xl p-4 flex flex-col items-center">
+              <span class="text-neutral-600 mb-1">结余</span>
+              <span class="text-xl font-bold text-primary-600">¥{{monthstatistics.balance.toFixed(2)}}</span>
+            </div>
           </div>
-          <div class="bg-gray-100 rounded-2xl p-2 flex flex-col items-center justify-center">
-            <span>支出</span>
-            <span class="text-xl font-bold text-red-500">¥{{monthstatistics.expense.toFixed(2)}}</span>
-          </div>
-          <div class="bg-gray-100 rounded-2xl p-2 flex flex-col items-center justify-center">
-            <span>结余</span>
-            <span class="text-xl font-bold">¥{{monthstatistics.balance.toFixed(2)}}</span>
-          </div>
-          <div class="col-span-3 h-80 w-full">
+          <div class="h-80 w-full">
             <v-chart class="chart" :option="chartOptions" autoresize v-if="yearStatistics.length" />
             <div v-else class="flex justify-center items-center h-full">
-              <p class="text-gray-700">本年度暂无数据</p>
+              <p class="text-neutral-500">本年度暂无数据</p>
             </div>
           </div>
         </div>
-        <div class="mt-2">
-          <div class="flex items-center py-4 gap-4 relative">
-            <span class="w-20 text-lg text-center transition-all duration-300"
-              :class="{ 'text-[#4245dc]': activeTab === '支出分析' }" @click="activeTab = '支出分析'">支出分析</span>
-            <span class="w-20 text-lg text-center transition-all duration-300"
-              :class="{ 'text-[#4245dc]': activeTab === '收入分析' }" @click="activeTab = '收入分析'">收入分析</span>
-            <!-- <span class="w-20 text-lg text-center transition-all duration-300"
-              :class="{ 'text-[#4245dc]': activeTab === '趋势' }" @click="activeTab = '趋势'">趋势</span> -->
-            <span class="absolute left-0 bottom-0 w-20 h-[2px] bg-[#4245dc] transition-all duration-300"
-              :style="{ transform: `translateX(${activeTab === '支出分析' ? '0' : activeTab === '收入分析' ? 'calc(100% + 1rem)' : 'calc(200% + 2rem)'})` }"></span>
+
+        <!-- 分析类型选择器 -->
+        <div class="app-card bg-white mb-6 overflow-hidden">
+          <div class="flex items-center mb-4 relative">
+            <button 
+              class="px-5 py-2 text-base relative transition-all duration-200"
+              :class="activeTab === '支出分析' ? 'text-primary-600 font-medium' : 'text-neutral-600'"
+              @click="activeTab = '支出分析'"
+            >
+              支出分析
+              <span v-if="activeTab === '支出分析'" class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-primary-600 rounded-full"></span>
+            </button>
+            <button 
+              class="px-5 py-2 text-base relative transition-all duration-200"
+              :class="activeTab === '收入分析' ? 'text-primary-600 font-medium' : 'text-neutral-600'"
+              @click="activeTab = '收入分析'"
+            >
+              收入分析
+              <span v-if="activeTab === '收入分析'" class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-primary-600 rounded-full"></span>
+            </button>
           </div>
-        </div>
-        <div class="mt-2 rounded-2xl border border-gray-200 p-4">
+
+          <!-- 饼图分析 -->
           <div class="h-80 w-full">
             <v-chart class="chart" :option="chartOptions2" autoresize />
           </div>
-          <ul class="flex flex-col items-center justify-between gap-2 text-xl mt-4">
+
+          <!-- 分类明细列表 -->
+          <ul class="flex flex-col gap-3 mt-4">
             <li 
-              class="flex items-center justify-between w-full py-1 border-b border-gray-200"
-              v-for="(item,index) in legendData"
+              v-for="(item, index) in legendData"
               :key="index"
+              class="flex items-center justify-between py-3 border-b border-neutral-100 last:border-0"
             >
-              <div class="flex items-center gap-2">
-                <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: index < colors.length ? colors[index] : colors[colors.length % index] }"></div>
-                <span>{{ item }}</span>
+              <div class="flex items-center gap-3">
+                <div class="w-4 h-4 rounded-full" 
+                  :style="{ backgroundColor: index < colors.length ? colors[index] : colors[index % colors.length] }">
+                </div>
+                <span class="text-neutral-800">{{ item }}</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="font-bold">¥{{ analysis[EI][item][activeTab === '支出分析' ? 'totalExpense' : 'totalIncome'] }}</span>
-                <span class="text-gray-500">
-                  {{ (analysis[EI][item][activeTab === '支出分析' ? 'totalExpense' : 'totalIncome'] / totalEI.reduce((a, b) => a + b.value, 0) * 100 ).toFixed(2) }}%
+                <span class="font-bold text-neutral-800">¥{{ analysis[EI][item][activeTab === '支出分析' ? 'totalExpense' : 'totalIncome'] }}</span>
+                <span class="text-neutral-500 text-sm">
+                  {{ (analysis[EI][item][activeTab === '支出分析' ? 'totalExpense' : 'totalIncome'] / (totalEI.reduce((a, b) => a + b.value, 0) || 1) * 100 ).toFixed(1) }}%
                 </span>
               </div>
             </li>
@@ -266,3 +287,10 @@ onIonViewDidEnter(() => {
     </ion-content>
   </ion-page>
 </template>
+
+<style scoped>
+.chart {
+  height: 100%;
+  width: 100%;
+}
+</style>
