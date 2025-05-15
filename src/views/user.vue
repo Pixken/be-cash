@@ -524,7 +524,7 @@ onMounted(() => {
         <!-- 用户头像和名称 -->
         <div class="flex flex-col items-center mt-6 mb-8">
           <div class="w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center mb-4 overflow-hidden" @click="handleSelectAvatar">
-            <img :src="userStore.user.avatar || defaultAvatar" alt="" class="w-full h-full object-cover">
+            <img :src="userStore.user.avatarBase64 || defaultAvatar" alt="" class="w-full h-full object-cover">
           </div>
           <h1 class="text-2xl font-bold text-white">{{ userStore.user.profile.nickname }}</h1>
           <p class="text-gray-100 mt-1">{{ userStore.user.phoneNumber || userStore.user.email.value }}</p>
