@@ -69,7 +69,7 @@ const onSubmit = async (e: Event) => {
     emitter.emit('message', { msg: '注册成功，请登录', type: 'success' });
     router.push('/login');
   }).catch(err => {
-    emitter.emit('message', { msg: err, type: 'error' });
+    emitter.emit('message', { msg: '注册失败，请重试', type: 'error' });
   }).finally(() => {
     isLoading.value = false;
   });

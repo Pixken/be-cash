@@ -75,8 +75,8 @@ onMounted(async () => {
   const savedUser = storage.getItem("user") || {};
   
   // 设置默认值
-  const defaultUsername = import.meta.env.VITE_ENV === "local" ? "test1" : "lgb";
-  const defaultPassword = import.meta.env.VITE_ENV === "local" ? "Test123456" : "123LGBlgb";
+  const defaultUsername = "";
+  const defaultPassword = "";
   
   // 优先使用保存的值，如果没有则使用默认值
   form.value.username = savedUser.username || defaultUsername;
