@@ -88,7 +88,7 @@ const getAccounts = async () => {
     label: item.name,
     value: item.id,
   }));
-  form.value.accountId = storage.getItem('defaultAccount') || accounts.value[0].value;
+  form.value.accountId = parseInt(storage.getItem('defaultAccount')||'') || accounts.value[0].value;
 };
 
 // 表单提交处理
