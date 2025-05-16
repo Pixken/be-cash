@@ -17,9 +17,13 @@ const form = ref({
 const validateForm = async (values: any) => {
   const schema = z.object({
     username: z.string().min(1, "用户名不能为空"),
-    email: z.string().email("请输入正确的邮箱"),
-    password: z.string().min(8, "密码长度至少为8位"),
-    confirmPassword: z.string().min(8, "确认密码长度至少为8位"),
+    email: z.string().email("请输入正确的邮箱").refine((val) => {
+      return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val);
+    }, "请输入正确的邮箱"),
+    password: z.string().min(8, "密码长度至少为8位").refine((val) => {
+      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(val);
+    }, "密码必须包含大小写字母和数字"),
+    confirmPassword: z.string(),
   });
   try {
     await schema.parseAsync(values);
@@ -47,8 +51,10 @@ const onSubmit = async (e: Event) => {
   isLoading.value = true;
   // 验证表单
   const errors = await validateForm(form.value);
+  console.log(errors);
+  const msg = errors[Object.keys(errors)[0]];
   if (errors) {
-    emitter.emit('message', { msg: '请检查表单', type: 'error' });
+    emitter.emit('message', { msg, type: 'error' });
     isLoading.value = false;
     return;
   }

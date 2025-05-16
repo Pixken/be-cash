@@ -75,10 +75,15 @@ const validateForm = async (values: any) => {
 
 const getAccounts = async () => {
   const res = await getAccount();
-  if (!res.data && res.data.legth === 0) {
+  
+  // 检查是否有账户数据
+  if (!res.data || res.data.length === 0) {
+    // 设置无账户标志，触发弹窗显示
     noAccount.value = true;
+    form.value.accountId = null;
     return;
   }
+  
   accounts.value = res.data.map((item: any) => ({
     label: item.name,
     value: item.id,
@@ -158,8 +163,9 @@ const getCashCategorys = async () => {
 const content = ref();
 
 onIonViewDidEnter(() => {
+  canDismiss.value = false;
   getCashCategorys();
-  getAccounts();
+  getAccounts(); // 获取账户数据，同时进行检查
   content.value?.$el.scrollToTop(0);
 });
 
@@ -177,9 +183,12 @@ const handleSelectCategory = (item: any) => {
   form.value.categoryId = item.id;
 };
 
+const canDismiss = ref(false);
+
 const handleTOAccount = () => {
   noAccount.value = false;
-  router.push("/tabs/account");
+  router.push("/tabs/account"); // 跳转到账户页面
+  canDismiss.value = true;
   modal.value?.$el.dismiss();
 };
 </script>
@@ -187,7 +196,7 @@ const handleTOAccount = () => {
   <ion-page>
     <be-header title="记账" />
     <ion-content ref="content">
-      <ion-modal ref="modal" :is-open="noAccount">
+      <ion-modal ref="modal" :is-open="noAccount" :can-dismiss="canDismiss">
         <div class="p-4">
           <p>请先添加账户</p>
           <button
