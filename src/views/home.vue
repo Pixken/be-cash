@@ -364,7 +364,7 @@ onIonViewDidEnter(() => {
                       </div>
                       <div>
                         <span class="text-gray-500 text-sm">日期</span>
-                        <p class="text-gray-800 font-medium">{{ dayjs(billDetail.date).format('YYYY-MM-DD HH:mm:ss') }}</p>
+                        <p class="text-gray-800 font-medium">{{ dayjs(billDetail.transactionDate).format('YYYY-MM-DD HH:mm:ss') }}</p>
                       </div>
                     </div>
                     
@@ -425,7 +425,7 @@ onIonViewDidEnter(() => {
                 </div>
                 <div class="flex items-center justify-between mt-1">
                   <p class="text-gray-500 text-sm max-w-28 text-ellipsis whitespace-nowrap overflow-hidden">{{ bill.description }}</p>
-                  <span class="text-gray-400 text-sm">{{ formatDate(bill.date) }}</span>
+                  <span class="text-gray-400 text-sm">{{ formatDate(bill.transactionDate) }}</span>
                 </div>
               </div>
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
