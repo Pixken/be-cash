@@ -35,7 +35,7 @@ const form = ref({
   amount: 0,
   categoryId: "",
   description: "",
-  accountId: parseInt(storage.getItem('defaultAccount')),
+  accountId: parseInt(storage.getItem('defaultAccount')||''),
   transactionDate: dayjs(),
 });
 
@@ -44,7 +44,7 @@ const resetForm = () => {
     amount: 0,
     categoryId: "",
     description: "",
-    accountId: parseInt(storage.getItem('defaultAccount')),
+    accountId: parseInt(storage.getItem('defaultAccount')||''),
     transactionDate: dayjs()
   };
 };
@@ -83,7 +83,7 @@ const getAccounts = async () => {
     label: item.name,
     value: item.id,
   }));
-  form.value.accountId = storage.getItem('defaultAccount');
+  form.value.accountId = storage.getItem('defaultAccount') || accounts.value[0].value;
 };
 
 // 表单提交处理
