@@ -337,9 +337,9 @@ const onInput = (e: Event, key: keyof typeof form.value) => {
                   >记住我</label
                 >
               </div>
-              <a href="#" class="text-blue-500 text-sm hover:underline"
+              <!-- <a href="#" class="text-blue-500 text-sm hover:underline"
                 >忘记密码？</a
-              >
+              > -->
             </div>
 
             <!-- 登录按钮 -->

@@ -21,6 +21,7 @@ import dayjs from "dayjs";
 import locale from "ant-design-vue/es/date-picker/locale/zh_CN";
 import { z } from "zod";
 import { debounce } from '@/utils/common';
+import { storage } from "@/utils/storage";
 
 const userStore = useUserStore();
 const activeTab = ref("EXPENSE");
@@ -34,7 +35,7 @@ const form = ref({
   amount: 0,
   categoryId: "",
   description: "",
-  accountId: "",
+  accountId: parseInt(storage.getItem('defaultAccount')),
   transactionDate: dayjs(),
 });
 
@@ -43,7 +44,7 @@ const resetForm = () => {
     amount: 0,
     categoryId: "",
     description: "",
-    accountId: accounts.value[0]?.value,
+    accountId: parseInt(storage.getItem('defaultAccount')),
     transactionDate: dayjs()
   };
 };
@@ -82,7 +83,7 @@ const getAccounts = async () => {
     label: item.name,
     value: item.id,
   }));
-  form.value.accountId = accounts.value[0]?.value;
+  form.value.accountId = storage.getItem('defaultAccount');
 };
 
 // 表单提交处理
