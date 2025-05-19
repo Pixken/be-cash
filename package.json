@@ -40,8 +40,6 @@
     "markdown-it": "^14.1.0",
     "mitt": "^3.0.1",
     "pinia": "^3.0.1",
-    "react": "19.2.0-canary-38ef6550-20250508",
-    "react-dom": "19.2.0-canary-38ef6550-20250508",
     "swiper": "^11.1.15",
     "timeago.js": "^4.0.2",
     "vee-validate": "^4.15.0",
