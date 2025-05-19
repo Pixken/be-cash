@@ -100,7 +100,18 @@ const chartOption = computed<EChartsOption>(() => {
         .map(bill => ({
           value: bill.amount,
           name: bill.category.name,
-        })),
+        })).reduce((acc, curr) => {
+            // 检查当前分类是否已存在
+            const existingItem = acc.find(item => item.name === curr.name);
+            
+            if (existingItem) {
+                existingItem.value += curr.value; // 合并 value
+            } else {
+                acc.push({ ...curr }); // 否则新增
+            }
+            
+            return acc;
+        }, []),
       labelLine: {
         show: false
       },
