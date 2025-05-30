@@ -1,4 +1,5 @@
 import type { CapacitorConfig } from '@capacitor/cli';
+import { KeyboardResize, KeyboardStyle } from '@capacitor/keyboard';
 
 const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
@@ -22,8 +23,9 @@ const config: CapacitorConfig = {
   // 添加键盘配置
   plugins: {
     Keyboard: {
-      resize: true, // 调整WebView大小
-      style: 'RESIZE' // 键盘样式为RESIZE
+      resize: KeyboardResize.Body, // 调整WebView大小
+      style: KeyboardStyle.Dark, // 键盘样式
+      resizeOnFullScreen: true, // 全屏时调整WebView大小
     }
   }
 };
