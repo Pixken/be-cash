@@ -1,7 +1,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { registerPlugin } from '@capacitor/core';
 
-const NativeDataSender = registerPlugin<any>('NotificationListenerPlugin');
+const NativeDataSender = registerPlugin<any>('NotificationListener');
 
 export function useNativeData() {
     const nativeData = ref<string | null>(null);
