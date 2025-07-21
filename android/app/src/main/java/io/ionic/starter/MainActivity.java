@@ -10,5 +10,6 @@ public class MainActivity extends BridgeActivity {
         
         // 注册自定义插件
         registerPlugin(AppUpdaterPlugin.class);
+        registerPlugin(NotificationListener.class);
     }
 }
