@@ -22,7 +22,7 @@ public class NotificationListenerPlugin extends Plugin {
     }
 
     public static void sendNotificationToFrontend(StatusBarNotification sbn) {
-      notifyListeners("onNotificationPosted", sbn);
+      notifyListeners("onNotificationPosted", '112312213');
         if (instance != null) {
             JSObject ret = new JSObject();
             ret.put("packageName", sbn.getPackageName());
