@@ -2,6 +2,7 @@ package io.ionic.starter;
 
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
+import io.ionic.starter.NotificationListenerPlugin;
 
 public class MainActivity extends BridgeActivity {
   @Override
@@ -10,6 +11,6 @@ public class MainActivity extends BridgeActivity {
         
         // 注册自定义插件
         registerPlugin(AppUpdaterPlugin.class);
-        registerPlugin(NotificationListener.class);
+        registerPlugin(NotificationListenerPlugin.class);
     }
 }
