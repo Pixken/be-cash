@@ -6,7 +6,7 @@ import { storage } from '@/utils/storage';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/tabs'
+    redirect: '/testnotificationlistener'
   },
   {
     path: '/login',
@@ -19,6 +19,10 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/notifications',
     component: () => import('@/views/notifications.vue')
+  },
+  {
+    path: '/testnotificationlistener',
+    component: () => import('@/views/testnotificationlistener.vue')
   },
   {
     path: '/tabs/',
@@ -61,15 +65,15 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const isAuthenticated = checkAuth() // 检查用户是否登录的方法
   
-  // 如果用户已登录但尝试访问登录页，重定向到首页
-  if (isAuthenticated && to.path === '/login') {
-    return next('/')
-  }
+  // // 如果用户已登录但尝试访问登录页，重定向到首页
+  // if (isAuthenticated && to.path === '/login') {
+  //   return next('/')
+  // }
   
-  // 如果需要登录且用户未登录，重定向到登录页
-  if (!isAuthenticated && to.path !== '/login' && to.path!== '/register') {
-    return next('/login')
-  }
+  // // 如果需要登录且用户未登录，重定向到登录页
+  // if (!isAuthenticated && to.path !== '/login' && to.path!== '/register') {
+  //   return next('/login')
+  // }
   
   // 其他情况正常放行
   next()
