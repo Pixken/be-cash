@@ -9,6 +9,12 @@ import android.service.notification.StatusBarNotification;
 
 @CapacitorPlugin(name = "NotificationListener")
 public class NotificationListenerPlugin extends Plugin {
+  private static NotificationListenerPlugin instance;
+
+  @Override
+  public void load() {
+      instance = this; // 保存插件实例
+  }
 
     @PluginMethod
     public void start(PluginCall call) {
@@ -20,6 +26,6 @@ public class NotificationListenerPlugin extends Plugin {
       ret.put("packageName", sbn.getPackageName());
       ret.put("title", sbn.getNotification().extras.getString("android.title"));
       ret.put("text", sbn.getNotification().extras.getString("android.text"));
-      notifyListeners("onNotificationPosted", ret);
+      instance.notifyListeners("onNotificationPosted", ret);
     }
 }
