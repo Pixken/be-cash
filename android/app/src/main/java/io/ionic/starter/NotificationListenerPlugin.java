@@ -22,10 +22,12 @@ public class NotificationListenerPlugin extends Plugin {
     }
 
     public static void sendNotificationToFrontend(StatusBarNotification sbn) {
-      JSObject ret = new JSObject();
-      ret.put("packageName", sbn.getPackageName());
-      ret.put("title", sbn.getNotification().extras.getString("android.title"));
-      ret.put("text", sbn.getNotification().extras.getString("android.text"));
-      instance.notifyListeners("onNotificationPosted", ret);
+      if (instance != null) {
+        JSObject ret = new JSObject();
+        ret.put("packageName", sbn.getPackageName());
+        ret.put("title", sbn.getNotification().extras.getString("android.title"));
+        ret.put("text", sbn.getNotification().extras.getString("android.text"));
+        instance.notifyListeners("onNotificationPosted", ret);
+      }
     }
 }
