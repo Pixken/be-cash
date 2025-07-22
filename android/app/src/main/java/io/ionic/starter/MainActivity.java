@@ -10,11 +10,11 @@ import io.ionic.starter.NotificationListenerPlugin;
 public class MainActivity extends BridgeActivity {
   @Override
     public void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      toggleNotificationListenerService(this);
       // 注册自定义插件
       registerPlugin(AppUpdaterPlugin.class);
       registerPlugin(NotificationListenerPlugin.class);
+      super.onCreate(savedInstanceState);
+      toggleNotificationListenerService(this);
 
     }
   
