@@ -9,12 +9,6 @@ import android.service.notification.StatusBarNotification;
 
 @CapacitorPlugin(name = "NotificationListener")
 public class NotificationListenerPlugin extends Plugin {
-    private static NotificationListenerPlugin instance;
-
-    @Override
-    public void load() {
-        instance = this;
-    }
 
     @PluginMethod
     public void start(PluginCall call) {
@@ -22,17 +16,10 @@ public class NotificationListenerPlugin extends Plugin {
     }
 
     public static void sendNotificationToFrontend(StatusBarNotification sbn) {
-      JSObject aaa = new JSObject();
-      aaa.put("packageName", "112312213");
-      aaa.put("title", "112312213");
-      aaa.put("text", "112312213");
-      instance.notifyListeners("onNotificationPosted", aaa);
-        if (instance != null) {
-            JSObject ret = new JSObject();
-            ret.put("packageName", sbn.getPackageName());
-            ret.put("title", sbn.getNotification().extras.getString("android.title"));
-            ret.put("text", sbn.getNotification().extras.getString("android.text"));
-            instance.notifyListeners("onNotificationPosted", ret);
-        }
+      JSObject ret = new JSObject();
+      ret.put("packageName", sbn.getPackageName());
+      ret.put("title", sbn.getNotification().extras.getString("android.title"));
+      ret.put("text", sbn.getNotification().extras.getString("android.text"));
+      notifyListeners("onNotificationPosted", ret);
     }
 }

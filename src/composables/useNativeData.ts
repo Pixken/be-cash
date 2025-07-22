@@ -12,6 +12,7 @@ export function useNativeData() {
         listener = await NativeDataSender.addListener(
             'onNotificationPosted', 
             (data: { value: string }) => {
+                console.log('Received from native:');
                 nativeData.value = data.value;
                 console.log('Received from native:', data.value);
             }
