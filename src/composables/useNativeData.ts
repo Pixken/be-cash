@@ -11,10 +11,10 @@ export function useNativeData() {
         // 添加事件监听
         listener = await NativeDataSender.addListener(
             'onNotificationPosted', 
-            (data: { value: string }) => {
+            (data: { packageName: string, title: string, text: string }) => {
                 console.log('Received from native:');
-                nativeData.value = data.value;
-                console.log('Received from native:', data.value);
+                nativeData.value = JSON.stringify(data);
+                console.log('Received from native:', data);
             }
         );
         
