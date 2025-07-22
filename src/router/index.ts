@@ -22,7 +22,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/testnotificationlistener',
-    component: () => import('@/views/testnotificationlistener.vue')
+    component: () => import('@/views/NotificationPage.vue')
   },
   {
     path: '/tabs/',
