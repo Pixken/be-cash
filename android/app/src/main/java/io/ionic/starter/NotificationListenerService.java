@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -72,6 +73,38 @@ public class NotificationListenerService extends android.service.notification.No
     public void onListenerDisconnected() {
         Log.d(TAG, "Notification Listener Service disconnected!");
         super.onListenerDisconnected();
+        
+        // 尝试重新连接
+        requestRebind(new ComponentName(this, NotificationListenerService.class));
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "NotificationListenerService destroyed");
+        super.onDestroy();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "NotificationListenerService onStartCommand");
+        
+        // 确保前台服务正在运行
+        if (!isForegroundServiceRunning()) {
+            startForegroundService();
+        }
+        
+        // 返回 START_STICKY 让系统在服务被杀死后自动重启
+        return START_STICKY;
+    }
+
+    private boolean isForegroundServiceRunning() {
+        try {
+            // 简单检查：如果能获取到通知管理器，说明服务还在运行
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            return manager != null;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private void createNotificationChannel() {
