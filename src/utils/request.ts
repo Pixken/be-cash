@@ -4,10 +4,6 @@ import useUserStore from '@/store/user'
 import { refreshToken } from '@/api/user'
 import { storage } from '@/utils/storage'
 import emitter from './emitter'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
-
 export interface ApiResponse<T> {
   info: string
   code: string
@@ -81,8 +77,8 @@ request.interceptors.response.use((response: AxiosResponse) => {
   console.log(error,9090);
   
   if (error.response.data.code === 401) {
-    // window.location.href = '/login'
-    router.push('/login')
+    window.location.href = '/login'
+    // router.push('/login')
     return
   }
   emitter.emit('message', { msg: error.response.data.message, type: 'error' })

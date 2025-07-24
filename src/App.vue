@@ -87,9 +87,9 @@ checkNativeUpdate((progress) => {
   }
 });
 
-const checkAuth = async () => {
-  await get('/auth')
-}
+// const checkAuth = async () => {
+//   await get('/auth')
+// }
 
 // 添加键盘处理
 onMounted(async () => {
@@ -118,7 +118,7 @@ onMounted(async () => {
     // 移除CSS类
     document.body.classList.remove('keyboard-is-open');
   });
-  await checkAuth();
+  // await checkAuth();
 });
 
 // 清理监听器
