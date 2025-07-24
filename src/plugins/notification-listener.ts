@@ -2,6 +2,11 @@ import { registerPlugin } from '@capacitor/core';
 
 export interface NotificationListenerPlugin {
   /**
+   * 设置用户认证信息
+   */
+  setAuthInfo(options: { userId: string; token: string }): Promise<{ success: boolean; message: string }>;
+
+  /**
    * 启动通知监听服务
    */
   start(): Promise<{ success: boolean; message: string; needPermission?: boolean }>;
@@ -50,6 +55,11 @@ export interface NotificationListenerPlugin {
    * 清除失败的请求
    */
   clearFailedRequests(): Promise<{ success: boolean; message: string }>;
+
+  /**
+   * 重试失败的请求
+   */
+  retryFailedRequests(): Promise<{ success: boolean; message: string }>;
 
   /**
    * 添加监听器，监听新通知

@@ -181,19 +181,6 @@ onMounted(async () => {
       ...notification,
       id: ++notificationIdCounter
     });
-
-    fetch('http://117.72.49.27:3000/notification', {
-      method: 'POST',
-      body: JSON.stringify({
-        title: notification.title,
-        content: notification.text,
-        appName: notification.appName
-      })
-    }).then(res => {
-      console.log(res);
-    }).catch(err => {
-      console.error('发送通知失败:', err);
-    });
     
     // 限制实时通知数量
     if (liveNotifications.value.length > 100) {

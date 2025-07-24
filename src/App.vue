@@ -32,8 +32,12 @@ import { IonApp, IonRouterOutlet, IonToast } from '@ionic/vue';
 import { ref, watch, onMounted, onUnmounted } from 'vue';
 import emitter from './utils/emitter';
 import { Keyboard } from '@capacitor/keyboard';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 import { checkNativeUpdate } from '@/services/update/nativeUpdate';
+import { get } from './utils/request';
 
 // 更新进度状态
 const showUpdateProgress = ref(false);
@@ -83,8 +87,12 @@ checkNativeUpdate((progress) => {
   }
 });
 
+const checkAuth = async () => {
+  await get('/auth')
+}
+
 // 添加键盘处理
-onMounted(() => {
+onMounted(async () => {
   // 监听键盘弹出事件
   Keyboard.addListener('keyboardWillShow', info => {
     // 键盘将要显示
@@ -110,6 +118,7 @@ onMounted(() => {
     // 移除CSS类
     document.body.classList.remove('keyboard-is-open');
   });
+  await checkAuth();
 });
 
 // 清理监听器
@@ -141,7 +150,7 @@ const formatMessage = (msg: string, messageType: 'success' | 'error' | 'warning'
 // 为不同类型的消息设置不同颜色
 const colors: Record<string, string> = {
   success: '#10b981',
-  error: '#ef4444',
+  error: '#FF5F4E',
   warning: '#f59e0b'
 };
 

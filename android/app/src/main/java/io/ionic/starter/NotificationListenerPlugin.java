@@ -30,6 +30,31 @@ public class NotificationListenerPlugin extends Plugin {
     }
 
     @PluginMethod
+    public void setAuthInfo(PluginCall call) {
+        try {
+            String userId = call.getString("userId");
+            String token = call.getString("token");
+            
+            if (userId == null || token == null) {
+                call.reject("userId和token不能为空");
+                return;
+            }
+            
+            // 将认证信息传递给服务
+            NotificationListenerService.setAuthInfo(getContext(), userId, token);
+            
+            JSObject ret = new JSObject();
+            ret.put("success", true);
+            ret.put("message", "认证信息已设置");
+            call.resolve(ret);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error setting auth info", e);
+            call.reject("设置认证信息失败: " + e.getMessage());
+        }
+    }
+
+    @PluginMethod
     public void start(PluginCall call) {
         try {
             // 检查权限
@@ -189,6 +214,28 @@ public class NotificationListenerPlugin extends Plugin {
         } catch (Exception e) {
             Log.e(TAG, "Error clearing failed requests", e);
             call.reject("清除失败请求失败: " + e.getMessage());
+        }
+    }
+
+    @PluginMethod
+    public void retryFailedRequests(PluginCall call) {
+        try {
+            // 检查是否有认证信息
+            if (!NotificationListenerService.hasAuthInfo(getContext())) {
+                call.reject("没有认证信息，请先登录");
+                return;
+            }
+
+            NotificationListenerService.retryFailedRequests(getContext());
+            
+            JSObject ret = new JSObject();
+            ret.put("success", true);
+            ret.put("message", "开始重试失败的请求");
+            call.resolve(ret);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error retrying failed requests", e);
+            call.reject("重试失败请求失败: " + e.getMessage());
         }
     }
 

@@ -9,7 +9,6 @@ import './a.css';
 import markdownit from 'markdown-it';
 import useUserStore from '@/store/user';
 
-const userStore = useUserStore();
 interface Message {
   type: 'user' | 'ai';
   content: string;
@@ -37,6 +36,7 @@ export default defineComponent({
   },
   emits: ['update:isOpen'],
   setup(props, { emit }) {
+    const userStore = useUserStore();
     const messages = ref<BubbleProps[]>([
       {
         role: 'ai',

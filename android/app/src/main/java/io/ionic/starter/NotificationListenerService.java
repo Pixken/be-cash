@@ -30,6 +30,9 @@ public class NotificationListenerService extends android.service.notification.No
     private static final String TAG = "NotificationListener";
     private static final String CHANNEL_ID = "notification_listener_channel";
     private static final int FOREGROUND_ID = 1001;
+    private static final String AUTH_PREFS = "auth_data";
+    private static final String KEY_USER_ID = "userId";
+    private static final String KEY_TOKEN = "token";
     private SharedPreferences sharedPreferences;
     private ExecutorService networkExecutor;
 
@@ -247,6 +250,19 @@ public class NotificationListenerService extends android.service.notification.No
     }
 
     private void sendHttpRequest(String serverUrl, JSONObject originalData) throws IOException {
+        // 从SharedPreferences获取认证信息
+        SharedPreferences authPrefs = getSharedPreferences(AUTH_PREFS, Context.MODE_PRIVATE);
+        String token = authPrefs.getString(KEY_TOKEN, "");
+        String userId = authPrefs.getString(KEY_USER_ID, "");
+        
+        // 检查是否有认证信息
+        if (token.isEmpty() || userId.isEmpty()) {
+            Log.w(TAG, "No auth info available, skipping notification send");
+            // 保存到失败队列，等待用户登录后重试
+            saveFailedRequest(originalData);
+            return;
+        }
+        
         URL url = new URL(serverUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         
@@ -255,6 +271,7 @@ public class NotificationListenerService extends android.service.notification.No
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("User-Agent", "NotificationListener/1.0");
+            connection.setRequestProperty("Authorization", "Bearer " + token);
             
             connection.setDoOutput(true);
             connection.setConnectTimeout(10000); // 10秒连接超时
@@ -266,6 +283,7 @@ public class NotificationListenerService extends android.service.notification.No
                 requestData.put("title", originalData.optString("title", ""));
                 requestData.put("content", originalData.optString("text", ""));
                 requestData.put("appName", originalData.optString("appName", ""));
+                requestData.put("userId", userId);
             } catch (JSONException e) {
                 Log.e(TAG, "Error constructing request data", e);
                 return;
@@ -282,8 +300,16 @@ public class NotificationListenerService extends android.service.notification.No
             if (responseCode >= 200 && responseCode < 300) {
                 Log.d(TAG, "Successfully sent notification to server: " + responseCode);
                 Log.d(TAG, "Sent data: " + requestData.toString());
+            } else if (responseCode == 401) {
+                Log.w(TAG, "Authentication failed (401), clearing auth info and saving to failed queue");
+                // 清除无效的认证信息
+                clearAuthInfo();
+                // 保存到失败队列，等待重新登录
+                saveFailedRequest(originalData);
             } else {
                 Log.w(TAG, "Server responded with error code: " + responseCode);
+                // 其他错误也保存到失败队列
+                saveFailedRequest(originalData);
             }
 
         } finally {
@@ -356,5 +382,71 @@ public class NotificationListenerService extends android.service.notification.No
     public static void clearFailedRequests(Context context) {
         SharedPreferences prefs = context.getSharedPreferences("notification_data", Context.MODE_PRIVATE);
         prefs.edit().remove("failed_requests").apply();
+    }
+
+    // 设置认证信息
+    public static void setAuthInfo(Context context, String userId, String token) {
+        SharedPreferences authPrefs = context.getSharedPreferences(AUTH_PREFS, Context.MODE_PRIVATE);
+        authPrefs.edit()
+            .putString(KEY_USER_ID, userId)
+            .putString(KEY_TOKEN, token)
+            .apply();
+        Log.d(TAG, "Auth info saved - userId: " + userId + ", token: " + (token != null ? "***" : "null"));
+    }
+
+    // 清除认证信息
+    private void clearAuthInfo() {
+        SharedPreferences authPrefs = getSharedPreferences(AUTH_PREFS, Context.MODE_PRIVATE);
+        authPrefs.edit()
+            .remove(KEY_USER_ID)
+            .remove(KEY_TOKEN)
+            .apply();
+        Log.d(TAG, "Auth info cleared due to authentication failure");
+    }
+
+    // 获取认证状态
+    public static boolean hasAuthInfo(Context context) {
+        SharedPreferences authPrefs = context.getSharedPreferences(AUTH_PREFS, Context.MODE_PRIVATE);
+        String token = authPrefs.getString(KEY_TOKEN, "");
+        String userId = authPrefs.getString(KEY_USER_ID, "");
+        return !token.isEmpty() && !userId.isEmpty();
+    }
+
+    // 重试失败的请求
+    public static void retryFailedRequests(Context context) {
+        try {
+            JSONArray failedRequests = getFailedRequests(context);
+            if (failedRequests.length() == 0) {
+                Log.d(TAG, "No failed requests to retry");
+                return;
+            }
+
+            Log.d(TAG, "Retrying " + failedRequests.length() + " failed requests");
+            
+            // 创建一个临时的服务实例来处理重试
+            ExecutorService retryExecutor = Executors.newFixedThreadPool(2);
+            
+            for (int i = 0; i < failedRequests.length(); i++) {
+                JSONObject failedItem = failedRequests.getJSONObject(i);
+                JSONObject notificationData = failedItem.getJSONObject("data");
+                
+                retryExecutor.execute(() -> {
+                    try {
+                        // 创建临时服务实例来发送请求
+                        NotificationListenerService tempService = new NotificationListenerService();
+                        tempService.sharedPreferences = context.getSharedPreferences("notification_data", Context.MODE_PRIVATE);
+                        tempService.sendHttpRequest("http://117.72.49.27:3000/notification", notificationData);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Failed to retry request", e);
+                    }
+                });
+            }
+            
+            // 清除失败队列（因为我们已经重试了）
+            clearFailedRequests(context);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error retrying failed requests", e);
+        }
     }
 }

@@ -4,7 +4,9 @@ import useUserStore from '@/store/user'
 import { refreshToken } from '@/api/user'
 import { storage } from '@/utils/storage'
 import emitter from './emitter'
-const userStore = useUserStore()
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 export interface ApiResponse<T> {
   info: string
@@ -28,11 +30,14 @@ const request: AxiosInstance = axios.create({
 // 添加请求拦截器，用于调试
 request.interceptors.request.use((config) => {
   // 记录每个请求，辅助调试
-  
+
+  // 在拦截器内部获取 store，确保 Pinia 已经初始化
+  const userStore = useUserStore()
+
   // config.headers['Authorization'] = `Bearer ${userStore.access_token}`
-  
+
   config.headers['X-User-ID'] = `${userStore.user.id?.value || userStore.user.id || ''}`
-  
+
   // 添加API版本和时间戳防止缓存
   // if (config.method === 'get') {
   //   config.params = {
@@ -41,7 +46,7 @@ request.interceptors.request.use((config) => {
   //     _v: import.meta.env.VITE_API_VERSION || '1.0.0'
   //   };
   // }
-  
+
   return config
 })
 
@@ -54,34 +59,37 @@ const retryRequest = async (config: AxiosRequestConfig, retries = 0): Promise<an
     if (retries >= MAX_RETRIES) {
       throw err;
     }
-    
+
     // 等待时间递增
     const delay = Math.pow(2, retries) * 1000;
     await new Promise(resolve => setTimeout(resolve, delay));
-    
+
     return retryRequest(config, retries + 1);
   }
 };
 
 request.interceptors.response.use((response: AxiosResponse) => {
-  console.log(response)
   if (response.data.code == '0000') {
     return response;
   } else if (response.status == 200) {
     return response;
   } else {
-    emitter.emit('message', { msg: response.data.info, type: 'error'  })
+    emitter.emit('message', { msg: response.data.info, type: 'error' })
     return Promise.reject(response.data.info)
   }
 }, (error: any) => {
-  console.log(error);
-  
+  if (error.response.data.code === 401) {
+    // window.location.href = '/login'
+    router.push('/login')
+    return
+  }
+  emitter.emit('message', { msg: error.response.data.message, type: 'error' })
   if (!error.response) {
     // 网络错误
     const errorMessage = `网络错误: ${error.message}。API地址: ${import.meta.env.VITE_BASE_URL}`;
     return Promise.reject(errorMessage);
   }
-  
+
   // if (error.response.status === 401) {
   //   try {
   //     const refresh_token = storage.getItem('refresh_token')
@@ -98,7 +106,7 @@ request.interceptors.response.use((response: AxiosResponse) => {
   //     window.location.href = '/login?redirect=' + window.location.pathname
   //   }
   // }
-  
+
   return Promise.reject(error.response.data.message)
 })
 

@@ -2,8 +2,6 @@ import { get, post } from "@/utils/request"
 import useUserStore from "@/store/user"
 import { Password } from "@/types"
 
-const userStore = useUserStore()
-
 export const login = (data: any) => {
   return post('/identity/login', data)
 }
@@ -11,6 +9,7 @@ export const register = (data: any) => {
   return post('/identity/register', data)
 }
 export const refreshToken = () => {
+  const userStore = useUserStore()
   return post('/identity/refresh', {
     refreshToken: userStore.refresh_token
   })
