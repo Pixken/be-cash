@@ -21,6 +21,9 @@
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import NotificationListener from '@/components/NotificationListener.vue';
+import { get } from '@/utils/request';
+
+get('/auth')
 </script>
 
 <style scoped>  
