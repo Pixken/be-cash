@@ -11,6 +11,13 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import androidx.core.app.NotificationCompat;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,11 +31,13 @@ public class NotificationListenerService extends android.service.notification.No
     private static final String CHANNEL_ID = "notification_listener_channel";
     private static final int FOREGROUND_ID = 1001;
     private SharedPreferences sharedPreferences;
+    private ExecutorService networkExecutor;
 
     @Override
     public void onCreate() {
         super.onCreate();
         sharedPreferences = getSharedPreferences("notification_data", Context.MODE_PRIVATE);
+        networkExecutor = Executors.newFixedThreadPool(3); // 用于网络请求的线程池
         createNotificationChannel();
         startForegroundService();
         Log.d(TAG, "NotificationListenerService created");
@@ -56,6 +65,9 @@ public class NotificationListenerService extends android.service.notification.No
             // 发送到前端（如果应用在运行）
             NotificationListenerPlugin.sendNotificationToFrontend(sbn);
             
+            // 发送网络请求（后台也能执行）
+            sendNotificationToServer(notificationData);
+            
             Log.d(TAG, "Notification processed: " + notificationData.toString());
             
         } catch (Exception e) {
@@ -81,6 +93,9 @@ public class NotificationListenerService extends android.service.notification.No
     @Override
     public void onDestroy() {
         Log.d(TAG, "NotificationListenerService destroyed");
+        if (networkExecutor != null && !networkExecutor.isShutdown()) {
+            networkExecutor.shutdown();
+        }
         super.onDestroy();
     }
 
@@ -213,5 +228,133 @@ public class NotificationListenerService extends android.service.notification.No
     public static void clearStoredNotifications(Context context) {
         SharedPreferences prefs = context.getSharedPreferences("notification_data", Context.MODE_PRIVATE);
         prefs.edit().remove("notifications").apply();
+    }
+
+    private void sendNotificationToServer(JSONObject notificationData) {
+        // 使用固定的服务器地址
+        String serverUrl = "http://117.72.49.27:3000/notification";
+        
+        // 在后台线程执行网络请求
+        networkExecutor.execute(() -> {
+            try {
+                sendHttpRequest(serverUrl, notificationData);
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to send notification to server", e);
+                // 可以选择重试或保存到失败队列
+                saveFailedRequest(notificationData);
+            }
+        });
+    }
+
+    private void sendHttpRequest(String serverUrl, JSONObject originalData) throws IOException {
+        URL url = new URL(serverUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        
+        try {
+            // 设置请求方法和头部
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("User-Agent", "NotificationListener/1.0");
+            
+            connection.setDoOutput(true);
+            connection.setConnectTimeout(10000); // 10秒连接超时
+            connection.setReadTimeout(15000);    // 15秒读取超时
+
+            // 按照你的格式构造数据
+            JSONObject requestData = new JSONObject();
+            try {
+                requestData.put("title", originalData.optString("title", ""));
+                requestData.put("content", originalData.optString("text", ""));
+                requestData.put("appName", originalData.optString("appName", ""));
+            } catch (JSONException e) {
+                Log.e(TAG, "Error constructing request data", e);
+                return;
+            }
+
+            // 发送数据
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = requestData.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            // 检查响应
+            int responseCode = connection.getResponseCode();
+            if (responseCode >= 200 && responseCode < 300) {
+                Log.d(TAG, "Successfully sent notification to server: " + responseCode);
+                Log.d(TAG, "Sent data: " + requestData.toString());
+            } else {
+                Log.w(TAG, "Server responded with error code: " + responseCode);
+            }
+
+        } finally {
+            connection.disconnect();
+        }
+    }
+
+    private void saveFailedRequest(JSONObject notificationData) {
+        try {
+            // 保存失败的请求，稍后重试
+            String failedRequests = sharedPreferences.getString("failed_requests", "[]");
+            JSONArray failed = new JSONArray(failedRequests);
+            
+            JSONObject failedItem = new JSONObject();
+            failedItem.put("data", notificationData);
+            failedItem.put("timestamp", System.currentTimeMillis());
+            failedItem.put("retryCount", 0);
+            
+            failed.put(failedItem);
+            
+            // 限制失败队列大小
+            if (failed.length() > 100) {
+                JSONArray trimmed = new JSONArray();
+                for (int i = failed.length() - 100; i < failed.length(); i++) {
+                    trimmed.put(failed.get(i));
+                }
+                failed = trimmed;
+            }
+            
+            sharedPreferences.edit()
+                .putString("failed_requests", failed.toString())
+                .apply();
+                
+        } catch (JSONException e) {
+            Log.e(TAG, "Error saving failed request", e);
+        }
+    }
+
+    // 测试网络连接的方法
+    public static boolean testConnection() {
+        try {
+            URL url = new URL("http://117.72.49.27:3000/notification");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("HEAD");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            
+            int responseCode = connection.getResponseCode();
+            connection.disconnect();
+            
+            return responseCode >= 200 && responseCode < 400;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // 获取失败的请求，用于重试
+    public static JSONArray getFailedRequests(Context context) {
+        try {
+            SharedPreferences prefs = context.getSharedPreferences("notification_data", Context.MODE_PRIVATE);
+            String data = prefs.getString("failed_requests", "[]");
+            return new JSONArray(data);
+        } catch (JSONException e) {
+            Log.e(TAG, "Error reading failed requests", e);
+            return new JSONArray();
+        }
+    }
+
+    // 清除失败的请求
+    public static void clearFailedRequests(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences("notification_data", Context.MODE_PRIVATE);
+        prefs.edit().remove("failed_requests").apply();
     }
 }

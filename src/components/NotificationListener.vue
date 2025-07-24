@@ -49,6 +49,8 @@
       </div>
     </div>
 
+    <ServerConfig />
+
     <div class="stored-section">
       <div class="section-header">
         <h3>存储的通知 ({{ storedNotifications.length }})</h3>
@@ -79,6 +81,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import NotificationListener, { type NotificationData } from '@/plugins/notification-listener';
+import ServerConfig from './ServerConfig.vue';
 
 const serviceStatus = ref({
   isEnabled: false,

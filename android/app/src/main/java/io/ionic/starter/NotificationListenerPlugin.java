@@ -140,6 +140,58 @@ public class NotificationListenerPlugin extends Plugin {
         call.resolve(ret);
     }
 
+    @PluginMethod
+    public void testConnection(PluginCall call) {
+        // 在后台线程测试连接
+        new Thread(() -> {
+            try {
+                boolean isConnected = NotificationListenerService.testConnection();
+                
+                JSObject ret = new JSObject();
+                ret.put("success", isConnected);
+                ret.put("message", isConnected ? "服务器连接正常" : "服务器连接失败");
+                call.resolve(ret);
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error testing connection", e);
+                call.reject("测试连接失败: " + e.getMessage());
+            }
+        }).start();
+    }
+
+    @PluginMethod
+    public void getFailedRequests(PluginCall call) {
+        try {
+            JSONArray failedRequests = NotificationListenerService.getFailedRequests(getContext());
+            JSArray jsArray = JSArray.from(failedRequests);
+            
+            JSObject ret = new JSObject();
+            ret.put("failedRequests", jsArray);
+            ret.put("count", failedRequests.length());
+            call.resolve(ret);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting failed requests", e);
+            call.reject("获取失败请求失败: " + e.getMessage());
+        }
+    }
+
+    @PluginMethod
+    public void clearFailedRequests(PluginCall call) {
+        try {
+            NotificationListenerService.clearFailedRequests(getContext());
+            
+            JSObject ret = new JSObject();
+            ret.put("success", true);
+            ret.put("message", "已清除失败的请求");
+            call.resolve(ret);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error clearing failed requests", e);
+            call.reject("清除失败请求失败: " + e.getMessage());
+        }
+    }
+
     public static void sendNotificationToFrontend(StatusBarNotification sbn) {
         if (instance != null) {
             try {

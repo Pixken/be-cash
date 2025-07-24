@@ -12,6 +12,7 @@ declare module 'vue' {
     NotificationListener: typeof import('./components/NotificationListener.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    ServerConfig: typeof import('./components/ServerConfig.vue')['default']
     SvgIcon: typeof import('./components/common/svg-icon.vue')['default']
   }
 }

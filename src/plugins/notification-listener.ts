@@ -37,6 +37,21 @@ export interface NotificationListenerPlugin {
   getServiceStatus(): Promise<{ isEnabled: boolean; hasPermission: boolean }>;
 
   /**
+   * 测试服务器连接
+   */
+  testConnection(): Promise<{ success: boolean; message: string }>;
+
+  /**
+   * 获取发送失败的请求
+   */
+  getFailedRequests(): Promise<{ failedRequests: FailedRequest[]; count: number }>;
+
+  /**
+   * 清除失败的请求
+   */
+  clearFailedRequests(): Promise<{ success: boolean; message: string }>;
+
+  /**
    * 添加监听器，监听新通知
    */
   addListener(
@@ -59,6 +74,12 @@ export interface NotificationData {
   bigText?: string;
   postTime: number;
   timestamp: string;
+}
+
+export interface FailedRequest {
+  data: NotificationData;
+  timestamp: number;
+  retryCount: number;
 }
 
 const NotificationListener = registerPlugin<NotificationListenerPlugin>('NotificationListener');
