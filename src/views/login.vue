@@ -68,20 +68,19 @@ const login = () => {
     storage.setItem('access_token', res.data.access_token);
     storage.setItem('user_info', JSON.stringify(res.data.user));
 
-    // 设置认证信息
-    await NotificationListener.setAuthInfo({
-      userId: res.data.user.id,
-      token: res.data.access_token
-    });
-
     // 登录成功后，重试之前失败的通知请求
     try {
+      // 设置认证信息
+      await NotificationListener.setAuthInfo({
+        userId: res.data.user.id,
+        token: res.data.access_token
+      });
       await NotificationListener.retryFailedRequests();
       console.log('Successfully retried failed notification requests');
     } catch (error) {
       console.log('No failed requests to retry or retry failed:', error);
     }
-
+    
     router.push('/');
   }).catch(err => {
     console.log(err);
