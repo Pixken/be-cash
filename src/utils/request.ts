@@ -78,6 +78,8 @@ request.interceptors.response.use((response: AxiosResponse) => {
     return Promise.reject(response.data.info)
   }
 }, (error: any) => {
+  console.log(error,9090);
+  
   if (error.response.data.code === 401) {
     // window.location.href = '/login'
     router.push('/login')
