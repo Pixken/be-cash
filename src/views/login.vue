@@ -7,13 +7,15 @@
       <form action="" class="flex flex-col gap-6" @submit.prevent>
         <div class="flex flex-col gap-2">
           <input type="text" placeholder="请输入用户名" class="w-full p-2 outline-none" v-model="username"
-            @input="validateUsername">
-          <span class="text-sm text-red-500 pl-2">{{ usernameError }}</span>
+            @input="handleUsernameInput" @compositionstart="onCompositionStart"
+            @compositionend="onUsernameCompositionEnd" @change="validateUsername">
+          <span class="text-sm text-red-500 pl-2 h-2 block">{{ usernameError }}</span>
         </div>
         <div class="flex flex-col gap-2">
           <input type="password" placeholder="请输入密码" class="w-full p-2 outline-none" v-model="password"
-            @input="validatePassword">
-          <span class="text-sm text-red-500 pl-2">{{ passwordError }}</span>
+            @input="handlePasswordInput" @compositionstart="onCompositionStart"
+            @compositionend="onPasswordCompositionEnd" @change="validatePassword">
+          <span class="text-sm text-red-500 pl-2 h-2 block">{{ passwordError }}</span>
         </div>
         <button type="submit" class="w-full bg-blue-600 text-white rounded-full p-2 mt-4 tracking-widest"
           @click="login">登录</button>
@@ -38,6 +40,27 @@ const password = ref('');
 const usernameError = ref('');
 const passwordError = ref('');
 
+// 中文输入法组合状态
+const isComposing = ref(false);
+
+const onCompositionStart = () => {
+  isComposing.value = true;
+}
+
+const onUsernameCompositionEnd = (event: CompositionEvent) => {
+  isComposing.value = false;
+  // 组合输入结束后，确保 v-model 同步并验证
+  username.value = (event.target as HTMLInputElement).value;
+  validateUsername();
+}
+
+const onPasswordCompositionEnd = (event: CompositionEvent) => {
+  isComposing.value = false;
+  // 组合输入结束后，确保 v-model 同步并验证
+  password.value = (event.target as HTMLInputElement).value;
+  validatePassword();
+}
+
 const validateUsername = () => {
   if (!username.value) {
     usernameError.value = '请输入用户名';
@@ -51,6 +74,22 @@ const validatePassword = () => {
     passwordError.value = '请输入密码';
   } else {
     passwordError.value = '';
+  }
+}
+
+const handleUsernameInput = (event: Event) => {
+  // 在非组合输入状态下同步值并验证
+  if (!isComposing.value) {
+    username.value = (event.target as HTMLInputElement).value;
+    validateUsername();
+  }
+}
+
+const handlePasswordInput = (event: Event) => {
+  // 在非组合输入状态下同步值并验证
+  if (!isComposing.value) {
+    password.value = (event.target as HTMLInputElement).value;
+    validatePassword();
   }
 }
 
@@ -79,9 +118,14 @@ const login = () => {
       console.log('Successfully retried failed notification requests');
     } catch (error) {
       console.log('No failed requests to retry or retry failed:', error);
+    } finally {
+      setTimeout(() => {
+        console.log(storage.getItem('access_token'));
+        console.log(storage.getItem('user_info'));
+        router.push('/');
+      }, 1000);
     }
-    
-    router.push('/');
+
   }).catch(err => {
     console.log(err);
   })

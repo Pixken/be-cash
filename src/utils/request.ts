@@ -30,7 +30,7 @@ request.interceptors.request.use((config) => {
   // 在拦截器内部获取 store，确保 Pinia 已经初始化
   const userStore = useUserStore()
 
-  // config.headers['Authorization'] = `Bearer ${userStore.access_token}`
+  config.headers['Authorization'] = `Bearer ${storage.getItem('access_token')}`
 
   config.headers['X-User-ID'] = `${userStore.user.id?.value || userStore.user.id || ''}`
 
@@ -74,7 +74,7 @@ request.interceptors.response.use((response: AxiosResponse) => {
     return Promise.reject(response.data.info)
   }
 }, (error: any) => {
-  console.log(error,9090);
+  console.log(error,9090111);
   
   if (error.response.data.code === 401) {
     window.location.href = '/login'
