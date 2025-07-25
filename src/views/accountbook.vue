@@ -10,7 +10,7 @@
         总支出¥<span class="pr-2">{{ totalExpense }}</span>总收入¥<span>{{ totalIncome }}</span>
       </div>
     </ion-header>
-    <ion-content :fullscreen="true">
+    <ion-content>
       <div v-for="(computedAccountbook, key) in computedAccountbookList" :key="key" class="m-2 bg-white rounded-lg px-4 pt-6 pb-4">
         <div class="flex justify-between items-center mb-11">
           <span class="font-bold">{{ key }}</span>

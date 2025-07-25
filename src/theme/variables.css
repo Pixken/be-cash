@@ -6,7 +6,7 @@ http://ionicframework.com/docs/theming/ */
 
 /*设置安卓安全区域top高度 预留出状态栏区域*/
 :root {
-  --ion-safe-area-top: 20px;
+  --ion-safe-area-top: 24px;
   --ion-font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Roboto', sans-serif;
   --ion-background-color: #eaeaea;
 }
