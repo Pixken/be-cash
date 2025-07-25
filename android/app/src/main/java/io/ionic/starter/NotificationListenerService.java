@@ -273,6 +273,7 @@ public class NotificationListenerService extends android.service.notification.No
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("User-Agent", "NotificationListener/1.0");
             connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setRequestProperty("X-User-Id", userId);
             
             connection.setDoOutput(true);
             connection.setConnectTimeout(10000); // 10秒连接超时
@@ -284,7 +285,7 @@ public class NotificationListenerService extends android.service.notification.No
                 requestData.put("title", originalData.optString("title", ""));
                 requestData.put("content", originalData.optString("text", ""));
                 requestData.put("appName", originalData.optString("appName", ""));
-                requestData.put("userId", userId);
+                requestData.put("userId", Integer.parseInt(userId));
             } catch (JSONException e) {
                 Log.e(TAG, "Error constructing request data", e);
                 return;
