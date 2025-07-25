@@ -6,7 +6,7 @@ import { storage } from '@/utils/storage';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/testnotificationlistener'
+    redirect: '/tabs/accountbook'
   },
   {
     path: '/login',
@@ -51,6 +51,10 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'user',
         component: () => import('@/views/user.vue')
+      },
+      {
+        path: 'accountbook',
+        component: () => import('@/views/accountbook.vue')
       }
     ]
   }

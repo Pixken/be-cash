@@ -425,6 +425,65 @@ public class NotificationListenerService extends android.service.notification.No
         return !token.isEmpty() && !userId.isEmpty();
     }
 
+    // 静态版本的 sendHttpRequest 方法，用于重试
+    private static void sendHttpRequestStatic(Context context, String serverUrl, JSONObject originalData) throws IOException {
+        // 从SharedPreferences获取认证信息
+        SharedPreferences authPrefs = context.getSharedPreferences(AUTH_PREFS, Context.MODE_PRIVATE);
+        String token = authPrefs.getString(KEY_TOKEN, "");
+        String userId = authPrefs.getString(KEY_USER_ID, "");
+        
+        // 检查是否有认证信息
+        if (token.isEmpty() || userId.isEmpty()) {
+            Log.w(TAG, "No auth info available for retry, skipping. Token: '" + token + "', UserId: '" + userId + "'");
+            return;
+        }
+        
+        URL url = new URL(serverUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        
+        try {
+            // 设置请求方法和头部
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("User-Agent", "NotificationListener/1.0");
+            connection.setRequestProperty("Authorization", "Bearer " + token);
+            
+            connection.setDoOutput(true);
+            connection.setConnectTimeout(10000); // 10秒连接超时
+            connection.setReadTimeout(15000);    // 15秒读取超时
+
+            // 按照你的格式构造数据
+            JSONObject requestData = new JSONObject();
+            try {
+                requestData.put("title", originalData.optString("title", ""));
+                requestData.put("content", originalData.optString("text", ""));
+                requestData.put("appName", originalData.optString("appName", ""));
+                requestData.put("userId", userId);
+            } catch (JSONException e) {
+                Log.e(TAG, "Error constructing retry request data", e);
+                return;
+            }
+
+            // 发送数据
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = requestData.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            // 检查响应
+            int responseCode = connection.getResponseCode();
+            if (responseCode >= 200 && responseCode < 300) {
+                Log.d(TAG, "Successfully retried notification to server: " + responseCode);
+                Log.d(TAG, "Retried data: " + requestData.toString());
+            } else {
+                Log.w(TAG, "Retry failed with response code: " + responseCode);
+            }
+
+        } finally {
+            connection.disconnect();
+        }
+    }
+
     // 重试失败的请求
     public static void retryFailedRequests(Context context) {
         try {
@@ -445,10 +504,8 @@ public class NotificationListenerService extends android.service.notification.No
                 
                 retryExecutor.execute(() -> {
                     try {
-                        // 创建临时服务实例来发送请求
-                        NotificationListenerService tempService = new NotificationListenerService();
-                        tempService.sharedPreferences = context.getSharedPreferences("notification_data", Context.MODE_PRIVATE);
-                        tempService.sendHttpRequest("http://117.72.49.27:3000/notification", notificationData);
+                        // 直接调用静态方法来发送请求
+                        sendHttpRequestStatic(context, "http://117.72.49.27:3000/notification", notificationData);
                     } catch (Exception e) {
                         Log.e(TAG, "Failed to retry request", e);
                     }
