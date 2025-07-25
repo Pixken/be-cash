@@ -1,17 +1,11 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar>
-        <ion-title>通知监听</ion-title>
+        <ion-title size="large">通知监听</ion-title>
       </ion-toolbar>
     </ion-header>
-    
     <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">通知监听</ion-title>
-        </ion-toolbar>
-      </ion-header>
       <NotificationListener />
     </ion-content>
   </ion-page>

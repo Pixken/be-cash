@@ -104,6 +104,12 @@ const login = () => {
     password: password.value
   }
   post('/auth/login', params).then(async res => {
+    console.log('Login response:', res);
+    console.log('Login response data:', res.data);
+    console.log('User data:', res.data.user);
+    console.log('User ID:', res.data.user?.id);
+    console.log('Access token:', res.data.access_token ? '***' : 'null');
+
     storage.setItem('access_token', res.data.access_token);
     storage.setItem('user_info', JSON.stringify(res.data.user));
 
@@ -111,12 +117,36 @@ const login = () => {
     try {
       // 设置认证信息
       console.log('Setting auth info:', {
-        userId: res.data.user.id,
+        userId: res.data.user?.id,
         token: res.data.access_token ? '***' : 'null'
       });
 
+      // 尝试多种可能的 userId 字段
+      let userId = res.data.user?.id || res.data.user?.userId || res.data.user?.user_id || res.data.userId;
+
+      // 如果还是没有 userId，尝试从 JWT token 中解析
+      if (!userId && res.data.access_token) {
+        try {
+          const tokenParts = res.data.access_token.split('.');
+          if (tokenParts.length === 3) {
+            const payload = JSON.parse(atob(tokenParts[1]));
+            console.log('JWT payload:', payload);
+            userId = payload.sub || payload.userId || payload.user_id || payload.id;
+          }
+        } catch (e) {
+          console.log('Failed to parse JWT token:', e);
+        }
+      }
+
+      // 最后的备选方案
+      if (!userId) {
+        userId = String(res.data.user?.email) || 'unknown';
+      }
+
+      console.log('Final userId to use:', userId);
+
       const authResult = await NotificationListener.setAuthInfo({
-        userId: res.data.user.id,
+        userId: String(userId),
         token: res.data.access_token
       });
 
