@@ -32,7 +32,7 @@ request.interceptors.request.use((config) => {
 
   config.headers['Authorization'] = `Bearer ${storage.getItem('access_token')}`
 
-  config.headers['X-User-ID'] = `${userStore.user.id?.value || userStore.user.id || ''}`
+  config.headers['X-User-ID'] = `${userStore.user.id?.value || userStore.user.id || storage.getItem('user_info')?.id || ''}`
 
   // 添加API版本和时间戳防止缓存
   // if (config.method === 'get') {
