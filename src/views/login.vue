@@ -110,10 +110,22 @@ const login = () => {
     // 登录成功后，重试之前失败的通知请求
     try {
       // 设置认证信息
-      await NotificationListener.setAuthInfo({
+      console.log('Setting auth info:', {
+        userId: res.data.user.id,
+        token: res.data.access_token ? '***' : 'null'
+      });
+
+      const authResult = await NotificationListener.setAuthInfo({
         userId: res.data.user.id,
         token: res.data.access_token
       });
+
+      console.log('Auth info set result:', authResult);
+
+      // 调试：检查认证信息是否正确保存
+      const debugInfo = await NotificationListener.debugAuthInfo();
+      console.log('Debug auth info:', debugInfo);
+
       await NotificationListener.retryFailedRequests();
       console.log('Successfully retried failed notification requests');
     } catch (error) {

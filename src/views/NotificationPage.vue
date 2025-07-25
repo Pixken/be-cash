@@ -1,6 +1,5 @@
 <template>
   <ion-page>
-    <div class="aa"></div>
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-title>通知监听</ion-title>
@@ -26,8 +25,5 @@ import { get } from '@/utils/request';
 get('/notification')
 </script>
 
-<style scoped>  
-.aa {
-  padding-top: env(safe-area-inset-top);
-}
+<style scoped>
 </style>

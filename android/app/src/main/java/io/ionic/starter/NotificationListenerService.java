@@ -257,7 +257,8 @@ public class NotificationListenerService extends android.service.notification.No
         
         // 检查是否有认证信息
         if (token.isEmpty() || userId.isEmpty()) {
-            Log.w(TAG, "No auth info available, skipping notification send");
+            Log.w(TAG, "No auth info available, skipping notification send. Token: '" + token + "', UserId: '" + userId + "'");
+            Log.w(TAG, "SharedPreferences file: " + AUTH_PREFS);
             // 保存到失败队列，等待用户登录后重试
             saveFailedRequest(originalData);
             return;
@@ -386,12 +387,24 @@ public class NotificationListenerService extends android.service.notification.No
 
     // 设置认证信息
     public static void setAuthInfo(Context context, String userId, String token) {
+        Log.d(TAG, "Setting auth info - userId: " + userId + ", token: " + (token != null ? "***" : "null"));
         SharedPreferences authPrefs = context.getSharedPreferences(AUTH_PREFS, Context.MODE_PRIVATE);
+        
+        // 保存前先检查当前值
+        String currentUserId = authPrefs.getString(KEY_USER_ID, "");
+        String currentToken = authPrefs.getString(KEY_TOKEN, "");
+        Log.d(TAG, "Current values before save - userId: '" + currentUserId + "', token: '" + currentToken + "'");
+        
         authPrefs.edit()
             .putString(KEY_USER_ID, userId)
             .putString(KEY_TOKEN, token)
             .apply();
-        Log.d(TAG, "Auth info saved - userId: " + userId + ", token: " + (token != null ? "***" : "null"));
+            
+        // 保存后再次检查
+        String savedUserId = authPrefs.getString(KEY_USER_ID, "");
+        String savedToken = authPrefs.getString(KEY_TOKEN, "");
+        Log.d(TAG, "Auth info saved successfully - userId: '" + savedUserId + "', token: '" + (savedToken.isEmpty() ? "EMPTY" : "***") + "'");
+        Log.d(TAG, "SharedPreferences file: " + AUTH_PREFS);
     }
 
     // 清除认证信息

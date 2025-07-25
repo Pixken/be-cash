@@ -62,6 +62,11 @@ export interface NotificationListenerPlugin {
   retryFailedRequests(): Promise<{ success: boolean; message: string }>;
 
   /**
+   * 调试认证信息
+   */
+  debugAuthInfo(): Promise<{ hasAuthInfo: boolean; userId: string; tokenExists: boolean; tokenLength: number }>;
+
+  /**
    * 添加监听器，监听新通知
    */
   addListener(

@@ -35,7 +35,10 @@ public class NotificationListenerPlugin extends Plugin {
             String userId = call.getString("userId");
             String token = call.getString("token");
             
+            Log.d(TAG, "Plugin setAuthInfo called with userId: " + userId + ", token: " + (token != null ? "***" : "null"));
+            
             if (userId == null || token == null) {
+                Log.e(TAG, "userId or token is null - userId: " + userId + ", token: " + token);
                 call.reject("userId和token不能为空");
                 return;
             }
@@ -236,6 +239,26 @@ public class NotificationListenerPlugin extends Plugin {
         } catch (Exception e) {
             Log.e(TAG, "Error retrying failed requests", e);
             call.reject("重试失败请求失败: " + e.getMessage());
+        }
+    }
+
+    @PluginMethod
+    public void debugAuthInfo(PluginCall call) {
+        try {
+            android.content.SharedPreferences authPrefs = getContext().getSharedPreferences("auth_data", Context.MODE_PRIVATE);
+            String token = authPrefs.getString("token", "");
+            String userId = authPrefs.getString("userId", "");
+            
+            JSObject ret = new JSObject();
+            ret.put("hasAuthInfo", NotificationListenerService.hasAuthInfo(getContext()));
+            ret.put("userId", userId);
+            ret.put("tokenExists", !token.isEmpty());
+            ret.put("tokenLength", token.length());
+            call.resolve(ret);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error debugging auth info", e);
+            call.reject("调试认证信息失败: " + e.getMessage());
         }
     }
 
