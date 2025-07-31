@@ -18,3 +18,13 @@ export interface BillDTO {
   userId: string;
   accountId: string;
 }
+
+export interface AccountbookItem {
+  id: number
+  description: string
+  amount: number
+  type: 'income' | 'expense'
+  time: string
+  category: string
+  appName: string
+}

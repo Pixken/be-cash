@@ -11,6 +11,9 @@
       </div>
     </ion-header>
     <ion-content>
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
       <div v-for="(computedAccountbook, key) in computedAccountbookList" :key="key" class="m-2 bg-white rounded-lg px-4 pt-6 pb-4">
         <div class="flex justify-between items-center mb-11">
           <span class="font-bold">{{ key }}</span>
@@ -27,7 +30,7 @@
         </div>
         <template  v-for="(accountbook, index) in computedAccountbook" :key="accountbook.id">
           <div class="w-full h-[1px] bg-gray-200" v-if="index !== 0"></div>
-          <div class="flex justify-between h-10 gap-3 mt-5 accountbook">
+          <div class="flex justify-between h-10 gap-3 mt-5 accountbook" @click="handleDetail(accountbook)">
             <div class="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-full">
               <img src="@/assets/money.svg" alt="" class="w-7 h-7">
             </div>
@@ -44,43 +47,14 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonRefresher, IonRefresherContent, onIonViewDidEnter } from '@ionic/vue';
 import { getBill } from '@/api/bill';
+import { useRouter } from 'vue-router';
+import { AccountbookItem } from '@/types/bill';
 
-interface AccountbookItem {
-  id: number
-  description: string
-  amount: number
-  type: 'income' | 'expense'
-  time: string
-  category: string
-}
+const router = useRouter()
 
-const accountbookList = ref<AccountbookItem[]>([
-  {
-    id: 1,
-    description: '餐饮',
-    amount: 100,
-    type: 'expense',
-    time: '2025-01-01 12:00:00',
-    category: '餐饮',
-  },{
-    id: 1,
-    description: '餐饮urweuieui=葳蕤味儿顾问肉丸就让',
-    amount: 100,
-    type: 'expense',
-    time: '2025-01-01 12:00:00',
-    category: '餐饮',
-  },
-  {
-    id: 2,
-    description: '工资',
-    amount: 10000,
-    type: 'income',
-    time: '2025-04-01 12:00:00',
-    category: '工资',
-  },
-])
+const accountbookList = ref<AccountbookItem[]>([])
 
 const getTime = (time: string) => {
   const date = new Date(time)
@@ -111,14 +85,41 @@ const totalExpense = computed(() => {
   return accountbookList.value.filter(item => item.type === 'expense').reduce((acc, item) => acc + item.amount, 0).toFixed(2)
 })
 
-onMounted(async () => {
+const handleRefresh = async (event: any) => {
+  console.log('refreshed');
+  try {
+    await getBillList()
+  } finally {
+    event.target.complete();
+  }
+}
+
+const getBillList = async () => {
   const res = await getBill()
   accountbookList.value = res.data.map((item: any) => ({
     ...item,
     time: item.date,
     category: item.name,
   }))
-  console.log(accountbookList.value);
+}
+
+const handleDetail = (accountbook: AccountbookItem) => {
+  router.push({
+    path: '/a',
+    query: {
+      id: accountbook.id,
+      description: accountbook.description,
+      amount: accountbook.amount,
+      type: accountbook.type,
+      time: accountbook.time,
+      appName: accountbook.appName,
+      category: accountbook.category
+    }
+  })
+}
+
+onIonViewDidEnter(async () => {
+  await getBillList()
 })
 </script>
 

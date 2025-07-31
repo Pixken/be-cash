@@ -6,13 +6,13 @@
     <div class="mt-12">
       <form action="" class="flex flex-col gap-6" @submit.prevent>
         <div class="flex flex-col gap-2">
-          <input type="text" placeholder="请输入用户名" class="w-full p-2 outline-none" v-model="username"
+          <input type="text" placeholder="请输入用户名" class="w-full p-2 outline-none bg-transparent" v-model="username"
             @input="handleUsernameInput" @compositionstart="onCompositionStart"
             @compositionend="onUsernameCompositionEnd" @change="validateUsername">
           <span class="text-sm text-red-500 pl-2 h-2 block">{{ usernameError }}</span>
         </div>
         <div class="flex flex-col gap-2">
-          <input type="password" placeholder="请输入密码" class="w-full p-2 outline-none" v-model="password"
+          <input type="password" placeholder="请输入密码" class="w-full p-2 outline-none bg-transparent" v-model="password"
             @input="handlePasswordInput" @compositionstart="onCompositionStart"
             @compositionend="onPasswordCompositionEnd" @change="validatePassword">
           <span class="text-sm text-red-500 pl-2 h-2 block">{{ passwordError }}</span>
@@ -104,22 +104,11 @@ const login = () => {
     password: password.value
   }
   post('/auth/login', params).then(async res => {
-    console.log('Login response:', res);
-    console.log('Login response data:', res.data);
-    console.log('User data:', res.data.user);
-    console.log('User ID:', res.data.user?.id);
-    console.log('Access token:', res.data.access_token ? '***' : 'null');
-
     storage.setItem('access_token', res.data.access_token);
     storage.setItem('user_info', JSON.stringify(res.data.user));
 
     // 登录成功后，重试之前失败的通知请求
     try {
-      // 设置认证信息
-      console.log('Setting auth info:', {
-        userId: res.data.user?.id,
-        token: res.data.access_token ? '***' : 'null'
-      });
 
       // 尝试多种可能的 userId 字段
       let userId = res.data.user?.id || res.data.user?.userId || res.data.user?.user_id || res.data.userId;
