@@ -6,7 +6,7 @@ import { storage } from '@/utils/storage'
 import emitter from './emitter'
 export interface ApiResponse<T> {
   info: string
-  code: string
+  code: number
   data: T
 }
 

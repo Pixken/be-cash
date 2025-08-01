@@ -32,8 +32,16 @@
             </div>
           </div>
         </div>
-        <div class="">
-          shanhu 
+        <div class="flex justify-between items-center">
+          <button class="text-red-500 text-sm flex-1 h-14 flex justify-center items-center gap-2" @click="handleDelete">
+            <svg-icon :icon="'material-symbols:delete-outline'" color="#ef4444" size="20" class="mt-[1px]"></svg-icon>
+            <span>删除</span>
+          </button>
+          <div class="h-4 w-[1px] bg-gray-200"></div>
+          <button class="text-sm flex-1 h-14 flex justify-center items-center gap-2">
+            <svg-icon :icon="'ri:edit-line'" color="#000000" size="20" class="mt-[1px]"></svg-icon>
+            <span>编辑</span>
+          </button>
         </div>
       </div>
     </ion-content>
@@ -41,11 +49,14 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonRefresher, IonRefresherContent, IonBackButton, IonButtons } from '@ionic/vue';
-import { useRoute } from 'vue-router'
+import { IonContent, IonHeader, IonPage, IonToolbar, IonBackButton, IonButtons, alertController } from '@ionic/vue';
+import { useRoute, useRouter } from 'vue-router'
 import { AccountbookItem } from '@/types/bill'
+import { deleteBill } from '@/api/bill';
+import emitter from '@/utils/emitter';
 
 const route = useRoute()
+const router = useRouter()
 
 const data = ref<AccountbookItem>()
 
@@ -58,8 +69,37 @@ data.value = {
   appName: route.query.appName as unknown as string,
   category: route.query.category as unknown as string
 }
+
+const handleDelete = async () => {
+  const alert = await alertController.create({
+    subHeader: '确认是否删除该账单？',
+    buttons: [{
+      text: '取消',
+      role: 'cancel',
+      cssClass: 'alert-button-cancel'
+    }, {
+      text: '删除',
+      role: 'destructive',
+      cssClass: 'alert-button-confirm',
+      handler: async () => {
+        const res = await deleteBill(data.value?.id as number)
+        console.log(res);
+        if (res.code === 200) {
+          router.back()
+          emitter.emit('message', { msg: '删除成功', type: 'success' })
+        }
+      }
+    }],
+  })
+  await alert.present()
+}
 </script>
 
-<style scoped>
-
+<style>
+button.alert-button.alert-button-confirm {
+  color: #ef4444;
+}
+button.alert-button.alert-button-cancel {
+  color: #666666;
+}
 </style>
