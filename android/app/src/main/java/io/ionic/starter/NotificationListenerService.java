@@ -285,7 +285,7 @@ public class NotificationListenerService extends android.service.notification.No
                 requestData.put("title", originalData.optString("title", ""));
                 requestData.put("content", originalData.optString("text", ""));
                 requestData.put("appName", originalData.optString("appName", ""));
-                requestData.put("time", originalData.optString("postTime", ""));
+                requestData.put("time", originalData.optString("timestamp", ""));
                 requestData.put("userId", Integer.parseInt(userId));
             } catch (JSONException e) {
                 Log.e(TAG, "Error constructing request data", e);
