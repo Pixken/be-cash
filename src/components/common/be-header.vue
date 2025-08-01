@@ -13,22 +13,20 @@ defineProps<{
 </script>
 
 <template>
-  <ion-header class="ion-no-border relative border-b border-gray-200 h-20 flex items-center">
-    <div>
-      <ion-back-button :icon="chevronBackOutline" v-if="showBack" class="text-gray-500 mt-[36px]"
-        @click="router.back()"></ion-back-button>
-      <slot name="start" v-else></slot>
-    </div>
+  <ion-header class="ion-no-border">
+    <ion-toolbar class="relative">
+      <ion-buttons slot="start">
+        <ion-back-button :icon="chevronBackOutline" v-if="showBack" @click="router.back()"></ion-back-button>
+        <slot name="start" v-else></slot>
+      </ion-buttons>
+      
+      <div class="absolute left-[50%] translate-x-[-50%] top-[50%] translate-y-[-50%]">
+        <slot></slot>
+      </div>
 
-    <div class="absolute left-[50%] translate-x-[-50%] top-[50%] translate-y-[-50%] font-semibold text-lg content-wapper">
-      <span v-if="title">{{ title }}</span>
-      <slot v-else />
-    </div>
-
-    <div>
-      <slot name="end"></slot>
-      <ion-icon :icon="closeOutline" v-if="close" class="text-gray-500 absolute top-1/2 -translate-y-1/2 right-4"
-        @click="close" />
-    </div>
+      <ion-buttons slot="end">
+        <slot name="end"></slot>
+      </ion-buttons>
+    </ion-toolbar>
   </ion-header>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { IonPage, IonRouterOutlet, IonTabs, IonTabBar, IonTabButton, IonLabel, IonIcon } from '@ionic/vue'
-import { wallet } from 'ionicons/icons';
+import { wallet, settings } from 'ionicons/icons';
 </script>
 
 <template>
@@ -11,6 +11,10 @@ import { wallet } from 'ionicons/icons';
         <ion-tab-button tab="accountbook" href="/tabs/accountbook" style="--color-selected: #3b82f6; --background: #fff;">
           <ion-icon :icon="wallet" size="large" />
           <ion-label class="text-xs">账本</ion-label>
+        </ion-tab-button>
+        <ion-tab-button tab="setting" href="/tabs/setting" style="--color-selected: #3b82f6; --background: #fff;">
+          <ion-icon :icon="settings" size="large" />
+          <ion-label class="text-xs">设置</ion-label>
         </ion-tab-button>
       </ion-tab-bar>
     </ion-tabs>

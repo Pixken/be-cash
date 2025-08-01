@@ -1,6 +1,7 @@
 import { get, post } from "@/utils/request"
 import useUserStore from "@/store/user"
 import { Password } from "@/types"
+import { storage } from "@/utils/storage"
 
 export const login = (data: any) => {
   return post('/identity/login', data)
@@ -14,8 +15,11 @@ export const refreshToken = () => {
     refreshToken: userStore.refresh_token
   })
 }
-export const userInfo = () => {
-  return get('/identity/user/info')
+export const userInfo = (id: number) => {
+  return get(`/user/${id}`)
+}
+export const updateBalance = (id: number, data: { balance: number }) => {
+  return post(`/user/${id}/balance`, data)
 }
 export const getCaptcha = () => {
   return get('/identity/captcha')

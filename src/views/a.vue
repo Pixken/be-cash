@@ -1,12 +1,6 @@
 <template>
   <ion-page>
-    <ion-header class="ion-no-border">
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-back-button></ion-back-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
+    <be-header :show-back="true" />
     <ion-content>
       <div class="bg-white m-3 rounded-md px-6">
         <div class="py-12 border-b">
@@ -15,20 +9,20 @@
               <div class="bg-blue-500 w-fit p-[2px] rounded-full"><img src="@/assets/money.svg" alt="" class="w-5 h-5"></img></div>
               <span class="text-sm">{{  data?.category || '其他'  }}</span>
             </div>
-            <div class="text-4xl font-semibold">{{ data?.type === 'income' ? '+' : '-' + data?.amount }}</div>
+            <div class="text-4xl font-semibold">{{ (data?.type === 'income' ? '+' : '-') + data?.amount }}</div>
           </div>
           <div class="flex flex-col gap-2">
-            <div>
+            <div class="flex">
               <span class="text-gray-400 text-sm inline-block w-20">记录时间</span>
-              <span class="text-sm">{{ new Date(data?.time as string).toLocaleString().replace('/', '年').replace('/', '月').replace(' ', '日 ') }}</span>
+              <span class="text-sm flex-1">{{ new Date(data?.time as string).toLocaleString().replace('/', '年').replace('/', '月').replace(' ', '日 ') }}</span>
             </div>
-            <div>
+            <div class="flex">
               <span class="text-gray-400 text-sm inline-block w-20">应用来源</span>
-              <span class="text-sm">{{ data?.appName || '未知' }}</span>
+              <span class="text-sm flex-1">{{ data?.appName || '未知' }}</span>
             </div>
-            <div>
+            <div class="flex">
               <span class="text-gray-400 text-sm inline-block w-20">备注</span>
-              <span class="text-sm">{{ data?.description }}</span>
+              <span class="text-sm flex-1">{{ data?.description }}</span>
             </div>
           </div>
         </div>
@@ -36,6 +30,11 @@
           <button class="text-red-500 text-sm flex-1 h-14 flex justify-center items-center gap-2" @click="handleDelete">
             <svg-icon :icon="'material-symbols:delete-outline'" color="#ef4444" size="20" class="mt-[1px]"></svg-icon>
             <span>删除</span>
+          </button>
+          <div class="h-4 w-[1px] bg-gray-200"></div>
+          <button class="text-red-500 text-sm flex-1 h-14 flex justify-center items-center gap-2" @click="handleDeleteNoEffect">
+            <svg-icon :icon="'material-symbols:delete-outline'" color="#ef4444" size="20" class="mt-[1px]"></svg-icon>
+            <span>移除</span>
           </button>
           <div class="h-4 w-[1px] bg-gray-200"></div>
           <button class="text-sm flex-1 h-14 flex justify-center items-center gap-2">
@@ -49,10 +48,10 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonToolbar, IonBackButton, IonButtons, alertController } from '@ionic/vue';
+import { IonContent, IonPage, alertController } from '@ionic/vue';
 import { useRoute, useRouter } from 'vue-router'
 import { AccountbookItem } from '@/types/bill'
-import { deleteBill } from '@/api/bill';
+import { deleteBill, deleteNoEffectBill } from '@/api/bill';
 import emitter from '@/utils/emitter';
 
 const route = useRoute()
@@ -72,12 +71,12 @@ data.value = {
 
 const handleDelete = async () => {
   const alert = await alertController.create({
-    subHeader: '确认是否删除该账单？',
+    subHeader: '确认是否删除该账单（影响余额）？',
     buttons: [{
       text: '取消',
       role: 'cancel',
       cssClass: 'alert-button-cancel'
-    }, {
+    },  {
       text: '删除',
       role: 'destructive',
       cssClass: 'alert-button-confirm',
@@ -87,6 +86,30 @@ const handleDelete = async () => {
         if (res.code === 200) {
           router.back()
           emitter.emit('message', { msg: '删除成功', type: 'success' })
+        }
+      }
+    }],
+  })
+  await alert.present()
+}
+
+const handleDeleteNoEffect = async () => {
+  const alert = await alertController.create({
+    subHeader: '确认是否移除该账单（不影响余额）？',
+    buttons: [{
+      text: '取消',
+      role: 'cancel',
+      cssClass: 'alert-button-cancel'
+    },  {
+      text: '移除',
+      role: 'destructive',
+      cssClass: 'alert-button-confirm',
+      handler: async () => {
+        const res = await deleteNoEffectBill(data.value?.id as number)
+        console.log(res);
+        if (res.code === 200) {
+          router.back()
+          emitter.emit('message', { msg: '移除成功', type: 'success' })
         }
       }
     }],

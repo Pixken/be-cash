@@ -2,11 +2,14 @@
   <ion-page>
     <ion-header class="ion-no-border">
       <ion-toolbar>
-        <ion-title size="large">
+        <ion-title>
           <div class="w-full text-center text-white font-bold">记账本</div>
         </ion-title>
       </ion-toolbar>
       <div class="bg-blue-500 text-white py-3 px-5 text-sm font-bold">
+        <div>
+          总余额¥<span>{{ totalBalance }}</span>
+        </div>
         总支出¥<span class="pr-2">{{ totalExpense }}</span>总收入¥<span>{{ totalIncome }}</span>
       </div>
     </ion-header>
@@ -42,6 +45,9 @@
           </div>
         </template>
       </div>
+      <div v-if="!accountbookList.length" class="w-full h-full flex justify-center items-center text-gray-500">
+        暂无数据
+      </div>
     </ion-content>
   </ion-page>
 </template>
@@ -49,8 +55,10 @@
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonRefresher, IonRefresherContent, onIonViewDidEnter } from '@ionic/vue';
 import { getBill } from '@/api/bill';
+import { userInfo } from '@/api/user';
 import { useRouter } from 'vue-router';
 import { AccountbookItem } from '@/types/bill';
+import { storage } from '@/utils/storage';
 
 const router = useRouter()
 
@@ -85,6 +93,8 @@ const totalExpense = computed(() => {
   return accountbookList.value.filter(item => item.type === 'expense').reduce((acc, item) => acc + item.amount, 0).toFixed(2)
 })
 
+const totalBalance = ref(0)
+
 const handleRefresh = async (event: any) => {
   console.log('refreshed');
   try {
@@ -118,8 +128,14 @@ const handleDetail = (accountbook: AccountbookItem) => {
   })
 }
 
+const getBalance = async () => {
+  const res = await userInfo(storage.getItem('user_info')?.id)
+  totalBalance.value = (res.data.balance || 0).toFixed(2)
+}
+
 onIonViewDidEnter(async () => {
   await getBillList()
+  await getBalance()
 })
 </script>
 

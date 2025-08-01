@@ -7,3 +7,7 @@ export const getBill = async () => {
 export const deleteBill = async (id: number) => {
   return del(`/bill/${id}`)
 }
+
+export const deleteNoEffectBill = async (id: number) => {
+  return del(`/bill/${id}/no-effect`)
+}
